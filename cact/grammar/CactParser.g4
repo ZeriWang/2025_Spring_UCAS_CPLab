@@ -22,13 +22,13 @@ variableDeclaration: basicType variableDeclaration (Comma variableDefinition)* S
 // 变量定义: VarDef → Ident { '[' IntConst ']' } [ '=' ConstInitVal ]
 variableDefinition: Identifier (LeftBracket IntegerConstant RightBracket)* (Equal constantInitializationValue)?;
 // 函数定义FuncDef → FuncType Ident '(' [FuncFParams] ')' Block
-functionDefinition: functionType Identifier LeftParenthesis (functionParameters)? RightParenthesis block;
+functionDefinition: functionType Identifier LeftParenthesis (functionFormalParameters)? RightParenthesis block;
 // 函数类型FuncType → 'void' | 'int' | 'float' | 'char'
-fuctionType: Void | Int | Float | Char;
+functionType: Void | Int | Float | Char;
 // 形参列表FuncFParams → FuncFParam { ',' FuncFParam }
 functionFormalParameters: functionFormalParameter (Comma functionFormalParameter)*;
 // 函数形参FuncFParam → BType Ident [ '[' IntConst? ']' { '[' IntConst ']' } ]
-fucntionFormalParameter: basicType Identifier (LeftBracket IntegerConstant? RightBracket (LeftBracket IntegerConstant RightBracket)*)?;
+functionFormalParameter: basicType Identifier (LeftBracket IntegerConstant? RightBracket (LeftBracket IntegerConstant RightBracket)*)?;
 
 // statement & expression
 // 语句块: Block → '{' { BlockItem } '}'
@@ -55,7 +55,7 @@ leftValue: Identifier (LeftBracket expression RightBracket)*;
 // 数值Number → IntConst | CharConst | FloatConst
 number: IntegerConstant | CharacterConstant | FloatConstant;
 // 函数实参表FuncRParams → Exp { ',' Exp }
-fuctionRealParameters: expression (Comma expression)*;
+functionRealParameters: expression (Comma expression)*;
 // PrimaryExp → '(' Exp ')' | LVal | Number
 primaryExpression: LeftParenthesis expression RightParenthesis
                   | leftValue
@@ -63,7 +63,7 @@ primaryExpression: LeftParenthesis expression RightParenthesis
 // UnaryExp → PrimaryExp | ('+' | '-' | '!') UnaryExp | Ident '(' [ FuncRParams ] ')' 注：'!'仅出现在条件表达式中
 unaryExpression: primaryExpression
                 | (Plus | Minus | ExclamationMark) unaryExpression
-                | Identifier LeftParenthesis (fuctionRealParameters)? RightParenthesis;
+                | Identifier LeftParenthesis (functionRealParameters)? RightParenthesis;
 // MulExp → UnaryExp | MulExp (' *' | '/' | '%') UnaryExp
 multiplicativeExpression: unaryExpression | multiplicativeExpression (Asterisk | Slash | Percent) unaryExpression;
 // AddExp → MulExp | AddExp ('+'|'-') MulExp
