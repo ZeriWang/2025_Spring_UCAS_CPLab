@@ -1,10 +1,8 @@
 lexer grammar CactLexer;
 
 // Keywords
-BooleanConstant: 'true' | 'false' ;
 Const: 'const' ;
-Bool: 'bool' ;
-Int32: 'int' ;
+Int: 'int' ;
 Float: 'float' ;
 Char: 'char' ;
 Void: 'void' ;
