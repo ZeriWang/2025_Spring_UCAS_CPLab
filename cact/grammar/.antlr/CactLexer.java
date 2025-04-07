@@ -1,4 +1,4 @@
-// Generated from /home/zeriwang/2025Spring/CPLab/2025_Spring_UCAS_CPLab/cact/grammar/CactLexer.g4 by ANTLR 4.13.1
+// Generated from /Users/yaoyongzhou/work/25spring/2025_Spring_UCAS_CPLab/cact/grammar/CactLexer.g4 by ANTLR 4.13.1
 import org.antlr.v4.runtime.Lexer;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.Token;

@@ -14,11 +14,11 @@ constantDeclaration: Const basicType constantDefinition (Comma constantDefinitio
 // 基本类型: BType → 'int' | 'float' | 'char'
 basicType: Int | Float | Char;
 // 常量定义: ConstDef → Ident { '[' IntConst ']' } '=' ConstInitVal
-constantDefinition: Identifier (LeftBracket IntegerConstant RightBracket)? Equal constantInitializationValue;
+constantDefinition: Identifier (LeftBracket IntegerConstant RightBracket)* Equal constantInitializationValue;
 // 初始值: ConstInitVal → ConstExp | '{' [ ConstInitVal { ',' ConstInitVal } ] '}'
 constantInitializationValue: constantExpression | LeftBrace (constantInitializationValue (Comma constantInitializationValue)*)? RightBrace;
 // 变量声明: VarDecl → BType VarDef { ',' VarDef } ';'
-variableDeclaration: basicType variableDeclaration (Comma variableDefinition)* Semicolon;
+variableDeclaration: basicType variableDefinition (Comma variableDefinition)* Semicolon;
 // 变量定义: VarDef → Ident { '[' IntConst ']' } [ '=' ConstInitVal ]
 variableDefinition: Identifier (LeftBracket IntegerConstant RightBracket)* (Equal constantInitializationValue)?;
 // 函数定义FuncDef → FuncType Ident '(' [FuncFParams] ')' Block
