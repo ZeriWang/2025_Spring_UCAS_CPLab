@@ -1,0 +1,866 @@
+[
+{
+  "directory": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/build",
+  "command": "/Library/Developer/CommandLineTools/usr/bin/c++  -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/grammar -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/src -g -std=gnu++17 -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX15.4.sdk   -w -g -o CMakeFiles/antlr.dir/deps/antlr4-runtime/ANTLRErrorListener.cpp.o -c /Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/ANTLRErrorListener.cpp",
+  "file": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/ANTLRErrorListener.cpp",
+  "output": "CMakeFiles/antlr.dir/deps/antlr4-runtime/ANTLRErrorListener.cpp.o"
+},
+{
+  "directory": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/build",
+  "command": "/Library/Developer/CommandLineTools/usr/bin/c++  -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/grammar -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/src -g -std=gnu++17 -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX15.4.sdk   -w -g -o CMakeFiles/antlr.dir/deps/antlr4-runtime/ANTLRErrorStrategy.cpp.o -c /Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/ANTLRErrorStrategy.cpp",
+  "file": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/ANTLRErrorStrategy.cpp",
+  "output": "CMakeFiles/antlr.dir/deps/antlr4-runtime/ANTLRErrorStrategy.cpp.o"
+},
+{
+  "directory": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/build",
+  "command": "/Library/Developer/CommandLineTools/usr/bin/c++  -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/grammar -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/src -g -std=gnu++17 -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX15.4.sdk   -w -g -o CMakeFiles/antlr.dir/deps/antlr4-runtime/ANTLRFileStream.cpp.o -c /Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/ANTLRFileStream.cpp",
+  "file": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/ANTLRFileStream.cpp",
+  "output": "CMakeFiles/antlr.dir/deps/antlr4-runtime/ANTLRFileStream.cpp.o"
+},
+{
+  "directory": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/build",
+  "command": "/Library/Developer/CommandLineTools/usr/bin/c++  -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/grammar -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/src -g -std=gnu++17 -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX15.4.sdk   -w -g -o CMakeFiles/antlr.dir/deps/antlr4-runtime/ANTLRInputStream.cpp.o -c /Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/ANTLRInputStream.cpp",
+  "file": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/ANTLRInputStream.cpp",
+  "output": "CMakeFiles/antlr.dir/deps/antlr4-runtime/ANTLRInputStream.cpp.o"
+},
+{
+  "directory": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/build",
+  "command": "/Library/Developer/CommandLineTools/usr/bin/c++  -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/grammar -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/src -g -std=gnu++17 -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX15.4.sdk   -w -g -o CMakeFiles/antlr.dir/deps/antlr4-runtime/BailErrorStrategy.cpp.o -c /Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/BailErrorStrategy.cpp",
+  "file": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/BailErrorStrategy.cpp",
+  "output": "CMakeFiles/antlr.dir/deps/antlr4-runtime/BailErrorStrategy.cpp.o"
+},
+{
+  "directory": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/build",
+  "command": "/Library/Developer/CommandLineTools/usr/bin/c++  -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/grammar -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/src -g -std=gnu++17 -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX15.4.sdk   -w -g -o CMakeFiles/antlr.dir/deps/antlr4-runtime/BaseErrorListener.cpp.o -c /Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/BaseErrorListener.cpp",
+  "file": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/BaseErrorListener.cpp",
+  "output": "CMakeFiles/antlr.dir/deps/antlr4-runtime/BaseErrorListener.cpp.o"
+},
+{
+  "directory": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/build",
+  "command": "/Library/Developer/CommandLineTools/usr/bin/c++  -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/grammar -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/src -g -std=gnu++17 -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX15.4.sdk   -w -g -o CMakeFiles/antlr.dir/deps/antlr4-runtime/BufferedTokenStream.cpp.o -c /Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/BufferedTokenStream.cpp",
+  "file": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/BufferedTokenStream.cpp",
+  "output": "CMakeFiles/antlr.dir/deps/antlr4-runtime/BufferedTokenStream.cpp.o"
+},
+{
+  "directory": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/build",
+  "command": "/Library/Developer/CommandLineTools/usr/bin/c++  -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/grammar -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/src -g -std=gnu++17 -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX15.4.sdk   -w -g -o CMakeFiles/antlr.dir/deps/antlr4-runtime/CharStream.cpp.o -c /Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/CharStream.cpp",
+  "file": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/CharStream.cpp",
+  "output": "CMakeFiles/antlr.dir/deps/antlr4-runtime/CharStream.cpp.o"
+},
+{
+  "directory": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/build",
+  "command": "/Library/Developer/CommandLineTools/usr/bin/c++  -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/grammar -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/src -g -std=gnu++17 -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX15.4.sdk   -w -g -o CMakeFiles/antlr.dir/deps/antlr4-runtime/CommonToken.cpp.o -c /Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/CommonToken.cpp",
+  "file": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/CommonToken.cpp",
+  "output": "CMakeFiles/antlr.dir/deps/antlr4-runtime/CommonToken.cpp.o"
+},
+{
+  "directory": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/build",
+  "command": "/Library/Developer/CommandLineTools/usr/bin/c++  -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/grammar -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/src -g -std=gnu++17 -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX15.4.sdk   -w -g -o CMakeFiles/antlr.dir/deps/antlr4-runtime/CommonTokenFactory.cpp.o -c /Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/CommonTokenFactory.cpp",
+  "file": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/CommonTokenFactory.cpp",
+  "output": "CMakeFiles/antlr.dir/deps/antlr4-runtime/CommonTokenFactory.cpp.o"
+},
+{
+  "directory": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/build",
+  "command": "/Library/Developer/CommandLineTools/usr/bin/c++  -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/grammar -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/src -g -std=gnu++17 -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX15.4.sdk   -w -g -o CMakeFiles/antlr.dir/deps/antlr4-runtime/CommonTokenStream.cpp.o -c /Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/CommonTokenStream.cpp",
+  "file": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/CommonTokenStream.cpp",
+  "output": "CMakeFiles/antlr.dir/deps/antlr4-runtime/CommonTokenStream.cpp.o"
+},
+{
+  "directory": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/build",
+  "command": "/Library/Developer/CommandLineTools/usr/bin/c++  -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/grammar -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/src -g -std=gnu++17 -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX15.4.sdk   -w -g -o CMakeFiles/antlr.dir/deps/antlr4-runtime/ConsoleErrorListener.cpp.o -c /Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/ConsoleErrorListener.cpp",
+  "file": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/ConsoleErrorListener.cpp",
+  "output": "CMakeFiles/antlr.dir/deps/antlr4-runtime/ConsoleErrorListener.cpp.o"
+},
+{
+  "directory": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/build",
+  "command": "/Library/Developer/CommandLineTools/usr/bin/c++  -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/grammar -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/src -g -std=gnu++17 -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX15.4.sdk   -w -g -o CMakeFiles/antlr.dir/deps/antlr4-runtime/DefaultErrorStrategy.cpp.o -c /Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/DefaultErrorStrategy.cpp",
+  "file": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/DefaultErrorStrategy.cpp",
+  "output": "CMakeFiles/antlr.dir/deps/antlr4-runtime/DefaultErrorStrategy.cpp.o"
+},
+{
+  "directory": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/build",
+  "command": "/Library/Developer/CommandLineTools/usr/bin/c++  -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/grammar -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/src -g -std=gnu++17 -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX15.4.sdk   -w -g -o CMakeFiles/antlr.dir/deps/antlr4-runtime/DiagnosticErrorListener.cpp.o -c /Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/DiagnosticErrorListener.cpp",
+  "file": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/DiagnosticErrorListener.cpp",
+  "output": "CMakeFiles/antlr.dir/deps/antlr4-runtime/DiagnosticErrorListener.cpp.o"
+},
+{
+  "directory": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/build",
+  "command": "/Library/Developer/CommandLineTools/usr/bin/c++  -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/grammar -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/src -g -std=gnu++17 -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX15.4.sdk   -w -g -o CMakeFiles/antlr.dir/deps/antlr4-runtime/Exceptions.cpp.o -c /Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/Exceptions.cpp",
+  "file": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/Exceptions.cpp",
+  "output": "CMakeFiles/antlr.dir/deps/antlr4-runtime/Exceptions.cpp.o"
+},
+{
+  "directory": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/build",
+  "command": "/Library/Developer/CommandLineTools/usr/bin/c++  -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/grammar -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/src -g -std=gnu++17 -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX15.4.sdk   -w -g -o CMakeFiles/antlr.dir/deps/antlr4-runtime/FailedPredicateException.cpp.o -c /Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/FailedPredicateException.cpp",
+  "file": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/FailedPredicateException.cpp",
+  "output": "CMakeFiles/antlr.dir/deps/antlr4-runtime/FailedPredicateException.cpp.o"
+},
+{
+  "directory": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/build",
+  "command": "/Library/Developer/CommandLineTools/usr/bin/c++  -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/grammar -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/src -g -std=gnu++17 -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX15.4.sdk   -w -g -o CMakeFiles/antlr.dir/deps/antlr4-runtime/InputMismatchException.cpp.o -c /Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/InputMismatchException.cpp",
+  "file": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/InputMismatchException.cpp",
+  "output": "CMakeFiles/antlr.dir/deps/antlr4-runtime/InputMismatchException.cpp.o"
+},
+{
+  "directory": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/build",
+  "command": "/Library/Developer/CommandLineTools/usr/bin/c++  -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/grammar -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/src -g -std=gnu++17 -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX15.4.sdk   -w -g -o CMakeFiles/antlr.dir/deps/antlr4-runtime/IntStream.cpp.o -c /Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/IntStream.cpp",
+  "file": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/IntStream.cpp",
+  "output": "CMakeFiles/antlr.dir/deps/antlr4-runtime/IntStream.cpp.o"
+},
+{
+  "directory": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/build",
+  "command": "/Library/Developer/CommandLineTools/usr/bin/c++  -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/grammar -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/src -g -std=gnu++17 -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX15.4.sdk   -w -g -o CMakeFiles/antlr.dir/deps/antlr4-runtime/InterpreterRuleContext.cpp.o -c /Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/InterpreterRuleContext.cpp",
+  "file": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/InterpreterRuleContext.cpp",
+  "output": "CMakeFiles/antlr.dir/deps/antlr4-runtime/InterpreterRuleContext.cpp.o"
+},
+{
+  "directory": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/build",
+  "command": "/Library/Developer/CommandLineTools/usr/bin/c++  -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/grammar -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/src -g -std=gnu++17 -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX15.4.sdk   -w -g -o CMakeFiles/antlr.dir/deps/antlr4-runtime/Lexer.cpp.o -c /Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/Lexer.cpp",
+  "file": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/Lexer.cpp",
+  "output": "CMakeFiles/antlr.dir/deps/antlr4-runtime/Lexer.cpp.o"
+},
+{
+  "directory": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/build",
+  "command": "/Library/Developer/CommandLineTools/usr/bin/c++  -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/grammar -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/src -g -std=gnu++17 -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX15.4.sdk   -w -g -o CMakeFiles/antlr.dir/deps/antlr4-runtime/LexerInterpreter.cpp.o -c /Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/LexerInterpreter.cpp",
+  "file": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/LexerInterpreter.cpp",
+  "output": "CMakeFiles/antlr.dir/deps/antlr4-runtime/LexerInterpreter.cpp.o"
+},
+{
+  "directory": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/build",
+  "command": "/Library/Developer/CommandLineTools/usr/bin/c++  -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/grammar -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/src -g -std=gnu++17 -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX15.4.sdk   -w -g -o CMakeFiles/antlr.dir/deps/antlr4-runtime/LexerNoViableAltException.cpp.o -c /Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/LexerNoViableAltException.cpp",
+  "file": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/LexerNoViableAltException.cpp",
+  "output": "CMakeFiles/antlr.dir/deps/antlr4-runtime/LexerNoViableAltException.cpp.o"
+},
+{
+  "directory": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/build",
+  "command": "/Library/Developer/CommandLineTools/usr/bin/c++  -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/grammar -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/src -g -std=gnu++17 -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX15.4.sdk   -w -g -o CMakeFiles/antlr.dir/deps/antlr4-runtime/ListTokenSource.cpp.o -c /Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/ListTokenSource.cpp",
+  "file": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/ListTokenSource.cpp",
+  "output": "CMakeFiles/antlr.dir/deps/antlr4-runtime/ListTokenSource.cpp.o"
+},
+{
+  "directory": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/build",
+  "command": "/Library/Developer/CommandLineTools/usr/bin/c++  -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/grammar -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/src -g -std=gnu++17 -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX15.4.sdk   -w -g -o CMakeFiles/antlr.dir/deps/antlr4-runtime/NoViableAltException.cpp.o -c /Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/NoViableAltException.cpp",
+  "file": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/NoViableAltException.cpp",
+  "output": "CMakeFiles/antlr.dir/deps/antlr4-runtime/NoViableAltException.cpp.o"
+},
+{
+  "directory": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/build",
+  "command": "/Library/Developer/CommandLineTools/usr/bin/c++  -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/grammar -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/src -g -std=gnu++17 -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX15.4.sdk   -w -g -o CMakeFiles/antlr.dir/deps/antlr4-runtime/Parser.cpp.o -c /Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/Parser.cpp",
+  "file": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/Parser.cpp",
+  "output": "CMakeFiles/antlr.dir/deps/antlr4-runtime/Parser.cpp.o"
+},
+{
+  "directory": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/build",
+  "command": "/Library/Developer/CommandLineTools/usr/bin/c++  -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/grammar -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/src -g -std=gnu++17 -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX15.4.sdk   -w -g -o CMakeFiles/antlr.dir/deps/antlr4-runtime/ParserInterpreter.cpp.o -c /Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/ParserInterpreter.cpp",
+  "file": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/ParserInterpreter.cpp",
+  "output": "CMakeFiles/antlr.dir/deps/antlr4-runtime/ParserInterpreter.cpp.o"
+},
+{
+  "directory": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/build",
+  "command": "/Library/Developer/CommandLineTools/usr/bin/c++  -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/grammar -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/src -g -std=gnu++17 -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX15.4.sdk   -w -g -o CMakeFiles/antlr.dir/deps/antlr4-runtime/ParserRuleContext.cpp.o -c /Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/ParserRuleContext.cpp",
+  "file": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/ParserRuleContext.cpp",
+  "output": "CMakeFiles/antlr.dir/deps/antlr4-runtime/ParserRuleContext.cpp.o"
+},
+{
+  "directory": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/build",
+  "command": "/Library/Developer/CommandLineTools/usr/bin/c++  -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/grammar -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/src -g -std=gnu++17 -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX15.4.sdk   -w -g -o CMakeFiles/antlr.dir/deps/antlr4-runtime/ProxyErrorListener.cpp.o -c /Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/ProxyErrorListener.cpp",
+  "file": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/ProxyErrorListener.cpp",
+  "output": "CMakeFiles/antlr.dir/deps/antlr4-runtime/ProxyErrorListener.cpp.o"
+},
+{
+  "directory": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/build",
+  "command": "/Library/Developer/CommandLineTools/usr/bin/c++  -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/grammar -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/src -g -std=gnu++17 -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX15.4.sdk   -w -g -o CMakeFiles/antlr.dir/deps/antlr4-runtime/RecognitionException.cpp.o -c /Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/RecognitionException.cpp",
+  "file": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/RecognitionException.cpp",
+  "output": "CMakeFiles/antlr.dir/deps/antlr4-runtime/RecognitionException.cpp.o"
+},
+{
+  "directory": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/build",
+  "command": "/Library/Developer/CommandLineTools/usr/bin/c++  -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/grammar -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/src -g -std=gnu++17 -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX15.4.sdk   -w -g -o CMakeFiles/antlr.dir/deps/antlr4-runtime/Recognizer.cpp.o -c /Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/Recognizer.cpp",
+  "file": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/Recognizer.cpp",
+  "output": "CMakeFiles/antlr.dir/deps/antlr4-runtime/Recognizer.cpp.o"
+},
+{
+  "directory": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/build",
+  "command": "/Library/Developer/CommandLineTools/usr/bin/c++  -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/grammar -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/src -g -std=gnu++17 -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX15.4.sdk   -w -g -o CMakeFiles/antlr.dir/deps/antlr4-runtime/RuleContext.cpp.o -c /Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/RuleContext.cpp",
+  "file": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/RuleContext.cpp",
+  "output": "CMakeFiles/antlr.dir/deps/antlr4-runtime/RuleContext.cpp.o"
+},
+{
+  "directory": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/build",
+  "command": "/Library/Developer/CommandLineTools/usr/bin/c++  -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/grammar -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/src -g -std=gnu++17 -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX15.4.sdk   -w -g -o CMakeFiles/antlr.dir/deps/antlr4-runtime/RuleContextWithAltNum.cpp.o -c /Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/RuleContextWithAltNum.cpp",
+  "file": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/RuleContextWithAltNum.cpp",
+  "output": "CMakeFiles/antlr.dir/deps/antlr4-runtime/RuleContextWithAltNum.cpp.o"
+},
+{
+  "directory": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/build",
+  "command": "/Library/Developer/CommandLineTools/usr/bin/c++  -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/grammar -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/src -g -std=gnu++17 -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX15.4.sdk   -w -g -o CMakeFiles/antlr.dir/deps/antlr4-runtime/RuntimeMetaData.cpp.o -c /Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/RuntimeMetaData.cpp",
+  "file": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/RuntimeMetaData.cpp",
+  "output": "CMakeFiles/antlr.dir/deps/antlr4-runtime/RuntimeMetaData.cpp.o"
+},
+{
+  "directory": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/build",
+  "command": "/Library/Developer/CommandLineTools/usr/bin/c++  -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/grammar -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/src -g -std=gnu++17 -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX15.4.sdk   -w -g -o CMakeFiles/antlr.dir/deps/antlr4-runtime/Token.cpp.o -c /Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/Token.cpp",
+  "file": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/Token.cpp",
+  "output": "CMakeFiles/antlr.dir/deps/antlr4-runtime/Token.cpp.o"
+},
+{
+  "directory": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/build",
+  "command": "/Library/Developer/CommandLineTools/usr/bin/c++  -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/grammar -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/src -g -std=gnu++17 -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX15.4.sdk   -w -g -o CMakeFiles/antlr.dir/deps/antlr4-runtime/TokenSource.cpp.o -c /Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/TokenSource.cpp",
+  "file": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/TokenSource.cpp",
+  "output": "CMakeFiles/antlr.dir/deps/antlr4-runtime/TokenSource.cpp.o"
+},
+{
+  "directory": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/build",
+  "command": "/Library/Developer/CommandLineTools/usr/bin/c++  -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/grammar -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/src -g -std=gnu++17 -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX15.4.sdk   -w -g -o CMakeFiles/antlr.dir/deps/antlr4-runtime/TokenStream.cpp.o -c /Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/TokenStream.cpp",
+  "file": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/TokenStream.cpp",
+  "output": "CMakeFiles/antlr.dir/deps/antlr4-runtime/TokenStream.cpp.o"
+},
+{
+  "directory": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/build",
+  "command": "/Library/Developer/CommandLineTools/usr/bin/c++  -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/grammar -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/src -g -std=gnu++17 -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX15.4.sdk   -w -g -o CMakeFiles/antlr.dir/deps/antlr4-runtime/TokenStreamRewriter.cpp.o -c /Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/TokenStreamRewriter.cpp",
+  "file": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/TokenStreamRewriter.cpp",
+  "output": "CMakeFiles/antlr.dir/deps/antlr4-runtime/TokenStreamRewriter.cpp.o"
+},
+{
+  "directory": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/build",
+  "command": "/Library/Developer/CommandLineTools/usr/bin/c++  -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/grammar -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/src -g -std=gnu++17 -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX15.4.sdk   -w -g -o CMakeFiles/antlr.dir/deps/antlr4-runtime/UnbufferedCharStream.cpp.o -c /Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/UnbufferedCharStream.cpp",
+  "file": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/UnbufferedCharStream.cpp",
+  "output": "CMakeFiles/antlr.dir/deps/antlr4-runtime/UnbufferedCharStream.cpp.o"
+},
+{
+  "directory": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/build",
+  "command": "/Library/Developer/CommandLineTools/usr/bin/c++  -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/grammar -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/src -g -std=gnu++17 -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX15.4.sdk   -w -g -o CMakeFiles/antlr.dir/deps/antlr4-runtime/UnbufferedTokenStream.cpp.o -c /Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/UnbufferedTokenStream.cpp",
+  "file": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/UnbufferedTokenStream.cpp",
+  "output": "CMakeFiles/antlr.dir/deps/antlr4-runtime/UnbufferedTokenStream.cpp.o"
+},
+{
+  "directory": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/build",
+  "command": "/Library/Developer/CommandLineTools/usr/bin/c++  -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/grammar -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/src -g -std=gnu++17 -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX15.4.sdk   -w -g -o CMakeFiles/antlr.dir/deps/antlr4-runtime/Vocabulary.cpp.o -c /Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/Vocabulary.cpp",
+  "file": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/Vocabulary.cpp",
+  "output": "CMakeFiles/antlr.dir/deps/antlr4-runtime/Vocabulary.cpp.o"
+},
+{
+  "directory": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/build",
+  "command": "/Library/Developer/CommandLineTools/usr/bin/c++  -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/grammar -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/src -g -std=gnu++17 -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX15.4.sdk   -w -g -o CMakeFiles/antlr.dir/deps/antlr4-runtime/WritableToken.cpp.o -c /Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/WritableToken.cpp",
+  "file": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/WritableToken.cpp",
+  "output": "CMakeFiles/antlr.dir/deps/antlr4-runtime/WritableToken.cpp.o"
+},
+{
+  "directory": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/build",
+  "command": "/Library/Developer/CommandLineTools/usr/bin/c++  -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/grammar -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/src -g -std=gnu++17 -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX15.4.sdk   -w -g -o CMakeFiles/antlr.dir/deps/antlr4-runtime/atn/ATN.cpp.o -c /Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/atn/ATN.cpp",
+  "file": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/atn/ATN.cpp",
+  "output": "CMakeFiles/antlr.dir/deps/antlr4-runtime/atn/ATN.cpp.o"
+},
+{
+  "directory": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/build",
+  "command": "/Library/Developer/CommandLineTools/usr/bin/c++  -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/grammar -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/src -g -std=gnu++17 -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX15.4.sdk   -w -g -o CMakeFiles/antlr.dir/deps/antlr4-runtime/atn/ATNConfig.cpp.o -c /Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/atn/ATNConfig.cpp",
+  "file": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/atn/ATNConfig.cpp",
+  "output": "CMakeFiles/antlr.dir/deps/antlr4-runtime/atn/ATNConfig.cpp.o"
+},
+{
+  "directory": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/build",
+  "command": "/Library/Developer/CommandLineTools/usr/bin/c++  -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/grammar -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/src -g -std=gnu++17 -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX15.4.sdk   -w -g -o CMakeFiles/antlr.dir/deps/antlr4-runtime/atn/ATNConfigSet.cpp.o -c /Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/atn/ATNConfigSet.cpp",
+  "file": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/atn/ATNConfigSet.cpp",
+  "output": "CMakeFiles/antlr.dir/deps/antlr4-runtime/atn/ATNConfigSet.cpp.o"
+},
+{
+  "directory": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/build",
+  "command": "/Library/Developer/CommandLineTools/usr/bin/c++  -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/grammar -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/src -g -std=gnu++17 -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX15.4.sdk   -w -g -o CMakeFiles/antlr.dir/deps/antlr4-runtime/atn/ATNDeserializationOptions.cpp.o -c /Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/atn/ATNDeserializationOptions.cpp",
+  "file": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/atn/ATNDeserializationOptions.cpp",
+  "output": "CMakeFiles/antlr.dir/deps/antlr4-runtime/atn/ATNDeserializationOptions.cpp.o"
+},
+{
+  "directory": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/build",
+  "command": "/Library/Developer/CommandLineTools/usr/bin/c++  -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/grammar -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/src -g -std=gnu++17 -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX15.4.sdk   -w -g -o CMakeFiles/antlr.dir/deps/antlr4-runtime/atn/ATNDeserializer.cpp.o -c /Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/atn/ATNDeserializer.cpp",
+  "file": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/atn/ATNDeserializer.cpp",
+  "output": "CMakeFiles/antlr.dir/deps/antlr4-runtime/atn/ATNDeserializer.cpp.o"
+},
+{
+  "directory": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/build",
+  "command": "/Library/Developer/CommandLineTools/usr/bin/c++  -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/grammar -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/src -g -std=gnu++17 -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX15.4.sdk   -w -g -o CMakeFiles/antlr.dir/deps/antlr4-runtime/atn/ATNSimulator.cpp.o -c /Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/atn/ATNSimulator.cpp",
+  "file": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/atn/ATNSimulator.cpp",
+  "output": "CMakeFiles/antlr.dir/deps/antlr4-runtime/atn/ATNSimulator.cpp.o"
+},
+{
+  "directory": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/build",
+  "command": "/Library/Developer/CommandLineTools/usr/bin/c++  -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/grammar -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/src -g -std=gnu++17 -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX15.4.sdk   -w -g -o CMakeFiles/antlr.dir/deps/antlr4-runtime/atn/ATNState.cpp.o -c /Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/atn/ATNState.cpp",
+  "file": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/atn/ATNState.cpp",
+  "output": "CMakeFiles/antlr.dir/deps/antlr4-runtime/atn/ATNState.cpp.o"
+},
+{
+  "directory": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/build",
+  "command": "/Library/Developer/CommandLineTools/usr/bin/c++  -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/grammar -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/src -g -std=gnu++17 -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX15.4.sdk   -w -g -o CMakeFiles/antlr.dir/deps/antlr4-runtime/atn/ATNStateType.cpp.o -c /Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/atn/ATNStateType.cpp",
+  "file": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/atn/ATNStateType.cpp",
+  "output": "CMakeFiles/antlr.dir/deps/antlr4-runtime/atn/ATNStateType.cpp.o"
+},
+{
+  "directory": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/build",
+  "command": "/Library/Developer/CommandLineTools/usr/bin/c++  -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/grammar -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/src -g -std=gnu++17 -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX15.4.sdk   -w -g -o CMakeFiles/antlr.dir/deps/antlr4-runtime/atn/ActionTransition.cpp.o -c /Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/atn/ActionTransition.cpp",
+  "file": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/atn/ActionTransition.cpp",
+  "output": "CMakeFiles/antlr.dir/deps/antlr4-runtime/atn/ActionTransition.cpp.o"
+},
+{
+  "directory": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/build",
+  "command": "/Library/Developer/CommandLineTools/usr/bin/c++  -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/grammar -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/src -g -std=gnu++17 -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX15.4.sdk   -w -g -o CMakeFiles/antlr.dir/deps/antlr4-runtime/atn/AmbiguityInfo.cpp.o -c /Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/atn/AmbiguityInfo.cpp",
+  "file": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/atn/AmbiguityInfo.cpp",
+  "output": "CMakeFiles/antlr.dir/deps/antlr4-runtime/atn/AmbiguityInfo.cpp.o"
+},
+{
+  "directory": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/build",
+  "command": "/Library/Developer/CommandLineTools/usr/bin/c++  -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/grammar -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/src -g -std=gnu++17 -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX15.4.sdk   -w -g -o CMakeFiles/antlr.dir/deps/antlr4-runtime/atn/ArrayPredictionContext.cpp.o -c /Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/atn/ArrayPredictionContext.cpp",
+  "file": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/atn/ArrayPredictionContext.cpp",
+  "output": "CMakeFiles/antlr.dir/deps/antlr4-runtime/atn/ArrayPredictionContext.cpp.o"
+},
+{
+  "directory": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/build",
+  "command": "/Library/Developer/CommandLineTools/usr/bin/c++  -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/grammar -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/src -g -std=gnu++17 -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX15.4.sdk   -w -g -o CMakeFiles/antlr.dir/deps/antlr4-runtime/atn/AtomTransition.cpp.o -c /Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/atn/AtomTransition.cpp",
+  "file": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/atn/AtomTransition.cpp",
+  "output": "CMakeFiles/antlr.dir/deps/antlr4-runtime/atn/AtomTransition.cpp.o"
+},
+{
+  "directory": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/build",
+  "command": "/Library/Developer/CommandLineTools/usr/bin/c++  -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/grammar -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/src -g -std=gnu++17 -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX15.4.sdk   -w -g -o CMakeFiles/antlr.dir/deps/antlr4-runtime/atn/ContextSensitivityInfo.cpp.o -c /Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/atn/ContextSensitivityInfo.cpp",
+  "file": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/atn/ContextSensitivityInfo.cpp",
+  "output": "CMakeFiles/antlr.dir/deps/antlr4-runtime/atn/ContextSensitivityInfo.cpp.o"
+},
+{
+  "directory": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/build",
+  "command": "/Library/Developer/CommandLineTools/usr/bin/c++  -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/grammar -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/src -g -std=gnu++17 -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX15.4.sdk   -w -g -o CMakeFiles/antlr.dir/deps/antlr4-runtime/atn/DecisionEventInfo.cpp.o -c /Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/atn/DecisionEventInfo.cpp",
+  "file": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/atn/DecisionEventInfo.cpp",
+  "output": "CMakeFiles/antlr.dir/deps/antlr4-runtime/atn/DecisionEventInfo.cpp.o"
+},
+{
+  "directory": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/build",
+  "command": "/Library/Developer/CommandLineTools/usr/bin/c++  -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/grammar -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/src -g -std=gnu++17 -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX15.4.sdk   -w -g -o CMakeFiles/antlr.dir/deps/antlr4-runtime/atn/DecisionInfo.cpp.o -c /Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/atn/DecisionInfo.cpp",
+  "file": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/atn/DecisionInfo.cpp",
+  "output": "CMakeFiles/antlr.dir/deps/antlr4-runtime/atn/DecisionInfo.cpp.o"
+},
+{
+  "directory": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/build",
+  "command": "/Library/Developer/CommandLineTools/usr/bin/c++  -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/grammar -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/src -g -std=gnu++17 -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX15.4.sdk   -w -g -o CMakeFiles/antlr.dir/deps/antlr4-runtime/atn/DecisionState.cpp.o -c /Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/atn/DecisionState.cpp",
+  "file": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/atn/DecisionState.cpp",
+  "output": "CMakeFiles/antlr.dir/deps/antlr4-runtime/atn/DecisionState.cpp.o"
+},
+{
+  "directory": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/build",
+  "command": "/Library/Developer/CommandLineTools/usr/bin/c++  -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/grammar -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/src -g -std=gnu++17 -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX15.4.sdk   -w -g -o CMakeFiles/antlr.dir/deps/antlr4-runtime/atn/EpsilonTransition.cpp.o -c /Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/atn/EpsilonTransition.cpp",
+  "file": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/atn/EpsilonTransition.cpp",
+  "output": "CMakeFiles/antlr.dir/deps/antlr4-runtime/atn/EpsilonTransition.cpp.o"
+},
+{
+  "directory": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/build",
+  "command": "/Library/Developer/CommandLineTools/usr/bin/c++  -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/grammar -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/src -g -std=gnu++17 -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX15.4.sdk   -w -g -o CMakeFiles/antlr.dir/deps/antlr4-runtime/atn/ErrorInfo.cpp.o -c /Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/atn/ErrorInfo.cpp",
+  "file": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/atn/ErrorInfo.cpp",
+  "output": "CMakeFiles/antlr.dir/deps/antlr4-runtime/atn/ErrorInfo.cpp.o"
+},
+{
+  "directory": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/build",
+  "command": "/Library/Developer/CommandLineTools/usr/bin/c++  -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/grammar -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/src -g -std=gnu++17 -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX15.4.sdk   -w -g -o CMakeFiles/antlr.dir/deps/antlr4-runtime/atn/LL1Analyzer.cpp.o -c /Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/atn/LL1Analyzer.cpp",
+  "file": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/atn/LL1Analyzer.cpp",
+  "output": "CMakeFiles/antlr.dir/deps/antlr4-runtime/atn/LL1Analyzer.cpp.o"
+},
+{
+  "directory": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/build",
+  "command": "/Library/Developer/CommandLineTools/usr/bin/c++  -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/grammar -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/src -g -std=gnu++17 -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX15.4.sdk   -w -g -o CMakeFiles/antlr.dir/deps/antlr4-runtime/atn/LexerATNConfig.cpp.o -c /Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/atn/LexerATNConfig.cpp",
+  "file": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/atn/LexerATNConfig.cpp",
+  "output": "CMakeFiles/antlr.dir/deps/antlr4-runtime/atn/LexerATNConfig.cpp.o"
+},
+{
+  "directory": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/build",
+  "command": "/Library/Developer/CommandLineTools/usr/bin/c++  -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/grammar -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/src -g -std=gnu++17 -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX15.4.sdk   -w -g -o CMakeFiles/antlr.dir/deps/antlr4-runtime/atn/LexerATNSimulator.cpp.o -c /Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/atn/LexerATNSimulator.cpp",
+  "file": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/atn/LexerATNSimulator.cpp",
+  "output": "CMakeFiles/antlr.dir/deps/antlr4-runtime/atn/LexerATNSimulator.cpp.o"
+},
+{
+  "directory": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/build",
+  "command": "/Library/Developer/CommandLineTools/usr/bin/c++  -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/grammar -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/src -g -std=gnu++17 -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX15.4.sdk   -w -g -o CMakeFiles/antlr.dir/deps/antlr4-runtime/atn/LexerAction.cpp.o -c /Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/atn/LexerAction.cpp",
+  "file": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/atn/LexerAction.cpp",
+  "output": "CMakeFiles/antlr.dir/deps/antlr4-runtime/atn/LexerAction.cpp.o"
+},
+{
+  "directory": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/build",
+  "command": "/Library/Developer/CommandLineTools/usr/bin/c++  -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/grammar -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/src -g -std=gnu++17 -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX15.4.sdk   -w -g -o CMakeFiles/antlr.dir/deps/antlr4-runtime/atn/LexerActionExecutor.cpp.o -c /Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/atn/LexerActionExecutor.cpp",
+  "file": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/atn/LexerActionExecutor.cpp",
+  "output": "CMakeFiles/antlr.dir/deps/antlr4-runtime/atn/LexerActionExecutor.cpp.o"
+},
+{
+  "directory": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/build",
+  "command": "/Library/Developer/CommandLineTools/usr/bin/c++  -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/grammar -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/src -g -std=gnu++17 -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX15.4.sdk   -w -g -o CMakeFiles/antlr.dir/deps/antlr4-runtime/atn/LexerChannelAction.cpp.o -c /Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/atn/LexerChannelAction.cpp",
+  "file": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/atn/LexerChannelAction.cpp",
+  "output": "CMakeFiles/antlr.dir/deps/antlr4-runtime/atn/LexerChannelAction.cpp.o"
+},
+{
+  "directory": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/build",
+  "command": "/Library/Developer/CommandLineTools/usr/bin/c++  -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/grammar -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/src -g -std=gnu++17 -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX15.4.sdk   -w -g -o CMakeFiles/antlr.dir/deps/antlr4-runtime/atn/LexerCustomAction.cpp.o -c /Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/atn/LexerCustomAction.cpp",
+  "file": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/atn/LexerCustomAction.cpp",
+  "output": "CMakeFiles/antlr.dir/deps/antlr4-runtime/atn/LexerCustomAction.cpp.o"
+},
+{
+  "directory": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/build",
+  "command": "/Library/Developer/CommandLineTools/usr/bin/c++  -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/grammar -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/src -g -std=gnu++17 -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX15.4.sdk   -w -g -o CMakeFiles/antlr.dir/deps/antlr4-runtime/atn/LexerIndexedCustomAction.cpp.o -c /Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/atn/LexerIndexedCustomAction.cpp",
+  "file": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/atn/LexerIndexedCustomAction.cpp",
+  "output": "CMakeFiles/antlr.dir/deps/antlr4-runtime/atn/LexerIndexedCustomAction.cpp.o"
+},
+{
+  "directory": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/build",
+  "command": "/Library/Developer/CommandLineTools/usr/bin/c++  -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/grammar -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/src -g -std=gnu++17 -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX15.4.sdk   -w -g -o CMakeFiles/antlr.dir/deps/antlr4-runtime/atn/LexerModeAction.cpp.o -c /Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/atn/LexerModeAction.cpp",
+  "file": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/atn/LexerModeAction.cpp",
+  "output": "CMakeFiles/antlr.dir/deps/antlr4-runtime/atn/LexerModeAction.cpp.o"
+},
+{
+  "directory": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/build",
+  "command": "/Library/Developer/CommandLineTools/usr/bin/c++  -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/grammar -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/src -g -std=gnu++17 -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX15.4.sdk   -w -g -o CMakeFiles/antlr.dir/deps/antlr4-runtime/atn/LexerMoreAction.cpp.o -c /Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/atn/LexerMoreAction.cpp",
+  "file": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/atn/LexerMoreAction.cpp",
+  "output": "CMakeFiles/antlr.dir/deps/antlr4-runtime/atn/LexerMoreAction.cpp.o"
+},
+{
+  "directory": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/build",
+  "command": "/Library/Developer/CommandLineTools/usr/bin/c++  -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/grammar -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/src -g -std=gnu++17 -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX15.4.sdk   -w -g -o CMakeFiles/antlr.dir/deps/antlr4-runtime/atn/LexerPopModeAction.cpp.o -c /Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/atn/LexerPopModeAction.cpp",
+  "file": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/atn/LexerPopModeAction.cpp",
+  "output": "CMakeFiles/antlr.dir/deps/antlr4-runtime/atn/LexerPopModeAction.cpp.o"
+},
+{
+  "directory": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/build",
+  "command": "/Library/Developer/CommandLineTools/usr/bin/c++  -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/grammar -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/src -g -std=gnu++17 -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX15.4.sdk   -w -g -o CMakeFiles/antlr.dir/deps/antlr4-runtime/atn/LexerPushModeAction.cpp.o -c /Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/atn/LexerPushModeAction.cpp",
+  "file": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/atn/LexerPushModeAction.cpp",
+  "output": "CMakeFiles/antlr.dir/deps/antlr4-runtime/atn/LexerPushModeAction.cpp.o"
+},
+{
+  "directory": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/build",
+  "command": "/Library/Developer/CommandLineTools/usr/bin/c++  -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/grammar -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/src -g -std=gnu++17 -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX15.4.sdk   -w -g -o CMakeFiles/antlr.dir/deps/antlr4-runtime/atn/LexerSkipAction.cpp.o -c /Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/atn/LexerSkipAction.cpp",
+  "file": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/atn/LexerSkipAction.cpp",
+  "output": "CMakeFiles/antlr.dir/deps/antlr4-runtime/atn/LexerSkipAction.cpp.o"
+},
+{
+  "directory": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/build",
+  "command": "/Library/Developer/CommandLineTools/usr/bin/c++  -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/grammar -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/src -g -std=gnu++17 -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX15.4.sdk   -w -g -o CMakeFiles/antlr.dir/deps/antlr4-runtime/atn/LexerTypeAction.cpp.o -c /Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/atn/LexerTypeAction.cpp",
+  "file": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/atn/LexerTypeAction.cpp",
+  "output": "CMakeFiles/antlr.dir/deps/antlr4-runtime/atn/LexerTypeAction.cpp.o"
+},
+{
+  "directory": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/build",
+  "command": "/Library/Developer/CommandLineTools/usr/bin/c++  -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/grammar -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/src -g -std=gnu++17 -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX15.4.sdk   -w -g -o CMakeFiles/antlr.dir/deps/antlr4-runtime/atn/LookaheadEventInfo.cpp.o -c /Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/atn/LookaheadEventInfo.cpp",
+  "file": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/atn/LookaheadEventInfo.cpp",
+  "output": "CMakeFiles/antlr.dir/deps/antlr4-runtime/atn/LookaheadEventInfo.cpp.o"
+},
+{
+  "directory": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/build",
+  "command": "/Library/Developer/CommandLineTools/usr/bin/c++  -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/grammar -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/src -g -std=gnu++17 -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX15.4.sdk   -w -g -o CMakeFiles/antlr.dir/deps/antlr4-runtime/atn/NotSetTransition.cpp.o -c /Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/atn/NotSetTransition.cpp",
+  "file": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/atn/NotSetTransition.cpp",
+  "output": "CMakeFiles/antlr.dir/deps/antlr4-runtime/atn/NotSetTransition.cpp.o"
+},
+{
+  "directory": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/build",
+  "command": "/Library/Developer/CommandLineTools/usr/bin/c++  -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/grammar -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/src -g -std=gnu++17 -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX15.4.sdk   -w -g -o CMakeFiles/antlr.dir/deps/antlr4-runtime/atn/OrderedATNConfigSet.cpp.o -c /Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/atn/OrderedATNConfigSet.cpp",
+  "file": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/atn/OrderedATNConfigSet.cpp",
+  "output": "CMakeFiles/antlr.dir/deps/antlr4-runtime/atn/OrderedATNConfigSet.cpp.o"
+},
+{
+  "directory": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/build",
+  "command": "/Library/Developer/CommandLineTools/usr/bin/c++  -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/grammar -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/src -g -std=gnu++17 -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX15.4.sdk   -w -g -o CMakeFiles/antlr.dir/deps/antlr4-runtime/atn/ParseInfo.cpp.o -c /Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/atn/ParseInfo.cpp",
+  "file": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/atn/ParseInfo.cpp",
+  "output": "CMakeFiles/antlr.dir/deps/antlr4-runtime/atn/ParseInfo.cpp.o"
+},
+{
+  "directory": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/build",
+  "command": "/Library/Developer/CommandLineTools/usr/bin/c++  -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/grammar -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/src -g -std=gnu++17 -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX15.4.sdk   -w -g -o CMakeFiles/antlr.dir/deps/antlr4-runtime/atn/ParserATNSimulator.cpp.o -c /Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/atn/ParserATNSimulator.cpp",
+  "file": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/atn/ParserATNSimulator.cpp",
+  "output": "CMakeFiles/antlr.dir/deps/antlr4-runtime/atn/ParserATNSimulator.cpp.o"
+},
+{
+  "directory": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/build",
+  "command": "/Library/Developer/CommandLineTools/usr/bin/c++  -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/grammar -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/src -g -std=gnu++17 -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX15.4.sdk   -w -g -o CMakeFiles/antlr.dir/deps/antlr4-runtime/atn/PrecedencePredicateTransition.cpp.o -c /Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/atn/PrecedencePredicateTransition.cpp",
+  "file": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/atn/PrecedencePredicateTransition.cpp",
+  "output": "CMakeFiles/antlr.dir/deps/antlr4-runtime/atn/PrecedencePredicateTransition.cpp.o"
+},
+{
+  "directory": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/build",
+  "command": "/Library/Developer/CommandLineTools/usr/bin/c++  -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/grammar -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/src -g -std=gnu++17 -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX15.4.sdk   -w -g -o CMakeFiles/antlr.dir/deps/antlr4-runtime/atn/PredicateEvalInfo.cpp.o -c /Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/atn/PredicateEvalInfo.cpp",
+  "file": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/atn/PredicateEvalInfo.cpp",
+  "output": "CMakeFiles/antlr.dir/deps/antlr4-runtime/atn/PredicateEvalInfo.cpp.o"
+},
+{
+  "directory": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/build",
+  "command": "/Library/Developer/CommandLineTools/usr/bin/c++  -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/grammar -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/src -g -std=gnu++17 -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX15.4.sdk   -w -g -o CMakeFiles/antlr.dir/deps/antlr4-runtime/atn/PredicateTransition.cpp.o -c /Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/atn/PredicateTransition.cpp",
+  "file": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/atn/PredicateTransition.cpp",
+  "output": "CMakeFiles/antlr.dir/deps/antlr4-runtime/atn/PredicateTransition.cpp.o"
+},
+{
+  "directory": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/build",
+  "command": "/Library/Developer/CommandLineTools/usr/bin/c++  -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/grammar -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/src -g -std=gnu++17 -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX15.4.sdk   -w -g -o CMakeFiles/antlr.dir/deps/antlr4-runtime/atn/PredictionContext.cpp.o -c /Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/atn/PredictionContext.cpp",
+  "file": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/atn/PredictionContext.cpp",
+  "output": "CMakeFiles/antlr.dir/deps/antlr4-runtime/atn/PredictionContext.cpp.o"
+},
+{
+  "directory": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/build",
+  "command": "/Library/Developer/CommandLineTools/usr/bin/c++  -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/grammar -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/src -g -std=gnu++17 -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX15.4.sdk   -w -g -o CMakeFiles/antlr.dir/deps/antlr4-runtime/atn/PredictionContextCache.cpp.o -c /Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/atn/PredictionContextCache.cpp",
+  "file": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/atn/PredictionContextCache.cpp",
+  "output": "CMakeFiles/antlr.dir/deps/antlr4-runtime/atn/PredictionContextCache.cpp.o"
+},
+{
+  "directory": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/build",
+  "command": "/Library/Developer/CommandLineTools/usr/bin/c++  -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/grammar -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/src -g -std=gnu++17 -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX15.4.sdk   -w -g -o CMakeFiles/antlr.dir/deps/antlr4-runtime/atn/PredictionContextMergeCache.cpp.o -c /Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/atn/PredictionContextMergeCache.cpp",
+  "file": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/atn/PredictionContextMergeCache.cpp",
+  "output": "CMakeFiles/antlr.dir/deps/antlr4-runtime/atn/PredictionContextMergeCache.cpp.o"
+},
+{
+  "directory": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/build",
+  "command": "/Library/Developer/CommandLineTools/usr/bin/c++  -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/grammar -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/src -g -std=gnu++17 -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX15.4.sdk   -w -g -o CMakeFiles/antlr.dir/deps/antlr4-runtime/atn/PredictionMode.cpp.o -c /Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/atn/PredictionMode.cpp",
+  "file": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/atn/PredictionMode.cpp",
+  "output": "CMakeFiles/antlr.dir/deps/antlr4-runtime/atn/PredictionMode.cpp.o"
+},
+{
+  "directory": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/build",
+  "command": "/Library/Developer/CommandLineTools/usr/bin/c++  -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/grammar -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/src -g -std=gnu++17 -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX15.4.sdk   -w -g -o CMakeFiles/antlr.dir/deps/antlr4-runtime/atn/ProfilingATNSimulator.cpp.o -c /Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/atn/ProfilingATNSimulator.cpp",
+  "file": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/atn/ProfilingATNSimulator.cpp",
+  "output": "CMakeFiles/antlr.dir/deps/antlr4-runtime/atn/ProfilingATNSimulator.cpp.o"
+},
+{
+  "directory": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/build",
+  "command": "/Library/Developer/CommandLineTools/usr/bin/c++  -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/grammar -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/src -g -std=gnu++17 -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX15.4.sdk   -w -g -o CMakeFiles/antlr.dir/deps/antlr4-runtime/atn/RangeTransition.cpp.o -c /Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/atn/RangeTransition.cpp",
+  "file": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/atn/RangeTransition.cpp",
+  "output": "CMakeFiles/antlr.dir/deps/antlr4-runtime/atn/RangeTransition.cpp.o"
+},
+{
+  "directory": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/build",
+  "command": "/Library/Developer/CommandLineTools/usr/bin/c++  -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/grammar -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/src -g -std=gnu++17 -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX15.4.sdk   -w -g -o CMakeFiles/antlr.dir/deps/antlr4-runtime/atn/RuleTransition.cpp.o -c /Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/atn/RuleTransition.cpp",
+  "file": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/atn/RuleTransition.cpp",
+  "output": "CMakeFiles/antlr.dir/deps/antlr4-runtime/atn/RuleTransition.cpp.o"
+},
+{
+  "directory": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/build",
+  "command": "/Library/Developer/CommandLineTools/usr/bin/c++  -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/grammar -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/src -g -std=gnu++17 -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX15.4.sdk   -w -g -o CMakeFiles/antlr.dir/deps/antlr4-runtime/atn/SemanticContext.cpp.o -c /Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/atn/SemanticContext.cpp",
+  "file": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/atn/SemanticContext.cpp",
+  "output": "CMakeFiles/antlr.dir/deps/antlr4-runtime/atn/SemanticContext.cpp.o"
+},
+{
+  "directory": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/build",
+  "command": "/Library/Developer/CommandLineTools/usr/bin/c++  -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/grammar -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/src -g -std=gnu++17 -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX15.4.sdk   -w -g -o CMakeFiles/antlr.dir/deps/antlr4-runtime/atn/SetTransition.cpp.o -c /Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/atn/SetTransition.cpp",
+  "file": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/atn/SetTransition.cpp",
+  "output": "CMakeFiles/antlr.dir/deps/antlr4-runtime/atn/SetTransition.cpp.o"
+},
+{
+  "directory": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/build",
+  "command": "/Library/Developer/CommandLineTools/usr/bin/c++  -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/grammar -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/src -g -std=gnu++17 -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX15.4.sdk   -w -g -o CMakeFiles/antlr.dir/deps/antlr4-runtime/atn/SingletonPredictionContext.cpp.o -c /Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/atn/SingletonPredictionContext.cpp",
+  "file": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/atn/SingletonPredictionContext.cpp",
+  "output": "CMakeFiles/antlr.dir/deps/antlr4-runtime/atn/SingletonPredictionContext.cpp.o"
+},
+{
+  "directory": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/build",
+  "command": "/Library/Developer/CommandLineTools/usr/bin/c++  -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/grammar -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/src -g -std=gnu++17 -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX15.4.sdk   -w -g -o CMakeFiles/antlr.dir/deps/antlr4-runtime/atn/StarLoopbackState.cpp.o -c /Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/atn/StarLoopbackState.cpp",
+  "file": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/atn/StarLoopbackState.cpp",
+  "output": "CMakeFiles/antlr.dir/deps/antlr4-runtime/atn/StarLoopbackState.cpp.o"
+},
+{
+  "directory": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/build",
+  "command": "/Library/Developer/CommandLineTools/usr/bin/c++  -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/grammar -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/src -g -std=gnu++17 -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX15.4.sdk   -w -g -o CMakeFiles/antlr.dir/deps/antlr4-runtime/atn/Transition.cpp.o -c /Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/atn/Transition.cpp",
+  "file": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/atn/Transition.cpp",
+  "output": "CMakeFiles/antlr.dir/deps/antlr4-runtime/atn/Transition.cpp.o"
+},
+{
+  "directory": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/build",
+  "command": "/Library/Developer/CommandLineTools/usr/bin/c++  -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/grammar -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/src -g -std=gnu++17 -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX15.4.sdk   -w -g -o CMakeFiles/antlr.dir/deps/antlr4-runtime/atn/TransitionType.cpp.o -c /Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/atn/TransitionType.cpp",
+  "file": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/atn/TransitionType.cpp",
+  "output": "CMakeFiles/antlr.dir/deps/antlr4-runtime/atn/TransitionType.cpp.o"
+},
+{
+  "directory": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/build",
+  "command": "/Library/Developer/CommandLineTools/usr/bin/c++  -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/grammar -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/src -g -std=gnu++17 -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX15.4.sdk   -w -g -o CMakeFiles/antlr.dir/deps/antlr4-runtime/atn/WildcardTransition.cpp.o -c /Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/atn/WildcardTransition.cpp",
+  "file": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/atn/WildcardTransition.cpp",
+  "output": "CMakeFiles/antlr.dir/deps/antlr4-runtime/atn/WildcardTransition.cpp.o"
+},
+{
+  "directory": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/build",
+  "command": "/Library/Developer/CommandLineTools/usr/bin/c++  -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/grammar -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/src -g -std=gnu++17 -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX15.4.sdk   -w -g -o CMakeFiles/antlr.dir/deps/antlr4-runtime/dfa/DFA.cpp.o -c /Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/dfa/DFA.cpp",
+  "file": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/dfa/DFA.cpp",
+  "output": "CMakeFiles/antlr.dir/deps/antlr4-runtime/dfa/DFA.cpp.o"
+},
+{
+  "directory": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/build",
+  "command": "/Library/Developer/CommandLineTools/usr/bin/c++  -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/grammar -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/src -g -std=gnu++17 -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX15.4.sdk   -w -g -o CMakeFiles/antlr.dir/deps/antlr4-runtime/dfa/DFASerializer.cpp.o -c /Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/dfa/DFASerializer.cpp",
+  "file": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/dfa/DFASerializer.cpp",
+  "output": "CMakeFiles/antlr.dir/deps/antlr4-runtime/dfa/DFASerializer.cpp.o"
+},
+{
+  "directory": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/build",
+  "command": "/Library/Developer/CommandLineTools/usr/bin/c++  -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/grammar -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/src -g -std=gnu++17 -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX15.4.sdk   -w -g -o CMakeFiles/antlr.dir/deps/antlr4-runtime/dfa/DFAState.cpp.o -c /Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/dfa/DFAState.cpp",
+  "file": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/dfa/DFAState.cpp",
+  "output": "CMakeFiles/antlr.dir/deps/antlr4-runtime/dfa/DFAState.cpp.o"
+},
+{
+  "directory": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/build",
+  "command": "/Library/Developer/CommandLineTools/usr/bin/c++  -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/grammar -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/src -g -std=gnu++17 -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX15.4.sdk   -w -g -o CMakeFiles/antlr.dir/deps/antlr4-runtime/dfa/LexerDFASerializer.cpp.o -c /Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/dfa/LexerDFASerializer.cpp",
+  "file": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/dfa/LexerDFASerializer.cpp",
+  "output": "CMakeFiles/antlr.dir/deps/antlr4-runtime/dfa/LexerDFASerializer.cpp.o"
+},
+{
+  "directory": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/build",
+  "command": "/Library/Developer/CommandLineTools/usr/bin/c++  -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/grammar -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/src -g -std=gnu++17 -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX15.4.sdk   -w -g -o CMakeFiles/antlr.dir/deps/antlr4-runtime/internal/Synchronization.cpp.o -c /Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/internal/Synchronization.cpp",
+  "file": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/internal/Synchronization.cpp",
+  "output": "CMakeFiles/antlr.dir/deps/antlr4-runtime/internal/Synchronization.cpp.o"
+},
+{
+  "directory": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/build",
+  "command": "/Library/Developer/CommandLineTools/usr/bin/c++  -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/grammar -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/src -g -std=gnu++17 -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX15.4.sdk   -w -g -o CMakeFiles/antlr.dir/deps/antlr4-runtime/misc/InterpreterDataReader.cpp.o -c /Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/misc/InterpreterDataReader.cpp",
+  "file": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/misc/InterpreterDataReader.cpp",
+  "output": "CMakeFiles/antlr.dir/deps/antlr4-runtime/misc/InterpreterDataReader.cpp.o"
+},
+{
+  "directory": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/build",
+  "command": "/Library/Developer/CommandLineTools/usr/bin/c++  -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/grammar -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/src -g -std=gnu++17 -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX15.4.sdk   -w -g -o CMakeFiles/antlr.dir/deps/antlr4-runtime/misc/Interval.cpp.o -c /Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/misc/Interval.cpp",
+  "file": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/misc/Interval.cpp",
+  "output": "CMakeFiles/antlr.dir/deps/antlr4-runtime/misc/Interval.cpp.o"
+},
+{
+  "directory": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/build",
+  "command": "/Library/Developer/CommandLineTools/usr/bin/c++  -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/grammar -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/src -g -std=gnu++17 -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX15.4.sdk   -w -g -o CMakeFiles/antlr.dir/deps/antlr4-runtime/misc/IntervalSet.cpp.o -c /Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/misc/IntervalSet.cpp",
+  "file": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/misc/IntervalSet.cpp",
+  "output": "CMakeFiles/antlr.dir/deps/antlr4-runtime/misc/IntervalSet.cpp.o"
+},
+{
+  "directory": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/build",
+  "command": "/Library/Developer/CommandLineTools/usr/bin/c++  -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/grammar -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/src -g -std=gnu++17 -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX15.4.sdk   -w -g -o CMakeFiles/antlr.dir/deps/antlr4-runtime/misc/MurmurHash.cpp.o -c /Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/misc/MurmurHash.cpp",
+  "file": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/misc/MurmurHash.cpp",
+  "output": "CMakeFiles/antlr.dir/deps/antlr4-runtime/misc/MurmurHash.cpp.o"
+},
+{
+  "directory": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/build",
+  "command": "/Library/Developer/CommandLineTools/usr/bin/c++  -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/grammar -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/src -g -std=gnu++17 -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX15.4.sdk   -w -g -o CMakeFiles/antlr.dir/deps/antlr4-runtime/misc/Predicate.cpp.o -c /Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/misc/Predicate.cpp",
+  "file": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/misc/Predicate.cpp",
+  "output": "CMakeFiles/antlr.dir/deps/antlr4-runtime/misc/Predicate.cpp.o"
+},
+{
+  "directory": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/build",
+  "command": "/Library/Developer/CommandLineTools/usr/bin/c++  -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/grammar -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/src -g -std=gnu++17 -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX15.4.sdk   -w -g -o CMakeFiles/antlr.dir/deps/antlr4-runtime/support/Any.cpp.o -c /Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/support/Any.cpp",
+  "file": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/support/Any.cpp",
+  "output": "CMakeFiles/antlr.dir/deps/antlr4-runtime/support/Any.cpp.o"
+},
+{
+  "directory": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/build",
+  "command": "/Library/Developer/CommandLineTools/usr/bin/c++  -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/grammar -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/src -g -std=gnu++17 -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX15.4.sdk   -w -g -o CMakeFiles/antlr.dir/deps/antlr4-runtime/support/Arrays.cpp.o -c /Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/support/Arrays.cpp",
+  "file": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/support/Arrays.cpp",
+  "output": "CMakeFiles/antlr.dir/deps/antlr4-runtime/support/Arrays.cpp.o"
+},
+{
+  "directory": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/build",
+  "command": "/Library/Developer/CommandLineTools/usr/bin/c++  -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/grammar -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/src -g -std=gnu++17 -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX15.4.sdk   -w -g -o CMakeFiles/antlr.dir/deps/antlr4-runtime/support/CPPUtils.cpp.o -c /Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/support/CPPUtils.cpp",
+  "file": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/support/CPPUtils.cpp",
+  "output": "CMakeFiles/antlr.dir/deps/antlr4-runtime/support/CPPUtils.cpp.o"
+},
+{
+  "directory": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/build",
+  "command": "/Library/Developer/CommandLineTools/usr/bin/c++  -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/grammar -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/src -g -std=gnu++17 -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX15.4.sdk   -w -g -o CMakeFiles/antlr.dir/deps/antlr4-runtime/support/StringUtils.cpp.o -c /Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/support/StringUtils.cpp",
+  "file": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/support/StringUtils.cpp",
+  "output": "CMakeFiles/antlr.dir/deps/antlr4-runtime/support/StringUtils.cpp.o"
+},
+{
+  "directory": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/build",
+  "command": "/Library/Developer/CommandLineTools/usr/bin/c++  -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/grammar -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/src -g -std=gnu++17 -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX15.4.sdk   -w -g -o CMakeFiles/antlr.dir/deps/antlr4-runtime/support/Utf8.cpp.o -c /Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/support/Utf8.cpp",
+  "file": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/support/Utf8.cpp",
+  "output": "CMakeFiles/antlr.dir/deps/antlr4-runtime/support/Utf8.cpp.o"
+},
+{
+  "directory": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/build",
+  "command": "/Library/Developer/CommandLineTools/usr/bin/c++  -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/grammar -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/src -g -std=gnu++17 -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX15.4.sdk   -w -g -o CMakeFiles/antlr.dir/deps/antlr4-runtime/tree/ErrorNodeImpl.cpp.o -c /Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/tree/ErrorNodeImpl.cpp",
+  "file": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/tree/ErrorNodeImpl.cpp",
+  "output": "CMakeFiles/antlr.dir/deps/antlr4-runtime/tree/ErrorNodeImpl.cpp.o"
+},
+{
+  "directory": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/build",
+  "command": "/Library/Developer/CommandLineTools/usr/bin/c++  -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/grammar -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/src -g -std=gnu++17 -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX15.4.sdk   -w -g -o CMakeFiles/antlr.dir/deps/antlr4-runtime/tree/IterativeParseTreeWalker.cpp.o -c /Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/tree/IterativeParseTreeWalker.cpp",
+  "file": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/tree/IterativeParseTreeWalker.cpp",
+  "output": "CMakeFiles/antlr.dir/deps/antlr4-runtime/tree/IterativeParseTreeWalker.cpp.o"
+},
+{
+  "directory": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/build",
+  "command": "/Library/Developer/CommandLineTools/usr/bin/c++  -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/grammar -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/src -g -std=gnu++17 -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX15.4.sdk   -w -g -o CMakeFiles/antlr.dir/deps/antlr4-runtime/tree/ParseTree.cpp.o -c /Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/tree/ParseTree.cpp",
+  "file": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/tree/ParseTree.cpp",
+  "output": "CMakeFiles/antlr.dir/deps/antlr4-runtime/tree/ParseTree.cpp.o"
+},
+{
+  "directory": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/build",
+  "command": "/Library/Developer/CommandLineTools/usr/bin/c++  -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/grammar -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/src -g -std=gnu++17 -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX15.4.sdk   -w -g -o CMakeFiles/antlr.dir/deps/antlr4-runtime/tree/ParseTreeListener.cpp.o -c /Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/tree/ParseTreeListener.cpp",
+  "file": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/tree/ParseTreeListener.cpp",
+  "output": "CMakeFiles/antlr.dir/deps/antlr4-runtime/tree/ParseTreeListener.cpp.o"
+},
+{
+  "directory": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/build",
+  "command": "/Library/Developer/CommandLineTools/usr/bin/c++  -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/grammar -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/src -g -std=gnu++17 -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX15.4.sdk   -w -g -o CMakeFiles/antlr.dir/deps/antlr4-runtime/tree/ParseTreeVisitor.cpp.o -c /Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/tree/ParseTreeVisitor.cpp",
+  "file": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/tree/ParseTreeVisitor.cpp",
+  "output": "CMakeFiles/antlr.dir/deps/antlr4-runtime/tree/ParseTreeVisitor.cpp.o"
+},
+{
+  "directory": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/build",
+  "command": "/Library/Developer/CommandLineTools/usr/bin/c++  -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/grammar -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/src -g -std=gnu++17 -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX15.4.sdk   -w -g -o CMakeFiles/antlr.dir/deps/antlr4-runtime/tree/ParseTreeWalker.cpp.o -c /Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/tree/ParseTreeWalker.cpp",
+  "file": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/tree/ParseTreeWalker.cpp",
+  "output": "CMakeFiles/antlr.dir/deps/antlr4-runtime/tree/ParseTreeWalker.cpp.o"
+},
+{
+  "directory": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/build",
+  "command": "/Library/Developer/CommandLineTools/usr/bin/c++  -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/grammar -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/src -g -std=gnu++17 -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX15.4.sdk   -w -g -o CMakeFiles/antlr.dir/deps/antlr4-runtime/tree/TerminalNodeImpl.cpp.o -c /Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/tree/TerminalNodeImpl.cpp",
+  "file": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/tree/TerminalNodeImpl.cpp",
+  "output": "CMakeFiles/antlr.dir/deps/antlr4-runtime/tree/TerminalNodeImpl.cpp.o"
+},
+{
+  "directory": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/build",
+  "command": "/Library/Developer/CommandLineTools/usr/bin/c++  -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/grammar -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/src -g -std=gnu++17 -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX15.4.sdk   -w -g -o CMakeFiles/antlr.dir/deps/antlr4-runtime/tree/Trees.cpp.o -c /Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/tree/Trees.cpp",
+  "file": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/tree/Trees.cpp",
+  "output": "CMakeFiles/antlr.dir/deps/antlr4-runtime/tree/Trees.cpp.o"
+},
+{
+  "directory": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/build",
+  "command": "/Library/Developer/CommandLineTools/usr/bin/c++  -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/grammar -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/src -g -std=gnu++17 -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX15.4.sdk   -w -g -o CMakeFiles/antlr.dir/deps/antlr4-runtime/tree/pattern/Chunk.cpp.o -c /Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/tree/pattern/Chunk.cpp",
+  "file": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/tree/pattern/Chunk.cpp",
+  "output": "CMakeFiles/antlr.dir/deps/antlr4-runtime/tree/pattern/Chunk.cpp.o"
+},
+{
+  "directory": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/build",
+  "command": "/Library/Developer/CommandLineTools/usr/bin/c++  -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/grammar -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/src -g -std=gnu++17 -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX15.4.sdk   -w -g -o CMakeFiles/antlr.dir/deps/antlr4-runtime/tree/pattern/ParseTreeMatch.cpp.o -c /Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/tree/pattern/ParseTreeMatch.cpp",
+  "file": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/tree/pattern/ParseTreeMatch.cpp",
+  "output": "CMakeFiles/antlr.dir/deps/antlr4-runtime/tree/pattern/ParseTreeMatch.cpp.o"
+},
+{
+  "directory": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/build",
+  "command": "/Library/Developer/CommandLineTools/usr/bin/c++  -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/grammar -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/src -g -std=gnu++17 -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX15.4.sdk   -w -g -o CMakeFiles/antlr.dir/deps/antlr4-runtime/tree/pattern/ParseTreePattern.cpp.o -c /Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/tree/pattern/ParseTreePattern.cpp",
+  "file": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/tree/pattern/ParseTreePattern.cpp",
+  "output": "CMakeFiles/antlr.dir/deps/antlr4-runtime/tree/pattern/ParseTreePattern.cpp.o"
+},
+{
+  "directory": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/build",
+  "command": "/Library/Developer/CommandLineTools/usr/bin/c++  -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/grammar -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/src -g -std=gnu++17 -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX15.4.sdk   -w -g -o CMakeFiles/antlr.dir/deps/antlr4-runtime/tree/pattern/ParseTreePatternMatcher.cpp.o -c /Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/tree/pattern/ParseTreePatternMatcher.cpp",
+  "file": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/tree/pattern/ParseTreePatternMatcher.cpp",
+  "output": "CMakeFiles/antlr.dir/deps/antlr4-runtime/tree/pattern/ParseTreePatternMatcher.cpp.o"
+},
+{
+  "directory": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/build",
+  "command": "/Library/Developer/CommandLineTools/usr/bin/c++  -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/grammar -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/src -g -std=gnu++17 -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX15.4.sdk   -w -g -o CMakeFiles/antlr.dir/deps/antlr4-runtime/tree/pattern/RuleTagToken.cpp.o -c /Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/tree/pattern/RuleTagToken.cpp",
+  "file": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/tree/pattern/RuleTagToken.cpp",
+  "output": "CMakeFiles/antlr.dir/deps/antlr4-runtime/tree/pattern/RuleTagToken.cpp.o"
+},
+{
+  "directory": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/build",
+  "command": "/Library/Developer/CommandLineTools/usr/bin/c++  -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/grammar -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/src -g -std=gnu++17 -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX15.4.sdk   -w -g -o CMakeFiles/antlr.dir/deps/antlr4-runtime/tree/pattern/TagChunk.cpp.o -c /Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/tree/pattern/TagChunk.cpp",
+  "file": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/tree/pattern/TagChunk.cpp",
+  "output": "CMakeFiles/antlr.dir/deps/antlr4-runtime/tree/pattern/TagChunk.cpp.o"
+},
+{
+  "directory": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/build",
+  "command": "/Library/Developer/CommandLineTools/usr/bin/c++  -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/grammar -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/src -g -std=gnu++17 -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX15.4.sdk   -w -g -o CMakeFiles/antlr.dir/deps/antlr4-runtime/tree/pattern/TextChunk.cpp.o -c /Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/tree/pattern/TextChunk.cpp",
+  "file": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/tree/pattern/TextChunk.cpp",
+  "output": "CMakeFiles/antlr.dir/deps/antlr4-runtime/tree/pattern/TextChunk.cpp.o"
+},
+{
+  "directory": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/build",
+  "command": "/Library/Developer/CommandLineTools/usr/bin/c++  -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/grammar -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/src -g -std=gnu++17 -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX15.4.sdk   -w -g -o CMakeFiles/antlr.dir/deps/antlr4-runtime/tree/pattern/TokenTagToken.cpp.o -c /Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/tree/pattern/TokenTagToken.cpp",
+  "file": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/tree/pattern/TokenTagToken.cpp",
+  "output": "CMakeFiles/antlr.dir/deps/antlr4-runtime/tree/pattern/TokenTagToken.cpp.o"
+},
+{
+  "directory": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/build",
+  "command": "/Library/Developer/CommandLineTools/usr/bin/c++  -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/grammar -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/src -g -std=gnu++17 -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX15.4.sdk   -w -g -o CMakeFiles/antlr.dir/deps/antlr4-runtime/tree/xpath/XPath.cpp.o -c /Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/tree/xpath/XPath.cpp",
+  "file": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/tree/xpath/XPath.cpp",
+  "output": "CMakeFiles/antlr.dir/deps/antlr4-runtime/tree/xpath/XPath.cpp.o"
+},
+{
+  "directory": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/build",
+  "command": "/Library/Developer/CommandLineTools/usr/bin/c++  -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/grammar -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/src -g -std=gnu++17 -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX15.4.sdk   -w -g -o CMakeFiles/antlr.dir/deps/antlr4-runtime/tree/xpath/XPathElement.cpp.o -c /Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/tree/xpath/XPathElement.cpp",
+  "file": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/tree/xpath/XPathElement.cpp",
+  "output": "CMakeFiles/antlr.dir/deps/antlr4-runtime/tree/xpath/XPathElement.cpp.o"
+},
+{
+  "directory": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/build",
+  "command": "/Library/Developer/CommandLineTools/usr/bin/c++  -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/grammar -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/src -g -std=gnu++17 -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX15.4.sdk   -w -g -o CMakeFiles/antlr.dir/deps/antlr4-runtime/tree/xpath/XPathLexer.cpp.o -c /Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/tree/xpath/XPathLexer.cpp",
+  "file": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/tree/xpath/XPathLexer.cpp",
+  "output": "CMakeFiles/antlr.dir/deps/antlr4-runtime/tree/xpath/XPathLexer.cpp.o"
+},
+{
+  "directory": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/build",
+  "command": "/Library/Developer/CommandLineTools/usr/bin/c++  -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/grammar -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/src -g -std=gnu++17 -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX15.4.sdk   -w -g -o CMakeFiles/antlr.dir/deps/antlr4-runtime/tree/xpath/XPathLexerErrorListener.cpp.o -c /Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/tree/xpath/XPathLexerErrorListener.cpp",
+  "file": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/tree/xpath/XPathLexerErrorListener.cpp",
+  "output": "CMakeFiles/antlr.dir/deps/antlr4-runtime/tree/xpath/XPathLexerErrorListener.cpp.o"
+},
+{
+  "directory": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/build",
+  "command": "/Library/Developer/CommandLineTools/usr/bin/c++  -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/grammar -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/src -g -std=gnu++17 -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX15.4.sdk   -w -g -o CMakeFiles/antlr.dir/deps/antlr4-runtime/tree/xpath/XPathRuleAnywhereElement.cpp.o -c /Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/tree/xpath/XPathRuleAnywhereElement.cpp",
+  "file": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/tree/xpath/XPathRuleAnywhereElement.cpp",
+  "output": "CMakeFiles/antlr.dir/deps/antlr4-runtime/tree/xpath/XPathRuleAnywhereElement.cpp.o"
+},
+{
+  "directory": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/build",
+  "command": "/Library/Developer/CommandLineTools/usr/bin/c++  -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/grammar -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/src -g -std=gnu++17 -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX15.4.sdk   -w -g -o CMakeFiles/antlr.dir/deps/antlr4-runtime/tree/xpath/XPathRuleElement.cpp.o -c /Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/tree/xpath/XPathRuleElement.cpp",
+  "file": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/tree/xpath/XPathRuleElement.cpp",
+  "output": "CMakeFiles/antlr.dir/deps/antlr4-runtime/tree/xpath/XPathRuleElement.cpp.o"
+},
+{
+  "directory": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/build",
+  "command": "/Library/Developer/CommandLineTools/usr/bin/c++  -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/grammar -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/src -g -std=gnu++17 -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX15.4.sdk   -w -g -o CMakeFiles/antlr.dir/deps/antlr4-runtime/tree/xpath/XPathTokenAnywhereElement.cpp.o -c /Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/tree/xpath/XPathTokenAnywhereElement.cpp",
+  "file": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/tree/xpath/XPathTokenAnywhereElement.cpp",
+  "output": "CMakeFiles/antlr.dir/deps/antlr4-runtime/tree/xpath/XPathTokenAnywhereElement.cpp.o"
+},
+{
+  "directory": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/build",
+  "command": "/Library/Developer/CommandLineTools/usr/bin/c++  -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/grammar -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/src -g -std=gnu++17 -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX15.4.sdk   -w -g -o CMakeFiles/antlr.dir/deps/antlr4-runtime/tree/xpath/XPathTokenElement.cpp.o -c /Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/tree/xpath/XPathTokenElement.cpp",
+  "file": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/tree/xpath/XPathTokenElement.cpp",
+  "output": "CMakeFiles/antlr.dir/deps/antlr4-runtime/tree/xpath/XPathTokenElement.cpp.o"
+},
+{
+  "directory": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/build",
+  "command": "/Library/Developer/CommandLineTools/usr/bin/c++  -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/grammar -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/src -g -std=gnu++17 -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX15.4.sdk   -w -g -o CMakeFiles/antlr.dir/deps/antlr4-runtime/tree/xpath/XPathWildcardAnywhereElement.cpp.o -c /Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/tree/xpath/XPathWildcardAnywhereElement.cpp",
+  "file": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/tree/xpath/XPathWildcardAnywhereElement.cpp",
+  "output": "CMakeFiles/antlr.dir/deps/antlr4-runtime/tree/xpath/XPathWildcardAnywhereElement.cpp.o"
+},
+{
+  "directory": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/build",
+  "command": "/Library/Developer/CommandLineTools/usr/bin/c++  -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/grammar -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/src -g -std=gnu++17 -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX15.4.sdk   -w -g -o CMakeFiles/antlr.dir/deps/antlr4-runtime/tree/xpath/XPathWildcardElement.cpp.o -c /Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/tree/xpath/XPathWildcardElement.cpp",
+  "file": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/tree/xpath/XPathWildcardElement.cpp",
+  "output": "CMakeFiles/antlr.dir/deps/antlr4-runtime/tree/xpath/XPathWildcardElement.cpp.o"
+},
+{
+  "directory": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/build",
+  "command": "/Library/Developer/CommandLineTools/usr/bin/c++  -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/grammar -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/src -g -std=gnu++17 -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX15.4.sdk   -w -g -o CMakeFiles/compiler.dir/grammar/CactLexer.cpp.o -c /Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/grammar/CactLexer.cpp",
+  "file": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/grammar/CactLexer.cpp",
+  "output": "CMakeFiles/compiler.dir/grammar/CactLexer.cpp.o"
+},
+{
+  "directory": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/build",
+  "command": "/Library/Developer/CommandLineTools/usr/bin/c++  -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/grammar -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/src -g -std=gnu++17 -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX15.4.sdk   -w -g -o CMakeFiles/compiler.dir/grammar/CactParser.cpp.o -c /Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/grammar/CactParser.cpp",
+  "file": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/grammar/CactParser.cpp",
+  "output": "CMakeFiles/compiler.dir/grammar/CactParser.cpp.o"
+},
+{
+  "directory": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/build",
+  "command": "/Library/Developer/CommandLineTools/usr/bin/c++  -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/grammar -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/src -g -std=gnu++17 -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX15.4.sdk   -w -g -o CMakeFiles/compiler.dir/grammar/CactParserBaseVisitor.cpp.o -c /Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/grammar/CactParserBaseVisitor.cpp",
+  "file": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/grammar/CactParserBaseVisitor.cpp",
+  "output": "CMakeFiles/compiler.dir/grammar/CactParserBaseVisitor.cpp.o"
+},
+{
+  "directory": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/build",
+  "command": "/Library/Developer/CommandLineTools/usr/bin/c++  -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/grammar -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/src -g -std=gnu++17 -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX15.4.sdk   -w -g -o CMakeFiles/compiler.dir/grammar/CactParserVisitor.cpp.o -c /Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/grammar/CactParserVisitor.cpp",
+  "file": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/grammar/CactParserVisitor.cpp",
+  "output": "CMakeFiles/compiler.dir/grammar/CactParserVisitor.cpp.o"
+},
+{
+  "directory": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/build",
+  "command": "/Library/Developer/CommandLineTools/usr/bin/c++  -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/grammar -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/src -g -std=gnu++17 -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX15.4.sdk   -w -g -o CMakeFiles/compiler.dir/src/SemanticAnalyzer.cpp.o -c /Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/src/SemanticAnalyzer.cpp",
+  "file": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/src/SemanticAnalyzer.cpp",
+  "output": "CMakeFiles/compiler.dir/src/SemanticAnalyzer.cpp.o"
+},
+{
+  "directory": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/build",
+  "command": "/Library/Developer/CommandLineTools/usr/bin/c++  -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/grammar -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/src -g -std=gnu++17 -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX15.4.sdk   -w -g -o CMakeFiles/compiler.dir/src/SymbolTable.cpp.o -c /Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/src/SymbolTable.cpp",
+  "file": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/src/SymbolTable.cpp",
+  "output": "CMakeFiles/compiler.dir/src/SymbolTable.cpp.o"
+},
+{
+  "directory": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/build",
+  "command": "/Library/Developer/CommandLineTools/usr/bin/c++  -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/grammar -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/src -g -std=gnu++17 -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX15.4.sdk   -w -g -o CMakeFiles/compiler.dir/src/main.cpp.o -c /Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/src/main.cpp",
+  "file": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/src/main.cpp",
+  "output": "CMakeFiles/compiler.dir/src/main.cpp.o"
+},
+{
+  "directory": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/build",
+  "command": "/Library/Developer/CommandLineTools/usr/bin/c++  -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/grammar -I/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/src -g -std=gnu++17 -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX15.4.sdk   -w -g -o CMakeFiles/compiler.dir/src/syntax_error_listener.cpp.o -c /Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/src/syntax_error_listener.cpp",
+  "file": "/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/src/syntax_error_listener.cpp",
+  "output": "CMakeFiles/compiler.dir/src/syntax_error_listener.cpp.o"
+}
+]

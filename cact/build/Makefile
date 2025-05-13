@@ -57,10 +57,10 @@ RM = /opt/homebrew/bin/cmake -E rm -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /Users/yaoyongzhou/work/25spring/2025_Spring_UCAS_CPLab/cact
+CMAKE_SOURCE_DIR = /Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /Users/yaoyongzhou/work/25spring/2025_Spring_UCAS_CPLab/cact/build
+CMAKE_BINARY_DIR = /Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/build
 
 #=============================================================================
 # Targets provided globally by CMake.
@@ -87,9 +87,9 @@ rebuild_cache/fast: rebuild_cache
 
 # The main all target
 all: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /Users/yaoyongzhou/work/25spring/2025_Spring_UCAS_CPLab/cact/build/CMakeFiles /Users/yaoyongzhou/work/25spring/2025_Spring_UCAS_CPLab/cact/build//CMakeFiles/progress.marks
+	$(CMAKE_COMMAND) -E cmake_progress_start /Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/build/CMakeFiles /Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/build//CMakeFiles/progress.marks
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 all
-	$(CMAKE_COMMAND) -E cmake_progress_start /Users/yaoyongzhou/work/25spring/2025_Spring_UCAS_CPLab/cact/build/CMakeFiles 0
+	$(CMAKE_COMMAND) -E cmake_progress_start /Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/build/CMakeFiles 0
 .PHONY : all
 
 # The main clean target
@@ -3502,6 +3502,54 @@ grammar/CactParserVisitor.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/compiler.dir/build.make CMakeFiles/compiler.dir/grammar/CactParserVisitor.cpp.s
 .PHONY : grammar/CactParserVisitor.cpp.s
 
+src/SemanticAnalyzer.o: src/SemanticAnalyzer.cpp.o
+.PHONY : src/SemanticAnalyzer.o
+
+# target to build an object file
+src/SemanticAnalyzer.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/compiler.dir/build.make CMakeFiles/compiler.dir/src/SemanticAnalyzer.cpp.o
+.PHONY : src/SemanticAnalyzer.cpp.o
+
+src/SemanticAnalyzer.i: src/SemanticAnalyzer.cpp.i
+.PHONY : src/SemanticAnalyzer.i
+
+# target to preprocess a source file
+src/SemanticAnalyzer.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/compiler.dir/build.make CMakeFiles/compiler.dir/src/SemanticAnalyzer.cpp.i
+.PHONY : src/SemanticAnalyzer.cpp.i
+
+src/SemanticAnalyzer.s: src/SemanticAnalyzer.cpp.s
+.PHONY : src/SemanticAnalyzer.s
+
+# target to generate assembly for a file
+src/SemanticAnalyzer.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/compiler.dir/build.make CMakeFiles/compiler.dir/src/SemanticAnalyzer.cpp.s
+.PHONY : src/SemanticAnalyzer.cpp.s
+
+src/SymbolTable.o: src/SymbolTable.cpp.o
+.PHONY : src/SymbolTable.o
+
+# target to build an object file
+src/SymbolTable.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/compiler.dir/build.make CMakeFiles/compiler.dir/src/SymbolTable.cpp.o
+.PHONY : src/SymbolTable.cpp.o
+
+src/SymbolTable.i: src/SymbolTable.cpp.i
+.PHONY : src/SymbolTable.i
+
+# target to preprocess a source file
+src/SymbolTable.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/compiler.dir/build.make CMakeFiles/compiler.dir/src/SymbolTable.cpp.i
+.PHONY : src/SymbolTable.cpp.i
+
+src/SymbolTable.s: src/SymbolTable.cpp.s
+.PHONY : src/SymbolTable.s
+
+# target to generate assembly for a file
+src/SymbolTable.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/compiler.dir/build.make CMakeFiles/compiler.dir/src/SymbolTable.cpp.s
+.PHONY : src/SymbolTable.cpp.s
+
 src/main.o: src/main.cpp.o
 .PHONY : src/main.o
 
@@ -3980,6 +4028,12 @@ help:
 	@echo "... grammar/CactParserVisitor.o"
 	@echo "... grammar/CactParserVisitor.i"
 	@echo "... grammar/CactParserVisitor.s"
+	@echo "... src/SemanticAnalyzer.o"
+	@echo "... src/SemanticAnalyzer.i"
+	@echo "... src/SemanticAnalyzer.s"
+	@echo "... src/SymbolTable.o"
+	@echo "... src/SymbolTable.i"
+	@echo "... src/SymbolTable.s"
 	@echo "... src/main.o"
 	@echo "... src/main.i"
 	@echo "... src/main.s"

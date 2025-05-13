@@ -6,6 +6,7 @@
 #include "CactLexer.h"          // 词法分析器
 #include "CactParser.h"         // 语法分析器
 #include "include/syntax_error_listener.h"  // 自定义语法错误监听器
+#include "include/SemanticAnalyzer.h"       // 语义分析器
 
 // 递归打印语法树，包含语法单元类型
 void printParseTree(antlr4::tree::ParseTree *tree, antlr4::Parser *parser, const std::string &prefix = "", bool isLast = true) {
@@ -48,7 +49,7 @@ int main(int argc, const char *argv[]) {
     }
 
     // 获取文件名（不包含路径）
-    std::string filename = std::filesystem::path(argv[1]).filename().string();
+    std::string filename = argv[1];
 
     // 创建 ANTLR 输入流
     antlr4::ANTLRInputStream input(stream);
@@ -87,16 +88,24 @@ int main(int argc, const char *argv[]) {
             return 1;
         }
 
+        // 语义分析
+        SemanticAnalyzer analyzer;
+        analyzer.visit(tree);
+        if (analyzer.hasSemanticError()) {
+            std::cerr << filename << ": Semantic error detected." << std::endl << std::endl;
+            std::cerr << "----------------------------------------" << std::endl<< std::endl; // 分隔线
+            return 1;
+        }
+
         // 输出成功信息
-        std::cout << filename << ": Parsing succeeded." << std::endl << std::endl;
+        std::cout << filename << ": Parsing and semantic analysis succeeded." << std::endl << std::endl;
         std::cerr << "----------------------------------------" << std::endl<< std::endl; // 分隔线
-    }catch (const antlr4::RecognitionException &e) {
+    } catch (const antlr4::RecognitionException &e) {
         // 处理 ANTLR 特定的异常
         std::cerr << "ANTLR Recognition error: " << e.what() << std::endl;
         std::cerr << filename << ": Parsing failed." << std::endl << std::endl;
         return 1;
-    } 
-    catch (const std::exception &e) {
+    } catch (const std::exception &e) {
         // 捕获异常并输出错误信息
         std::cerr << "Error while parsing file '" << argv[1] << "': " << e.what() << std::endl << std::endl;
         return 1;
