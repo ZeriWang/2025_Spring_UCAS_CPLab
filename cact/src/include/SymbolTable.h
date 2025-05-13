@@ -41,6 +41,11 @@ public:
     std::optional<Symbol> lookup(const std::string& name) const;
     std::shared_ptr<Scope> getParent() const;
 
+    // 新增：只查当前作用域
+    bool containsInCurrentScope(const std::string& name) const {
+        return table.count(name) > 0;
+    }
+
 private:
     std::unordered_map<std::string, Symbol> table;
     std::shared_ptr<Scope> parent;
@@ -55,6 +60,11 @@ public:
     void exitScope();
     bool insert(const Symbol& symbol);
     std::optional<Symbol> lookup(const std::string& name) const;
+
+    // 新增：只查当前作用域
+    bool containsInCurrentScope(const std::string& name) const {
+        return currentScope->containsInCurrentScope(name);
+    }
 
 private:
     std::shared_ptr<Scope> currentScope;
