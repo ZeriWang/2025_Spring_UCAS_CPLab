@@ -995,5 +995,4 @@ CMakeFiles/compiler.dir/src/SemanticAnalyzer.cpp.o: \
   /Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/tree/xpath/XPathWildcardAnywhereElement.h \
   /Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/deps/antlr4-runtime/tree/xpath/XPathWildcardElement.h \
   /Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/grammar/CactParserVisitor.h \
-  /Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/grammar/CactParser.h \
-  /Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/src/include/SymbolTable.h
+  /Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/grammar/CactParser.h

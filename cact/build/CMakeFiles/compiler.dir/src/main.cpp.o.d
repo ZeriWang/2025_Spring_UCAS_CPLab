@@ -997,5 +997,4 @@ CMakeFiles/compiler.dir/src/main.cpp.o: \
   /Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/src/include/syntax_error_listener.h \
   /Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/src/include/SemanticAnalyzer.h \
   /Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/grammar/CactParserBaseVisitor.h \
-  /Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/grammar/CactParserVisitor.h \
-  /Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/src/include/SymbolTable.h
+  /Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/grammar/CactParserVisitor.h

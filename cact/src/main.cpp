@@ -89,9 +89,10 @@ int main(int argc, const char *argv[]) {
         }
 
         // 语义分析
-        SemanticAnalyzer analyzer;
+        SemanticAnalyzer analyzer(&parser); // Pass the parser instance
         analyzer.visit(tree);
         if (analyzer.hasSemanticError()) {
+            analyzer.printErrors(filename); // Print semantic errors
             std::cerr << filename << ": Semantic error detected." << std::endl << std::endl;
             std::cerr << "----------------------------------------" << std::endl<< std::endl; // 分隔线
             return 1;
