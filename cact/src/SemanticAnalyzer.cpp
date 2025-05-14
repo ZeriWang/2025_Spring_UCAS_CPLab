@@ -382,7 +382,9 @@ antlrcpp::Any SemanticAnalyzer::visitVariableDeclaration(CactParser::VariableDec
                     if (!initVal.isConst) { // As per spec: "CACT限制初值表达式必须是常数"
                         addError("Initializer for variable '" + name + "' must be a compile-time constant expression.", 
                                  varDefCtx->constantInitializationValue()->getStart());
-                    } else if (!initVal.type->equals(*actualType)) {
+                    } else if (!initVal.type->equals(*actualType) && initVal.type->baseType != Type::ERROR_TYPE) {
+                         // 只有当不是错误类型时才显示类型不匹配的错误
+                         // 错误类型表示已经在visitConstantInitializationValue中报告过错误
                          addError("Initializer type '" + initVal.type->toString() + 
                                  "' does not match variable type '" + actualType->toString() + 
                                  "' for '" + name + "'.", 
@@ -771,7 +773,11 @@ antlrcpp::Any SemanticAnalyzer::visitConstantInitializationValue(CactParser::Con
                     addError("Initializer type '" + evalRes.type->toString() + 
                              "' does not match expected type '" + expectedInitializerType->toString() + "'.", 
                              ctx->constantExpression()->getStart());
-                    return ConstEvalResult{Type::getError(), {}, false, false};
+                    // 返回一个带有错误类型但保留原始常量属性的结果
+                    // 这样可以避免触发"必须是编译时常量"的错误
+                    ConstEvalResult errorResult = evalRes;
+                    errorResult.type = Type::getError();
+                    return errorResult;
                 }
             }
         }
@@ -917,11 +923,22 @@ antlrcpp::Any SemanticAnalyzer::visitConstantExpression(CactParser::ConstantExpr
 }
 
 antlrcpp::Any SemanticAnalyzer::visitCondition(CactParser::ConditionContext *ctx) {
+    // 保存旧的上下文状态
+    bool oldInConditionContext = inConditionContext;
+    // 设置为条件表达式上下文
+    inConditionContext = true;
+    
+    std::shared_ptr<Type> result;
     if (ctx->logicalOrExpression()) {
-        return visitLogicalOrExpression(ctx->logicalOrExpression());
+        result = std::any_cast<std::shared_ptr<Type>>(visitLogicalOrExpression(ctx->logicalOrExpression()));
+    } else {
+        addError("Invalid condition structure.", ctx->getStart());
+        result = Type::getError();
     }
-    addError("Invalid condition structure.", ctx->getStart());
-    return Type::getError();
+    
+    // 恢复原来的上下文状态
+    inConditionContext = oldInConditionContext;
+    return result;
 }
 
 antlrcpp::Any SemanticAnalyzer::visitLeftValue(CactParser::LeftValueContext *ctx) {
@@ -1014,6 +1031,11 @@ antlrcpp::Any SemanticAnalyzer::visitUnaryExpression(CactParser::UnaryExpression
         }
         if (ctx->ExclamationMark()) { // !Exp
             // Spec: "!仅出现在条件表达式中" - implies it operates on something bool-like (numeric in CACT)
+            if (!inConditionContext) {
+                addError("Logical NOT '!' operator can only be used in condition expressions.", ctx->ExclamationMark()->getSymbol());
+                return Type::getError();
+            }
+            
             if (operandType->baseType != Type::INT && operandType->baseType != Type::FLOAT && operandType->baseType != Type::CHAR) {
                 addError("Logical NOT '!' must be applied to numeric type, got '" + operandType->toString() + "'.", ctx->ExclamationMark()->getSymbol());
                 return Type::getError();
