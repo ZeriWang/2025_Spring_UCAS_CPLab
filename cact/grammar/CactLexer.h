@@ -6,6 +6,9 @@
 
 #include "antlr4-runtime.h"
 
+
+
+
 class  CactLexer : public antlr4::Lexer {
 public:
   enum {
@@ -50,6 +53,5 @@ private:
 
   // Individual semantic predicate functions triggered by sempred() above.
 
-  };
-
+};
 

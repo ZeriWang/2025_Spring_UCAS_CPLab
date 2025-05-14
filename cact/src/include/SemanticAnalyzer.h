@@ -26,7 +26,9 @@ public:
     antlrcpp::Any visitPrimaryExpression(CactParser::PrimaryExpressionContext *ctx) override;
     antlrcpp::Any visitUnaryExpression(CactParser::UnaryExpressionContext *ctx) override;
     antlrcpp::Any visitCondition(CactParser::ConditionContext *ctx) override;
-
+    antlrcpp::Any visitAddExpression(CactParser::AddExpressionContext *ctx) override;
+    antlrcpp::Any visitMultiplicativeExpression(CactParser::MultiplicativeExpressionContext *ctx) override;
+    
     // 辅助函数声明
     void checkVariableUsage(const std::string& name, antlr4::ParserRuleContext* ctx, const std::unordered_set<std::string>& declaredNames);
 
@@ -36,9 +38,17 @@ public:
 private:
     SymbolTable symbolTable;
     bool semanticError = false;
+    std::unique_ptr<std::unordered_set<std::string>> globalDeclaredNames; // 全局作用域声明的变量
     std::unordered_set<std::string>* currentDeclaredNames = nullptr; // 当前作用域已声明的变量
     std::unordered_set<std::string>* functionParamNames = nullptr; // 当前函数的参数名
     bool inConditionContext = false; // 标记是否在条件表达式上下文中
+
+    // 获取表达式的类型
+    BaseType getExpressionType(CactParser::ExpressionContext *ctx);
+    // 获取左值的类型
+    BaseType getLeftValueType(CactParser::LeftValueContext *ctx);
+    // 检查类型是否兼容（用于赋值）
+    bool areTypesCompatible(BaseType leftType, BaseType rightType);
 
     void reportError(const std::string& msg, antlr4::ParserRuleContext* ctx);
 };

@@ -66,7 +66,7 @@ fragment EscapeSequence: '\\' ['"?\\abfnrtv0];
 FloatConstant: ([-]?       '.'[0-9]+                  |
                 [-]?[0-9]+ '.'[0-9]*                  |
                 [-]?       '.'[0-9]+  [eE][+-]?[0-9]+ |
-                [-]?[0-9]+('.'[0-9]*)?[eE][+-]?[0-9]+  )[fF];
+                [-]?[0-9]+('.'[0-9]*)?[eE][+-]?[0-9]+  )[fF]?;
 
 // Comments and white spaces
 LineComment: '//' ~[\r\n]* -> skip;
