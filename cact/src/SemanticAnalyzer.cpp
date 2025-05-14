@@ -268,3 +268,26 @@ void SemanticAnalyzer::reportError(const std::string& msg, antlr4::ParserRuleCon
     std::cerr << "[Semantic Error] " << msg
               << " (line " << ctx->getStart()->getLine() << ")" << std::endl;
 }
+
+// 添加对一元表达式和条件表达式的访问处理
+antlrcpp::Any SemanticAnalyzer::visitUnaryExpression(CactParser::UnaryExpressionContext *ctx) {
+    // 检查是否使用 ! 运算符而且不在条件表达式上下文中
+    if (ctx->ExclamationMark() && !inConditionContext) {
+        reportError("逻辑非操作符 ! 只能在条件表达式中使用", ctx);
+    }
+    return visitChildren(ctx);
+}
+
+antlrcpp::Any SemanticAnalyzer::visitCondition(CactParser::ConditionContext *ctx) {
+    // 设置进入条件表达式上下文
+    bool oldInConditionContext = inConditionContext;
+    inConditionContext = true;
+    
+    // 访问条件表达式内容
+    auto result = visitChildren(ctx);
+    
+    // 恢复之前的上下文状态
+    inConditionContext = oldInConditionContext;
+    
+    return result;
+}

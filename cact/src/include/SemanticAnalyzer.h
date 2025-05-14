@@ -24,6 +24,8 @@ public:
     antlrcpp::Any visitLeftValue(CactParser::LeftValueContext *ctx) override;
     antlrcpp::Any visitExpression(CactParser::ExpressionContext *ctx) override;
     antlrcpp::Any visitPrimaryExpression(CactParser::PrimaryExpressionContext *ctx) override;
+    antlrcpp::Any visitUnaryExpression(CactParser::UnaryExpressionContext *ctx) override;
+    antlrcpp::Any visitCondition(CactParser::ConditionContext *ctx) override;
 
     // 辅助函数声明
     void checkVariableUsage(const std::string& name, antlr4::ParserRuleContext* ctx, const std::unordered_set<std::string>& declaredNames);
@@ -36,6 +38,7 @@ private:
     bool semanticError = false;
     std::unordered_set<std::string>* currentDeclaredNames = nullptr; // 当前作用域已声明的变量
     std::unordered_set<std::string>* functionParamNames = nullptr; // 当前函数的参数名
+    bool inConditionContext = false; // 标记是否在条件表达式上下文中
 
     void reportError(const std::string& msg, antlr4::ParserRuleContext* ctx);
 };
