@@ -236,30 +236,13 @@ antlrcpp::Any SemanticAnalyzer::visitFunctionDefinition(CactParser::FunctionDefi
             addError("Failed to define parameter '" + pSym->name + "' in function scope (should be impossible).", pSym->definitionNode->getStart());
         }
     }
-
-    // 保存当前的返回状态标志
-    bool savedFunctionHasReturn = currentFunctionHasReturn;
-    currentFunctionHasReturn = false; // 重置标志，准备分析函数体
-    
     visitBlock(ctx->block());
     
     // 检查非void函数的返回值
     if (returnType->baseType != Type::VOID && !currentFunctionHasReturn) {
-        // 如果函数名是main，我们可以特殊处理一下
-        if (funcName == "main") {
-            // main函数通常被假定总是会返回，所以我们可以不报错
-            // 但这是特殊的语义规则，如果规范要求所有非void函数必须有返回，则这里应该保留下面的错误
-            // 为了让测试通过，我们可以简单地设置这个标志为true
-            currentFunctionHasReturn = true;
-        } else {
-            // 对于其他函数，按照规范进行检查
-            addError("Non-void function '" + funcName + "' might not return a value on all paths.", ctx->Identifier()->getSymbol());
-        }
+        // 对所有函数进行一致的检查：每个非void函数都必须有返回值
+        addError("Non-void function '" + funcName + "' might not return a value on all paths.", ctx->Identifier()->getSymbol());
     }
-    
-    // 恢复之前的返回状态标志
-    currentFunctionHasReturn = savedFunctionHasReturn;
-
 
     exitScope(); // Function scope
     currentFunctionSymbol = nullptr; // Clear current function context
@@ -514,8 +497,37 @@ antlrcpp::Any SemanticAnalyzer::visitBlock(CactParser::BlockContext *ctx) {
     return nullptr;
 }
 
-antlrcpp::Any SemanticAnalyzer::visitStatement(CactParser::StatementContext *ctx) {
-    if (ctx->leftValue() && ctx->Equal() && ctx->expression()) { // Assignment: LVal '=' Exp ';'
+antlrcpp::Any SemanticAnalyzer::visitStatement(CactParser::StatementContext *ctx) {    
+    // 先检查Return语句，因为Return语句也可能包含expression
+    if (ctx->Return()) { // Return statement: 'return' Exp? ';'
+        if (!currentFunctionSymbol) {
+            addError("'return' statement outside of function.", ctx->Return()->getSymbol());
+            return nullptr;
+        }
+        currentFunctionHasReturn = true; // Mark that a return statement was encountered
+        std::shared_ptr<Type> expectedReturnType = currentFunctionSymbol->type->elementType; // elementType holds return type for functions
+
+        if (ctx->expression()) { // return Exp;
+            if (expectedReturnType->baseType == Type::VOID) {
+                addError("Cannot return a value from a void function '" + currentFunctionSymbol->name + "'.", ctx->Return()->getSymbol());
+            } else {
+                std::shared_ptr<Type> actualReturnType = std::any_cast<std::shared_ptr<Type>>(visitExpression(ctx->expression()));
+                if (actualReturnType->baseType != Type::ERROR_TYPE) {
+                    // Create temporary non-const versions for comparison
+                    auto tempExpected = std::make_shared<Type>(*expectedReturnType); tempExpected->isConst = false;
+                    auto tempActual = std::make_shared<Type>(*actualReturnType); tempActual->isConst = false;
+                    if (!tempExpected->equals(*tempActual)) {
+                        addError("Return type mismatch: expected '" + expectedReturnType->toString() +
+                                 "', got '" + actualReturnType->toString() + "'.", ctx->expression()->getStart());
+                    }
+                }
+            }
+        } else { // return;
+            if (expectedReturnType->baseType != Type::VOID) {
+                addError("Non-void function '" + currentFunctionSymbol->name + "' must return a value.", ctx->Return()->getSymbol());
+            }
+        }
+    } else if (ctx->leftValue() && ctx->Equal() && ctx->expression()) { // Assignment: LVal '=' Exp ';'
         std::shared_ptr<Type> lvalType = std::any_cast<std::shared_ptr<Type>>(visitLeftValue(ctx->leftValue()));
         std::shared_ptr<Type> expType = std::any_cast<std::shared_ptr<Type>>(visitExpression(ctx->expression()));
 
@@ -548,34 +560,6 @@ antlrcpp::Any SemanticAnalyzer::visitStatement(CactParser::StatementContext *ctx
         visitExpression(ctx->expression()); // Evaluate for side effects and errors
     } else if (ctx->block()) { // Block statement
         visitBlock(ctx->block());
-    } else if (ctx->Return()) { // Return statement: 'return' Exp? ';'
-        if (!currentFunctionSymbol) {
-            addError("'return' statement outside of function.", ctx->Return()->getSymbol());
-            return nullptr;
-        }
-        currentFunctionHasReturn = true; // Mark that a return statement was encountered
-        std::shared_ptr<Type> expectedReturnType = currentFunctionSymbol->type->elementType; // elementType holds return type for functions
-
-        if (ctx->expression()) { // return Exp;
-            if (expectedReturnType->baseType == Type::VOID) {
-                addError("Cannot return a value from a void function '" + currentFunctionSymbol->name + "'.", ctx->Return()->getSymbol());
-            } else {
-                std::shared_ptr<Type> actualReturnType = std::any_cast<std::shared_ptr<Type>>(visitExpression(ctx->expression()));
-                if (actualReturnType->baseType != Type::ERROR_TYPE) {
-                    // Create temporary non-const versions for comparison
-                    auto tempExpected = std::make_shared<Type>(*expectedReturnType); tempExpected->isConst = false;
-                    auto tempActual = std::make_shared<Type>(*actualReturnType); tempActual->isConst = false;
-                    if (!tempExpected->equals(*tempActual)) {
-                        addError("Return type mismatch: expected '" + expectedReturnType->toString() +
-                                 "', got '" + actualReturnType->toString() + "'.", ctx->expression()->getStart());
-                    }
-                }
-            }
-        } else { // return;
-            if (expectedReturnType->baseType != Type::VOID) {
-                addError("Non-void function '" + currentFunctionSymbol->name + "' must return a value.", ctx->Return()->getSymbol());
-            }
-        }
     } else if (ctx->If()) { // If statement: 'if' '(' Cond ')' Stmt [ 'else' Stmt ]
         std::shared_ptr<Type> condType = std::any_cast<std::shared_ptr<Type>>(visitCondition(ctx->condition()));
         if (condType->baseType != Type::ERROR_TYPE && 
