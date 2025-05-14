@@ -1094,11 +1094,22 @@ antlrcpp::Any SemanticAnalyzer::visitMultiplicativeExpression(CactParser::Multip
                      opToken);
             return Type::getError();
         }
-        // Type promotion: int op float -> float. int op int -> int. float op float -> float.
-        if (left->baseType == Type::FLOAT || right->baseType == Type::FLOAT) {
-            return Type::getFloat();
+        
+        // CACT不支持任何形式的类型转换，确保操作数类型相同
+        if (left->baseType != right->baseType) {
+            antlr4::Token* opToken = nullptr;
+            if (ctx->Asterisk()) opToken = ctx->Asterisk()->getSymbol();
+            else if (ctx->Slash()) opToken = ctx->Slash()->getSymbol();
+            else if (ctx->Percent()) opToken = ctx->Percent()->getSymbol();
+            
+            addError("Type mismatch in multiplication/division: CACT does not support type conversion, got '" +
+                     left->toString() + "' and '" + right->toString() + "'.", 
+                     opToken);
+            return Type::getError();
         }
-        return Type::getInt();
+        
+        // 现在，左右操作数类型一定相同
+        return std::make_shared<Type>(*left);
     } else { // UnaryExp
         return visitUnaryExpression(ctx->unaryExpression());
     }
@@ -1125,11 +1136,21 @@ antlrcpp::Any SemanticAnalyzer::visitAddExpression(CactParser::AddExpressionCont
                      opToken);
             return Type::getError();
         }
-        // Type promotion
-        if (left->baseType == Type::FLOAT || right->baseType == Type::FLOAT) {
-            return Type::getFloat();
+        
+        // CACT不支持任何形式的类型转换，确保操作数类型相同
+        if (left->baseType != right->baseType) {
+            antlr4::Token* opToken = nullptr;
+            if (ctx->Plus()) opToken = ctx->Plus()->getSymbol();
+            else if (ctx->Minus()) opToken = ctx->Minus()->getSymbol();
+            
+            addError("Type mismatch in addition/subtraction: CACT does not support type conversion, got '" +
+                     left->toString() + "' and '" + right->toString() + "'.", 
+                     opToken);
+            return Type::getError();
         }
-        return Type::getInt();
+        
+        // 现在，左右操作数类型一定相同
+        return std::make_shared<Type>(*left);
     } else { // MulExp
         return visitMultiplicativeExpression(ctx->multiplicativeExpression());
     }
@@ -1173,6 +1194,20 @@ antlrcpp::Any SemanticAnalyzer::visitRelationalExpression(CactParser::Relational
                      opToken);
             return Type::getError();
         }
+        
+        // CACT不支持任何形式的类型转换，确保非char操作数类型相同
+        if (left->baseType != Type::CHAR && right->baseType != left->baseType) {
+            antlr4::Token* opToken = nullptr;
+            if (ctx->Less()) opToken = ctx->Less()->getSymbol();
+            else if (ctx->Greater()) opToken = ctx->Greater()->getSymbol();
+            else if (ctx->LessEqual()) opToken = ctx->LessEqual()->getSymbol();
+            else if (ctx->GreaterEqual()) opToken = ctx->GreaterEqual()->getSymbol();
+            
+            addError("Type mismatch in relational expression: CACT does not support type conversion, got '" +
+                     left->toString() + "' and '" + right->toString() + "'.", 
+                     opToken);
+            return Type::getError();
+        }
         return Type::getInt(); // Result of relational expression is int (boolean)
     } else { // AddExp
         return visitAddExpression(ctx->addExpression());
@@ -1211,6 +1246,18 @@ antlrcpp::Any SemanticAnalyzer::visitEqualityExpression(CactParser::EqualityExpr
             
             addError("If one operand of an equality operator is char, the other must also be char. Got '" +
                      left->toString() + "' and '" + right->toString() + "'.",
+                     opToken);
+            return Type::getError();
+        }
+        
+        // CACT不支持任何形式的类型转换，确保非char操作数类型相同
+        if (left->baseType != Type::CHAR && right->baseType != left->baseType) {
+            antlr4::Token* opToken = nullptr;
+            if (ctx->LogicalEqual()) opToken = ctx->LogicalEqual()->getSymbol();
+            else if (ctx->NotEqual()) opToken = ctx->NotEqual()->getSymbol();
+            
+            addError("Type mismatch in equality expression: CACT does not support type conversion, got '" +
+                     left->toString() + "' and '" + right->toString() + "'.", 
                      opToken);
             return Type::getError();
         }
