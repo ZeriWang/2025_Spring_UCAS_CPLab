@@ -1,11 +1,19 @@
-\
 #include "include/SemanticAnalyzer.h"
-#include "CactParser.h" // Required for CactParser::*Context
+#include "CactParser.h"
 #include <iostream>
 #include <sstream>
-#include <algorithm> // For std::any_of
+#include <algorithm>
 
 // --- Type Implementation ---
+/**
+ * @brief Converts a type to its string representation
+ * 
+ * This method produces a readable string representation of a type,
+ * including basic types, array types with dimensions, and function types
+ * with return type and parameter types.
+ * 
+ * @return A string representing the type (with 'const' prefix if applicable)
+ */
 std::string Type::toString() const {
     std::string baseStr;
     switch (baseType) {
@@ -15,13 +23,10 @@ std::string Type::toString() const {
         case VOID: baseStr = "void"; break;
         case ARRAY: {
             baseStr = (elementType ? elementType->toString() : "unknown_element_type");
-            
-            // 按照正确的维度顺序输出：第一维，然后第二维...
             for (size_t i = 0; i < dimensions.size(); ++i) {
                 int dim = dimensions[i];
                 baseStr += "[";
                 if (dim == -1) {
-                    // 隐式维度不显示大小，常见于函数参数的第一维
                     baseStr += "";
                 } else {
                     baseStr += std::to_string(dim);
@@ -31,7 +36,7 @@ std::string Type::toString() const {
             break;
         }
         case FUNCTION:
-            baseStr = (elementType ? elementType->toString() : "unknown_ret_type"); // elementType is return type
+            baseStr = (elementType ? elementType->toString() : "unknown_ret_type");
             baseStr += "(";
             for (size_t i = 0; i < paramTypes.size(); ++i) {
                 baseStr += paramTypes[i]->toString();
@@ -46,20 +51,25 @@ std::string Type::toString() const {
     return (isConst ? "const " : "") + baseStr;
 }
 
-// 辅助函数，用于比较数组维度，特别处理函数参数中数组的第一维
+/**
+ * @brief Compares array dimensions for type equality checking
+ * 
+ * This method compares two arrays of dimension sizes to determine if they
+ * represent compatible array types. The first dimension is allowed to be
+ * unspecified (-1) for array parameters.
+ * 
+ * @param expected The expected array dimensions
+ * @param actual The actual array dimensions to check against
+ * @return true if dimensions are compatible, false otherwise
+ */
 bool Type::compareArrayDimensions(const std::vector<int>& expected, const std::vector<int>& actual) const {
     if (expected.size() != actual.size()) {
         return false;
     }
-    
     for (size_t i = 0; i < expected.size(); ++i) {
-        // 对于函数参数的数组，第一维度可以被省略（用-1表示）
-        // 如果预期类型或实际类型的第一维是-1，则允许匹配
         if (i == 0 && (expected[i] == -1 || actual[i] == -1)) {
-            continue; // 允许第一维不匹配
+            continue;
         }
-        
-        // 非第一维或第一维不是隐式的，必须严格匹配
         if (expected[i] != actual[i]) {
             return false;
         }
@@ -67,52 +77,71 @@ bool Type::compareArrayDimensions(const std::vector<int>& expected, const std::v
     return true;
 }
 
+/**
+ * @brief Compares two types for semantic equality
+ * 
+ * This method determines if two types are semantically equivalent.
+ * For array types, it recursively compares element types and dimensions.
+ * For function types, it compares return types and parameter types.
+ * 
+ * @param other The type to compare against
+ * @return true if types are semantically equal, false otherwise
+ */
 bool Type::equals(const Type& other) const {
     if (baseType != other.baseType) return false;
-    if (isConst != other.isConst && baseType != FUNCTION) { 
-        // Const-ness checking can be implemented here if needed
-        // For now we just ignore it to focus on fixing the array issues
+    if (isConst != other.isConst && baseType != FUNCTION) {
     }
-
     switch (baseType) {
         case ARRAY: {
-            // 特殊处理函数参数中的数组类型
             if (!elementType || !other.elementType) return false;
-            
-            // 比较元素类型
             if (!elementType->equals(*other.elementType)) return false;
-            
-            // 使用辅助函数比较维度
             return compareArrayDimensions(dimensions, other.dimensions);
         }
         case FUNCTION:
-            if (!elementType || !other.elementType || !elementType->equals(*other.elementType)) return false; // Return type
+            if (!elementType || !other.elementType || !elementType->equals(*other.elementType)) return false;
             if (paramTypes.size() != other.paramTypes.size()) return false;
             for (size_t i = 0; i < paramTypes.size(); ++i) {
                 if (!paramTypes[i] || !other.paramTypes[i] || !paramTypes[i]->equals(*other.paramTypes[i])) return false;
             }
             return true;
-        default: // For INT, FLOAT, CHAR, VOID, ERROR_TYPE, UNKNOWN
+        default:
             return true;
     }
 }
 
 // --- Scope Implementation ---
+/**
+ * @brief Defines a symbol in the current scope
+ * 
+ * This method attempts to add a symbol to the current scope's symbol table.
+ * It handles redefinition of symbols, with special treatment for function definitions.
+ * 
+ * @param name The name of the symbol to define
+ * @param symbol Information about the symbol being defined
+ * @return true if the symbol was successfully defined, false if a conflicting definition exists
+ */
 bool Scope::define(const std::string& name, std::shared_ptr<SymbolInfo> symbol) {
     auto it = symbols.find(name);
     if (it != symbols.end()) {
-        // 如果已存在同名符号，检查类型
-        // 只有当符号类型相同时，才视为重定义
         if ((it->second->kind == SymbolInfo::FUNCTION_DEF && symbol->kind == SymbolInfo::FUNCTION_DEF) ||
             (it->second->kind != SymbolInfo::FUNCTION_DEF && symbol->kind != SymbolInfo::FUNCTION_DEF)) {
-            return false; // 相同类型的同名符号，视为重定义
+            return false;
         }
-        // 否则允许不同类型符号同名（如变量和函数）
     }
     symbols[name] = symbol;
     return true;
 }
 
+/**
+ * @brief Resolves a symbol name in the current scope or parent scopes
+ * 
+ * This method looks up a symbol name in the current scope and, if not found,
+ * recursively searches parent scopes until either the symbol is found or
+ * there are no more parent scopes.
+ * 
+ * @param name The name of the symbol to resolve
+ * @return The symbol information if found, nullptr otherwise
+ */
 std::shared_ptr<SymbolInfo> Scope::resolve(const std::string& name) const {
     auto it = symbols.find(name);
     if (it != symbols.end()) {
@@ -121,9 +150,18 @@ std::shared_ptr<SymbolInfo> Scope::resolve(const std::string& name) const {
     if (parent_scope) {
         return parent_scope->resolve(name);
     }
-    return nullptr; // Not found
+    return nullptr;
 }
 
+/**
+ * @brief Resolves a symbol name in the current scope only
+ * 
+ * This method looks up a symbol name in the current scope only,
+ * without checking parent scopes.
+ * 
+ * @param name The name of the symbol to resolve
+ * @return The symbol information if found in current scope, nullptr otherwise
+ */
 std::shared_ptr<SymbolInfo> Scope::resolveCurrent(const std::string& name) const {
     auto it = symbols.find(name);
     if (it != symbols.end()) {
@@ -132,12 +170,25 @@ std::shared_ptr<SymbolInfo> Scope::resolveCurrent(const std::string& name) const
     return nullptr;
 }
 
-
 // --- SemanticAnalyzer Implementation ---
+/**
+ * @brief Constructor for the SemanticAnalyzer
+ * 
+ * Initializes the semantic analyzer with a reference to the parser
+ * and sets up initial state for analysis.
+ * 
+ * @param parser_ptr Pointer to the CACT parser
+ */
 SemanticAnalyzer::SemanticAnalyzer(CactParser* parser_ptr) : parser(parser_ptr), currentScope(nullptr), mainFunctionFound(false) {
-    // Constructor
 }
 
+/**
+ * @brief Prints all semantic errors detected during analysis
+ * 
+ * This method prints all semantic errors with source location information.
+ * 
+ * @param filename The source filename to include in error messages
+ */
 void SemanticAnalyzer::printErrors(const std::string& filename) const {
     for (const auto& err : errors) {
         std::cerr << filename << ":" << err.second->getLine() << ":" << err.second->getCharPositionInLine()
@@ -145,10 +196,25 @@ void SemanticAnalyzer::printErrors(const std::string& filename) const {
     }
 }
 
+/**
+ * @brief Creates a new scope and makes it the current scope
+ * 
+ * This method establishes a new lexical scope, optionally marking it as
+ * a function scope or loop scope for special semantic checks.
+ * 
+ * @param isFunctionScope Whether the new scope is a function body
+ * @param isLoopScope Whether the new scope is a loop body
+ */
 void SemanticAnalyzer::enterScope(bool isFunctionScope, bool isLoopScope) {
     currentScope = new Scope(currentScope, isFunctionScope, isLoopScope);
 }
 
+/**
+ * @brief Exits the current scope and returns to the parent scope
+ * 
+ * This method cleans up the current scope and makes its parent
+ * the new current scope.
+ */
 void SemanticAnalyzer::exitScope() {
     if (currentScope) {
         Scope* oldScope = currentScope;
@@ -157,39 +223,71 @@ void SemanticAnalyzer::exitScope() {
     }
 }
 
+/**
+ * @brief Records a semantic error with context information
+ * 
+ * @param message The error message
+ * @param ctx The parser rule context where the error occurred
+ */
 void SemanticAnalyzer::addError(const std::string& message, antlr4::ParserRuleContext* ctx) {
     if (ctx) {
         addError(message, ctx->getStart());
     } else {
-        errors.push_back({message, nullptr}); // Should ideally always have a token
+        errors.push_back({message, nullptr});
     }
 }
+/**
+ * @brief Records a semantic error with token information
+ * 
+ * @param message The error message
+ * @param token The token where the error occurred
+ */
 void SemanticAnalyzer::addError(const std::string& message, antlr4::Token* token) {
     errors.push_back({message, token});
 }
 
+/**
+ * @brief Extracts type information from a basic type context
+ * 
+ * @param ctx The basic type context to extract type from
+ * @return The corresponding Type object
+ */
 std::shared_ptr<Type> SemanticAnalyzer::getTypeFromBasicTypeCtx(CactParser::BasicTypeContext *ctx) {
     if (ctx->Int()) return Type::getInt();
     if (ctx->Float()) return Type::getFloat();
     if (ctx->Char()) return Type::getChar();
-    return Type::getError(); // Should not happen if grammar is correct
+    return Type::getError();
 }
 
+/**
+ * @brief Extracts type information from a function type context
+ * 
+ * @param ctx The function type context to extract type from
+ * @return The corresponding Type object
+ */
 std::shared_ptr<Type> SemanticAnalyzer::getTypeFromFunctionTypeCtx(CactParser::FunctionTypeContext *ctx) {
     if (ctx->Void()) return Type::getVoid();
     if (ctx->Int()) return Type::getInt();
     if (ctx->Float()) return Type::getFloat();
     if (ctx->Char()) return Type::getChar();
-    return Type::getError(); // Should not happen
+    return Type::getError();
 }
 
 // --- Visitor Implementations ---
-
+/**
+ * @brief Visits the root compilation unit node
+ * 
+ * This method processes the entire compilation unit, including:
+ * 1. Setting up the global scope
+ * 2. Registering built-in functions (print_int, get_int, etc.)
+ * 3. Processing global declarations and function definitions
+ * 4. Verifying the presence and signature of the main function
+ * 
+ * @param ctx The compilation unit context
+ * @return nullptr (no value is returned)
+ */
 antlrcpp::Any SemanticAnalyzer::visitCompilationUnit(CactParser::CompilationUnitContext *ctx) {
-    enterScope(); // Global scope
-
-    // 添加CACT内置函数到全局作用域
-    // 1. void print_int(int)
+    enterScope();
     {
         auto returnType = Type::getVoid();
         std::vector<std::shared_ptr<Type>> paramTypes = { Type::getInt() };
@@ -197,8 +295,6 @@ antlrcpp::Any SemanticAnalyzer::visitCompilationUnit(CactParser::CompilationUnit
         auto funcSymbol = std::make_shared<SymbolInfo>("print_int", funcType, SymbolInfo::FUNCTION_DEF, nullptr);
         currentScope->define("print_int", funcSymbol);
     }
-    
-    // 2. void print_float(float)
     {
         auto returnType = Type::getVoid();
         std::vector<std::shared_ptr<Type>> paramTypes = { Type::getFloat() };
@@ -206,8 +302,6 @@ antlrcpp::Any SemanticAnalyzer::visitCompilationUnit(CactParser::CompilationUnit
         auto funcSymbol = std::make_shared<SymbolInfo>("print_float", funcType, SymbolInfo::FUNCTION_DEF, nullptr);
         currentScope->define("print_float", funcSymbol);
     }
-    
-    // 3. void print_char(char)
     {
         auto returnType = Type::getVoid();
         std::vector<std::shared_ptr<Type>> paramTypes = { Type::getChar() };
@@ -215,8 +309,6 @@ antlrcpp::Any SemanticAnalyzer::visitCompilationUnit(CactParser::CompilationUnit
         auto funcSymbol = std::make_shared<SymbolInfo>("print_char", funcType, SymbolInfo::FUNCTION_DEF, nullptr);
         currentScope->define("print_char", funcSymbol);
     }
-    
-    // 4. int get_int()
     {
         auto returnType = Type::getInt();
         std::vector<std::shared_ptr<Type>> paramTypes = { };
@@ -224,8 +316,6 @@ antlrcpp::Any SemanticAnalyzer::visitCompilationUnit(CactParser::CompilationUnit
         auto funcSymbol = std::make_shared<SymbolInfo>("get_int", funcType, SymbolInfo::FUNCTION_DEF, nullptr);
         currentScope->define("get_int", funcSymbol);
     }
-    
-    // 5. float get_float()
     {
         auto returnType = Type::getFloat();
         std::vector<std::shared_ptr<Type>> paramTypes = { };
@@ -233,8 +323,6 @@ antlrcpp::Any SemanticAnalyzer::visitCompilationUnit(CactParser::CompilationUnit
         auto funcSymbol = std::make_shared<SymbolInfo>("get_float", funcType, SymbolInfo::FUNCTION_DEF, nullptr);
         currentScope->define("get_float", funcSymbol);
     }
-    
-    // 6. char get_char()
     {
         auto returnType = Type::getChar();
         std::vector<std::shared_ptr<Type>> paramTypes = { };
@@ -242,14 +330,12 @@ antlrcpp::Any SemanticAnalyzer::visitCompilationUnit(CactParser::CompilationUnit
         auto funcSymbol = std::make_shared<SymbolInfo>("get_char", funcType, SymbolInfo::FUNCTION_DEF, nullptr);
         currentScope->define("get_char", funcSymbol);
     }
-
     for (auto* item : ctx->declaration()) {
         visitDeclaration(item);
     }
     for (auto* item : ctx->functionDefinition()) {
         visitFunctionDefinition(item);
     }
-
     if (!mainFunctionFound) {
         addError("Main function 'int main()' not defined.", ctx->getStop() ? ctx->getStop() : ctx->getStart());
     } else {
@@ -262,32 +348,42 @@ antlrcpp::Any SemanticAnalyzer::visitCompilationUnit(CactParser::CompilationUnit
             }
         }
     }
-
-    exitScope(); // Global scope
+    exitScope();
     return nullptr;
 }
 
+/**
+ * @brief Processes a function definition
+ * 
+ * This method:
+ * 1. Extracts function name, return type, and parameters
+ * 2. Creates a function symbol and adds it to the current scope
+ * 3. Sets up a new scope for the function body
+ * 4. Processes the function body
+ * 5. Verifies that non-void functions have return statements on all paths
+ * 
+ * @param ctx The function definition context
+ * @return nullptr (no value is returned)
+ */
 antlrcpp::Any SemanticAnalyzer::visitFunctionDefinition(CactParser::FunctionDefinitionContext *ctx) {
     std::string funcName = ctx->Identifier()->getText();
     std::shared_ptr<Type> returnType = std::any_cast<std::shared_ptr<Type>>(visitFunctionType(ctx->functionType()));
 
     std::vector<std::shared_ptr<Type>> paramTypesList;
-    std::vector<std::shared_ptr<SymbolInfo>> paramSymbolsList; // To define later
+    std::vector<std::shared_ptr<SymbolInfo>> paramSymbolsList;
 
     if (ctx->functionFormalParameters()) {
         for (auto* paramCtx : ctx->functionFormalParameters()->functionFormalParameter()) {
             std::shared_ptr<SymbolInfo> paramSymbol = std::any_cast<std::shared_ptr<SymbolInfo>>(visitFunctionFormalParameter(paramCtx));
             if (!paramSymbol || paramSymbol->type->baseType == Type::ERROR_TYPE) {
-                 // Error already added by visitFunctionFormalParameter
-                 paramTypesList.push_back(Type::getError()); // Propagate error
+                 paramTypesList.push_back(Type::getError());
                  continue;
             }
-            // Check for duplicate parameter names
             for(const auto& pSym : paramSymbolsList){
                 if(pSym->name == paramSymbol->name){
                     addError("Redefinition of parameter '" + paramSymbol->name + "'.", paramCtx->Identifier()->getSymbol());
                     paramTypesList.push_back(Type::getError());
-                    goto next_param; // continue outer loop
+                    goto next_param;
                 }
             }
             paramTypesList.push_back(paramSymbol->type);
@@ -301,114 +397,96 @@ antlrcpp::Any SemanticAnalyzer::visitFunctionDefinition(CactParser::FunctionDefi
 
     if (!currentScope->define(funcName, funcSymbol)) {
         addError("Redefinition of '" + funcName + "'.", ctx->Identifier()->getSymbol());
-        // Do not proceed with this function if redefinition
         return nullptr;
     }
     
-    // Check for main function
     if (funcName == "main") {
         mainFunctionFound = true;
         mainFunctionSymbol = funcSymbol;
     }
 
     currentFunctionSymbol = funcSymbol;
-    currentFunctionHasReturn = false; // Reset for the new function
+    currentFunctionHasReturn = false;
 
-    enterScope(true); // Function scope
+    enterScope(true);
     for(const auto& pSym : paramSymbolsList){
         if(!currentScope->define(pSym->name, pSym)){
-            // This should not happen if duplicate check above was done.
             addError("Failed to define parameter '" + pSym->name + "' in function scope (should be impossible).", pSym->definitionNode->getStart());
         }
     }
     visitBlock(ctx->block());
     
-    // 检查非void函数的返回值
     if (returnType->baseType != Type::VOID && !currentFunctionHasReturn) {
-        // 对所有函数进行一致的检查：每个非void函数都必须有返回值
         addError("Non-void function '" + funcName + "' might not return a value on all paths.", ctx->Identifier()->getSymbol());
     }
 
-    exitScope(); // Function scope
-    currentFunctionSymbol = nullptr; // Clear current function context
+    exitScope();
+    currentFunctionSymbol = nullptr;
     return nullptr;
 }
 
+/**
+ * @brief Processes a constant declaration
+ * 
+ * This method:
+ * 1. Extracts the base type for the constants
+ * 2. For each constant definition:
+ *    - Determines the actual type (basic or array)
+ *    - Validates the initializer expression
+ *    - Verifies the initializer type matches the constant's type
+ *    - Stores the constant value for compile-time evaluation
+ * 
+ * @param ctx The constant declaration context
+ * @return nullptr (no value is returned)
+ */
 antlrcpp::Any SemanticAnalyzer::visitConstantDeclaration(CactParser::ConstantDeclarationContext *ctx) {
     std::shared_ptr<Type> baseType = std::any_cast<std::shared_ptr<Type>>(visitBasicType(ctx->basicType()));
-    baseType->isConst = true; // Mark the base type as const for symbols derived from it
+    baseType->isConst = true;
 
     for (auto* constDefCtx : ctx->constantDefinition()) {
         std::string name = constDefCtx->Identifier()->getText();
-        std::shared_ptr<Type> actualType = baseType; // Start with base
+        std::shared_ptr<Type> actualType = baseType;
         std::vector<int> dimensions;
 
-        if (!constDefCtx->LeftBracket().empty()) { // It's an array
+        if (!constDefCtx->LeftBracket().empty()) {
             for (auto* intConst : constDefCtx->IntegerConstant()) {
                 try {
                     dimensions.push_back(std::stoi(intConst->getText()));
                 } catch (const std::out_of_range& oor) {
                     addError("Array dimension '" + intConst->getText() + "' is too large.", intConst->getSymbol());
-                    dimensions.push_back(0); // Error recovery
+                    dimensions.push_back(0);
                 }
             }
-            // 直接创建数组类型，而不是使用 Type::getArray
             actualType = std::make_shared<Type>(Type::ARRAY);
             actualType->elementType = baseType;
             actualType->dimensions = dimensions;
             actualType->isConst = true;
         } else {
-             actualType = std::make_shared<Type>(*baseType); // Create a new type instance for scalar
+             actualType = std::make_shared<Type>(*baseType);
              actualType->isConst = true;
         }
 
-
         auto symbol = std::make_shared<SymbolInfo>(name, actualType, SymbolInfo::CONSTANT, constDefCtx);
         
-        // Constants MUST have an initializer
         if (!constDefCtx->constantInitializationValue()) {
              addError("Constant '" + name + "' must be initialized.", constDefCtx->Identifier()->getSymbol());
-             // Fall through to define it anyway to reduce cascaded errors, but it's an error state
         } else {
             expectingConstantInitializer = true;
-            expectedInitializerType = actualType; // Provide context for initializer
-            
-            // For array initializers, this will be more complex.
-            // For scalar, visitConstantInitializationValue should return a ConstEvalResult or similar.
-            // The spec "const int d = 4 + 5; //非法" is key.
-            // `constantInitializationValue` -> `constantExpression` -> `addExpression`
-            // We need to ensure `addExpression` is a literal or a named constant.
-            
+            expectedInitializerType = actualType;
             antlrcpp::Any initValueAny = visitConstantInitializationValue(constDefCtx->constantInitializationValue());
             
-            if (actualType->baseType == Type::ARRAY) {
-                // Array initialization handled within visitConstantInitializationValue or needs more complex logic here
-                // For now, assume visitConstantInitializationValue checks type compatibility for arrays
-                if (initValueAny.type() == typeid(bool) && !std::any_cast<bool>(initValueAny)) { // Assuming it returns false on error
-                     // Error already reported by visitConstantInitializationValue
-                }
-
-            } else { // Scalar
+            if (actualType->baseType != Type::ARRAY) {
                 if (initValueAny.type() == typeid(ConstEvalResult)) {
                     ConstEvalResult initVal = std::any_cast<ConstEvalResult>(initValueAny);
                     if (!initVal.isConst) {
                         addError("Initializer for constant '" + name + "' must be a compile-time constant expression.", 
                                  constDefCtx->constantInitializationValue()->getStart());
                     } else if (!initVal.type->equals(*actualType)) {
-                        // Allow int literal for char const, but not other way around easily without type cast
-                        bool compatible = false;
-                        if (actualType->baseType == Type::CHAR && initVal.type->baseType == Type::INT) {
-                            // Potentially allow if value is in char range, but spec says "types must be identical"
-                            // For now, strict type matching.
-                        }
-                         if (!compatible) {
-                            addError("Initializer type '" + initVal.type->toString() + 
-                                     "' does not match constant type '" + actualType->toString() + 
-                                     "' for '" + name + "'.", 
-                                     constDefCtx->constantInitializationValue()->getStart());
-                        }
+                        addError("Initializer type '" + initVal.type->toString() + 
+                                    "' does not match constant type '" + actualType->toString() + 
+                                    "' for '" + name + "'.", 
+                                    constDefCtx->constantInitializationValue()->getStart());
                     } else {
-                        // Store the constant value if needed for optimization or further checks
                         symbol->constValue = initVal.value;
                         symbol->hasConstValue = initVal.hasValue;
                     }
@@ -420,7 +498,7 @@ antlrcpp::Any SemanticAnalyzer::visitConstantDeclaration(CactParser::ConstantDec
             expectingConstantInitializer = false;
             expectedInitializerType = nullptr;
         }
-        symbol->isInitialized = true; // Constants are always initialized
+        symbol->isInitialized = true;
 
         if (!currentScope->define(name, symbol)) {
             addError("Redefinition of constant '" + name + "'.", constDefCtx->Identifier()->getSymbol());
@@ -429,6 +507,19 @@ antlrcpp::Any SemanticAnalyzer::visitConstantDeclaration(CactParser::ConstantDec
     return nullptr;
 }
 
+/**
+ * @brief Processes a variable declaration
+ * 
+ * This method:
+ * 1. Extracts the base type for the variables
+ * 2. For each variable definition:
+ *    - Determines the actual type (basic or array)
+ *    - If initialized, validates the initializer expression
+ *    - Verifies the initializer type matches the variable's type
+ * 
+ * @param ctx The variable declaration context
+ * @return nullptr (no value is returned)
+ */
 antlrcpp::Any SemanticAnalyzer::visitVariableDeclaration(CactParser::VariableDeclarationContext *ctx) {
     std::shared_ptr<Type> baseType = std::any_cast<std::shared_ptr<Type>>(visitBasicType(ctx->basicType()));
 
@@ -437,62 +528,47 @@ antlrcpp::Any SemanticAnalyzer::visitVariableDeclaration(CactParser::VariableDec
         std::shared_ptr<Type> actualType = baseType;
         std::vector<int> dimensions;
 
-        if (!varDefCtx->LeftBracket().empty()) { // Array
-            // 调试输出：记录原始表达形式
-            std::string origForm = name;
-            
+        if (!varDefCtx->LeftBracket().empty()) {
             for (auto* intConst : varDefCtx->IntegerConstant()) {
-                 origForm += "[";
                  try {
                     int dim = std::stoi(intConst->getText());
                     dimensions.push_back(dim);
-                    origForm += intConst->getText();
                  } catch (const std::out_of_range& oor) {
                     addError("Array dimension '" + intConst->getText() + "' is too large.", intConst->getSymbol());
-                    dimensions.push_back(0); // Error recovery
+                    dimensions.push_back(0);
                  }
-                 origForm += "]";
             }
-            
-            // 调试信息已移除
-            
-            // 直接创建数组类型，而不是使用 Type::getArray
             actualType = std::make_shared<Type>(Type::ARRAY);
             actualType->elementType = baseType;
             actualType->dimensions = dimensions;
-        } else { // Scalar
-            actualType = std::make_shared<Type>(*baseType); // Make a copy for scalar
+        } else {
+            actualType = std::make_shared<Type>(*baseType);
         }
-
 
         auto symbol = std::make_shared<SymbolInfo>(name, actualType, SymbolInfo::VARIABLE, varDefCtx);
 
         if (varDefCtx->constantInitializationValue()) {
             symbol->isInitialized = true;
-            expectingConstantInitializer = true; // Initializers for variables must also be "const expressions"
+            expectingConstantInitializer = true;
             expectedInitializerType = actualType;
 
             antlrcpp::Any initValueAny = visitConstantInitializationValue(varDefCtx->constantInitializationValue());
 
             if (actualType->baseType == Type::ARRAY) {
                 if (initValueAny.type() == typeid(bool) && !std::any_cast<bool>(initValueAny)) {
-                    // Error reported by visitConstantInitializationValue
                 }
-            } else { // Scalar
+            } else {
                  if (initValueAny.type() == typeid(ConstEvalResult)) {
                     ConstEvalResult initVal = std::any_cast<ConstEvalResult>(initValueAny);
-                    if (!initVal.isConst) { // As per spec: "CACT限制初值表达式必须是常数"
+                    if (!initVal.isConst) {
                         addError("Initializer for variable '" + name + "' must be a compile-time constant expression.", 
                                  varDefCtx->constantInitializationValue()->getStart());
                     } else if (!initVal.type->equals(*actualType) && initVal.type->baseType != Type::ERROR_TYPE) {
-                         // 只有当不是错误类型时才显示类型不匹配的错误
-                         // 错误类型表示已经在visitConstantInitializationValue中报告过错误
                          addError("Initializer type '" + initVal.type->toString() + 
                                  "' does not match variable type '" + actualType->toString() + 
                                  "' for '" + name + "'.", 
                                  varDefCtx->constantInitializationValue()->getStart());
                     }
-                    // Variable doesn't store constValue in symbol typically, unless for const propagation if it were const.
                 } else {
                      addError("Internal error: Could not evaluate variable initializer for '" + name + "'.", 
                               varDefCtx->constantInitializationValue()->getStart());
@@ -501,8 +577,7 @@ antlrcpp::Any SemanticAnalyzer::visitVariableDeclaration(CactParser::VariableDec
             expectingConstantInitializer = false;
             expectedInitializerType = nullptr;
         } else {
-            symbol->isInitialized = false; // Implicitly initialized to 0/false at runtime
-                                          // For semantic analysis, just note it's not explicitly initialized here.
+            symbol->isInitialized = false;
         }
 
         if (!currentScope->define(name, symbol)) {
@@ -512,128 +587,115 @@ antlrcpp::Any SemanticAnalyzer::visitVariableDeclaration(CactParser::VariableDec
     return nullptr;
 }
 
-
+/**
+ * @brief Processes a basic type node
+ * 
+ * @param ctx The basic type context
+ * @return The corresponding type object
+ */
 antlrcpp::Any SemanticAnalyzer::visitBasicType(CactParser::BasicTypeContext *ctx) {
     return getTypeFromBasicTypeCtx(ctx);
 }
 
+/**
+ * @brief Processes a function return type node
+ * 
+ * @param ctx The function type context
+ * @return The corresponding type object
+ */
 antlrcpp::Any SemanticAnalyzer::visitFunctionType(CactParser::FunctionTypeContext *ctx) {
     return getTypeFromFunctionTypeCtx(ctx);
 }
 
+/**
+ * @brief Processes a function formal parameter
+ * 
+ * This method extracts and validates information about a function parameter:
+ * 1. Determines the parameter type (basic or array)
+ * 2. Handles special array parameter syntax (first dimension can be omitted)
+ * 3. Creates a parameter symbol with the determined type
+ * 
+ * @param ctx The function formal parameter context
+ * @return A SymbolInfo object representing the parameter
+ */
 antlrcpp::Any SemanticAnalyzer::visitFunctionFormalParameter(CactParser::FunctionFormalParameterContext *ctx) {
     std::shared_ptr<Type> baseType = std::any_cast<std::shared_ptr<Type>>(visitBasicType(ctx->basicType()));
     std::string name = ctx->Identifier()->getText();
     std::shared_ptr<Type> actualType = baseType;
 
-    if (!ctx->LeftBracket().empty()) { // Array parameter
+    if (!ctx->LeftBracket().empty()) {
         std::vector<int> dimensions;
-        
-        // 处理数组参数
-        // 在C/C++中，数组参数如 int a[][2] 表示第一维度不固定，第二维度是2
-        // 维度顺序应该与声明顺序一致
-        
-        // 调试输出：记录原始表达形式
-        std::string origForm = name;
-        
-        // 根据文法，我们可以直接判断每个括号对的常量值情况
-        // 语法规则：functionFormalParameter: basicType Identifier (LeftBracket IntegerConstant? RightBracket (LeftBracket IntegerConstant RightBracket)*)?;
-        // 这表明第一个括号对可以有或没有常量(IntegerConstant?)，其余括号对必须有常量(IntegerConstant)
-        
-        // 获取所有括号对数量
         int bracketPairCount = ctx->LeftBracket().size();
-        
-        // 获取所有常量表达式
         auto intConstants = ctx->IntegerConstant();
-        
-        // 一个简单的规则：
-        // 如果常量数量 < 括号对数量，则第一维是隐式的(-1)
-        // 此时其他维度的常量索引需要适当调整
         bool firstDimImplicit = intConstants.size() < bracketPairCount;
-        
         for (int i = 0; i < bracketPairCount; i++) {
-            int dimension = -1; // 默认为隐式维度
-            origForm += "[";
-            
-            // 确定当前维度应该使用哪个常量，或者是否为隐式维度
+            int dimension = -1;
             if (i == 0 && firstDimImplicit) {
-                // 第一维是隐式的，不需要从常量列表中获取值
                 dimension = -1;
             } else {
-                // 常量索引需要考虑第一维是否为隐式的
                 int constantIndex = firstDimImplicit ? i - 1 : i;
-                
                 if (constantIndex >= 0 && constantIndex < intConstants.size()) {
                     try {
                         dimension = std::stoi(intConstants[constantIndex]->getText());
-                        origForm += intConstants[constantIndex]->getText();
                     } catch (const std::out_of_range& oor) {
                         addError("Integer constant for array dimension is out of range.", intConstants[constantIndex]->getSymbol());
-                        dimension = 0; // 错误标记
+                        dimension = 0;
                     } catch (const std::invalid_argument& ia) {
                         addError("Invalid integer constant for array dimension.", intConstants[constantIndex]->getSymbol());
                         dimension = 0;
                     }
                 }
             }
-            
-            origForm += "]";
             dimensions.push_back(dimension);
         }
-        
-        // 调试信息已移除
-        
-        // 直接创建数组类型，确保维度顺序正确
         actualType = std::make_shared<Type>(Type::ARRAY);
         actualType->elementType = baseType;
         actualType->dimensions = dimensions;
-    } else { // Scalar parameter
-        actualType = std::make_shared<Type>(*baseType); // Make a copy
+    } else {
+        actualType = std::make_shared<Type>(*baseType);
     }
-    
     auto paramSymbol = std::make_shared<SymbolInfo>(name, actualType, SymbolInfo::PARAMETER, ctx);
-    paramSymbol->isInitialized = true; // Considered initialized by function call mechanism
+    paramSymbol->isInitialized = true;
     return paramSymbol;
 }
 
-
+/**
+ * @brief Processes a code block
+ * 
+ * This method:
+ * 1. Creates a new scope for the block (unless it's the function body block)
+ * 2. Processes declarations and statements in the block
+ * 3. Tracks return statements for control flow analysis
+ * 4. Exits the scope when finished (unless it's the function body block)
+ * 
+ * @param ctx The block context
+ * @return nullptr (no value is returned)
+ */
 antlrcpp::Any SemanticAnalyzer::visitBlock(CactParser::BlockContext *ctx) {
-    // If current scope is already a function scope AND this block is the direct body of the function,
-    // don't create a new scope. The function definition already created it.
-    // This check is a bit tricky. A simple heuristic: if parent is FuncDef, this block is the func body.
     bool isFunctionBodyBlock = dynamic_cast<CactParser::FunctionDefinitionContext*>(ctx->parent) != nullptr;
 
     if (!isFunctionBodyBlock) {
-        enterScope(false, currentScope ? currentScope->isLoop() : false); // Inherit loop status
+        enterScope(false, currentScope ? currentScope->isLoop() : false);
     }
 
-    // 先遍历所有blockItem执行语义检查
-    bool allPathsReturn = true; // 假设所有路径都返回，除非我们发现一个未返回的路径
-    bool hasReturnStatement = false; // 是否有任何return语句
+    bool allPathsReturn = true;
+    bool hasReturnStatement = false;
     
     for (auto* item : ctx->blockItem()) {
         if (item->declaration()) {
             visitDeclaration(item->declaration());
         } else if (item->statement()) {
-            // 记录每条语句前的返回状态
             bool prevReturn = currentFunctionHasReturn;
-            
             visitStatement(item->statement());
-            
-            // 如果这条语句包含return，记录下来
             if (!prevReturn && currentFunctionHasReturn) {
                 hasReturnStatement = true;
             }
-            
-            // 如果语句改变了返回状态并且不是块的最后一条语句，则不是所有路径都返回
             if (item != ctx->blockItem().back() && currentFunctionHasReturn) {
-                // 后面的语句永远不会被执行，所以我们已经知道所有路径都返回了
                 break;
             }
         }
     }
     
-    // 如果块中有return语句但不是所有路径都返回，则块整体不保证返回
     if (!hasReturnStatement) {
         allPathsReturn = false;
     }
@@ -644,23 +706,36 @@ antlrcpp::Any SemanticAnalyzer::visitBlock(CactParser::BlockContext *ctx) {
     return nullptr;
 }
 
+/**
+ * @brief Processes a statement
+ * 
+ * This method handles various statement types:
+ * 1. Return statements - verifies return type compatibility with function return type
+ * 2. Assignment statements - validates LHS and RHS type compatibility
+ * 3. Expression statements - evaluates the expression
+ * 4. Block statements - processes the nested block
+ * 5. If statements - validates condition and processes branches
+ * 6. While statements - validates condition and processes loop body
+ * 7. Break/continue statements - verifies they are within loops
+ * 
+ * @param ctx The statement context
+ * @return nullptr (no value is returned)
+ */
 antlrcpp::Any SemanticAnalyzer::visitStatement(CactParser::StatementContext *ctx) {    
-    // 先检查Return语句，因为Return语句也可能包含expression
-    if (ctx->Return()) { // Return statement: 'return' Exp? ';'
+    if (ctx->Return()) {
         if (!currentFunctionSymbol) {
             addError("'return' statement outside of function.", ctx->Return()->getSymbol());
             return nullptr;
         }
-        currentFunctionHasReturn = true; // Mark that a return statement was encountered
-        std::shared_ptr<Type> expectedReturnType = currentFunctionSymbol->type->elementType; // elementType holds return type for functions
+        currentFunctionHasReturn = true;
+        std::shared_ptr<Type> expectedReturnType = currentFunctionSymbol->type->elementType;
 
-        if (ctx->expression()) { // return Exp;
+        if (ctx->expression()) {
             if (expectedReturnType->baseType == Type::VOID) {
                 addError("Cannot return a value from a void function '" + currentFunctionSymbol->name + "'.", ctx->Return()->getSymbol());
             } else {
                 std::shared_ptr<Type> actualReturnType = std::any_cast<std::shared_ptr<Type>>(visitExpression(ctx->expression()));
                 if (actualReturnType->baseType != Type::ERROR_TYPE) {
-                    // Create temporary non-const versions for comparison
                     auto tempExpected = std::make_shared<Type>(*expectedReturnType); tempExpected->isConst = false;
                     auto tempActual = std::make_shared<Type>(*actualReturnType); tempActual->isConst = false;
                     if (!tempExpected->equals(*tempActual)) {
@@ -669,22 +744,20 @@ antlrcpp::Any SemanticAnalyzer::visitStatement(CactParser::StatementContext *ctx
                     }
                 }
             }
-        } else { // return;
+        } else {
             if (expectedReturnType->baseType != Type::VOID) {
                 addError("Non-void function '" + currentFunctionSymbol->name + "' must return a value.", ctx->Return()->getSymbol());
             }
         }
-    } else if (ctx->leftValue() && ctx->Equal() && ctx->expression()) { // Assignment: LVal '=' Exp ';'
+    } else if (ctx->leftValue() && ctx->Equal() && ctx->expression()) {
         std::shared_ptr<Type> lvalType = std::any_cast<std::shared_ptr<Type>>(visitLeftValue(ctx->leftValue()));
         std::shared_ptr<Type> expType = std::any_cast<std::shared_ptr<Type>>(visitExpression(ctx->expression()));
 
         if (lvalType->baseType == Type::ERROR_TYPE || expType->baseType == Type::ERROR_TYPE) {
-            return nullptr; // Error already reported
+            return nullptr;
         }
 
         if (!lvalType->isLValue) {
-            // This should be caught by visitLeftValue if it's not an LValue (e.g. literal)
-            // but as a safeguard:
             addError("Expression is not assignable (not an L-value).", ctx->leftValue()->getStart());
             return nullptr;
         }
@@ -693,8 +766,6 @@ antlrcpp::Any SemanticAnalyzer::visitStatement(CactParser::StatementContext *ctx
             return nullptr;
         }
 
-        // Type checking: "LVal与Exp类型必须完全相同"
-        // Create temporary non-const versions for comparison if strict const matching is not desired for assignment
         auto tempLval = std::make_shared<Type>(*lvalType); tempLval->isConst = false;
         auto tempExp = std::make_shared<Type>(*expType); tempExp->isConst = false;
 
@@ -703,79 +774,71 @@ antlrcpp::Any SemanticAnalyzer::visitStatement(CactParser::StatementContext *ctx
                      "' to '" + lvalType->toString() + "'.", ctx->Equal()->getSymbol());
         }
 
-    } else if (ctx->expression()) { // Expression statement: [Exp] ';'
-        visitExpression(ctx->expression()); // Evaluate for side effects and errors
-    } else if (ctx->block()) { // Block statement
+    } else if (ctx->expression()) {
+        visitExpression(ctx->expression());
+    } else if (ctx->block()) {
         visitBlock(ctx->block());
-    } else if (ctx->If()) { // If statement: 'if' '(' Cond ')' Stmt [ 'else' Stmt ]
+    } else if (ctx->If()) {
         std::shared_ptr<Type> condType = std::any_cast<std::shared_ptr<Type>>(visitCondition(ctx->condition()));
         if (condType->baseType != Type::ERROR_TYPE && 
             !(condType->baseType == Type::INT || condType->baseType == Type::FLOAT || condType->baseType == Type::CHAR)) {
-            // CACT does not have a boolean type. Conditions are numeric.
             addError("Condition for 'if' statement must be a numeric type, got '" + condType->toString() + "'.", ctx->condition()->getStart());
         }
         
-        // 记录访问前的返回状态
         bool oldHasReturn = currentFunctionHasReturn;
         bool thenBranchReturns = false;
         bool elseBranchReturns = false;
         
-        currentFunctionHasReturn = false; // 重置为分支分析
-        visitStatement(ctx->statement(0)); // Then branch
+        currentFunctionHasReturn = false;
+        visitStatement(ctx->statement(0));
         thenBranchReturns = currentFunctionHasReturn;
         
-        currentFunctionHasReturn = false; // 为else分支重置
+        currentFunctionHasReturn = false;
         if (ctx->Else()) {
-            visitStatement(ctx->statement(1)); // Else branch
+            visitStatement(ctx->statement(1));
             elseBranchReturns = currentFunctionHasReturn;
         }
         
-        // 只有当两个分支都返回时，或者恢复到调用前的状态
         if (ctx->Else()) {
-            // 有else分支时，只有两个分支都返回才算整体有返回
             currentFunctionHasReturn = thenBranchReturns && elseBranchReturns;
         } else {
-            // 没有else分支时，不能保证有返回（因为if条件可能为假）
             currentFunctionHasReturn = oldHasReturn;
         }
-    } else if (ctx->While()) { // While statement: 'while' '(' Cond ')' Stmt
+    } else if (ctx->While()) {
         std::shared_ptr<Type> condType = std::any_cast<std::shared_ptr<Type>>(visitCondition(ctx->condition()));
          if (condType->baseType != Type::ERROR_TYPE && 
             !(condType->baseType == Type::INT || condType->baseType == Type::FLOAT || condType->baseType == Type::CHAR)) {
             addError("Condition for 'while' statement must be a numeric type, got '" + condType->toString() + "'.", ctx->condition()->getStart());
         }
         
-        // Enter loop scope for break/continue
-        // The scope should be around the statement, not the condition
         Scope* preLoopScope = currentScope;
-        currentScope = new Scope(preLoopScope, preLoopScope->isFunction(), true); // New scope is a loop scope
+        currentScope = new Scope(preLoopScope, preLoopScope->isFunction(), true);
 
-        // 对于while循环，不能保证循环体会执行，因此不会影响返回状态
         bool oldHasReturn = currentFunctionHasReturn;
-        visitStatement(ctx->statement(0)); // Loop body
-        currentFunctionHasReturn = oldHasReturn; // 恢复到之前的返回状态
+        visitStatement(ctx->statement(0));
+        currentFunctionHasReturn = oldHasReturn;
 
         Scope* temp = currentScope;
-        currentScope = preLoopScope; // Restore previous scope
-        delete temp; // Clean up loop scope
+        currentScope = preLoopScope;
+        delete temp;
 
-    } else if (ctx->Break()) { // Break statement: 'break' ';'
+    } else if (ctx->Break()) {
         Scope* s = currentScope;
         bool inLoop = false;
         while(s){
             if(s->isLoop()){ inLoop = true; break;}
-            if(s->isFunction()) break; // Stop at function boundary
+            if(s->isFunction()) break;
             s = s->getParent();
         }
         if (!inLoop) {
             addError("'break' statement not within a loop.", ctx->Break()->getSymbol());
         }
-    } else if (ctx->Continue()) { // Continue statement: 'continue' ';'
+    } else if (ctx->Continue()) {
          Scope* s = currentScope;
         bool inLoop = false;
         while(s){
             if(s->isLoop()){ inLoop = true; break;}
-            if(s->isFunction()) break; // Stop at function boundary
+            if(s->isFunction()) break;
             s = s->getParent();
         }
         if (!inLoop) {
@@ -785,39 +848,74 @@ antlrcpp::Any SemanticAnalyzer::visitStatement(CactParser::StatementContext *ctx
     return nullptr;
 }
 
-
-// --- Expression Visitors (Simplified stubs, need full implementation) ---
-
-// Helper for checking if an expression results in a compile-time constant literal or named constant
-// This is based on the "const int d = 4 + 5; //非法" rule.
-SemanticAnalyzer::ConstEvalResult SemanticAnalyzer::evaluateAddExpressionAsConstant(CactParser::AddExpressionContext* addCtx) { 
+/**
+ * @brief Evaluates an expression to determine if it's a compile-time constant
+ * 
+ * This method attempts to statically evaluate an expression to determine:
+ * 1. Whether it is a constant expression (can be evaluated at compile time)
+ * 2. What type the expression has
+ * 3. What value the expression evaluates to (if applicable)
+ * 
+ * Only a limited subset of expressions can be evaluated at compile time:
+ * - Literal constants (integers, floats, characters)
+ * - References to constant variables
+ * - Simple unary operations (+/-)
+ * 
+ * @param addCtx The expression context to evaluate
+ * @return A ConstEvalResult containing type, value, and constness information
+ */
+/**
+ * @brief Evaluates expressions for compile-time constant values
+ * 
+ * This method attempts to statically evaluate an expression to determine:
+ * 1. Whether it is a constant expression (can be evaluated at compile time)
+ * 2. What type the expression has
+ * 3. What value the expression evaluates to (if applicable)
+ * 
+ * Only a limited subset of expressions can be evaluated at compile time:
+ * - Literal constants (integers, floats, characters)
+ * - References to constant variables
+ * - Simple unary operations (+/-)
+ * 
+ * @param addCtx The expression context to evaluate
+ * @return A ConstEvalResult containing type, value, and constness information
+ */
+SemanticAnalyzer::ConstEvalResult SemanticAnalyzer::evaluateAddExpressionAsConstant(CactParser::AddExpressionContext* addCtx) {
+    // Return an error result if the input context is null
     if (!addCtx) return {Type::getError(), {}, false, false};
     
+    // Initialize result with default error values
     ConstEvalResult result;
     result.type = Type::getError(); 
-    result.isConst = false;
-    result.hasValue = false;
+    result.isConst = false;      // Not a compile-time constant by default
+    result.hasValue = false;     // No value available by default
 
+    // Rule 1: Binary operations with '+' or '-' operators cannot be compile-time constants
+    // Check if this is a binary expression with an operator
     if (addCtx->addExpression()) { 
+        // This is a complex expression involving binary '+' or '-' operations
+        // CACT only allows simple expressions to be compile-time constants
         return result; 
     }
 
     auto currentMulExp = addCtx->multiplicativeExpression();
+    // Rule 2: Multiplicative operations ('*', '/', '%') cannot be compile-time constants
     if (currentMulExp->multiplicativeExpression()) { 
+        // This is a complex expression involving multiplication/division/modulo
         return result; 
     }
 
     auto currentUnaryExp = currentMulExp->unaryExpression();
-    bool isNegative = false;
-    bool isPositive = false; 
+    // Track if we're applying unary + or - to a literal
+    bool isNegative = false;     // For applying unary minus to numeric literals
+    bool isPositive = false;     // For applying unary plus to numeric literals
 
-    // Check for function call first, as it's a distinct alternative in unaryExpression rule
+    // Rule 3: Function calls cannot be evaluated at compile-time 
     if (currentUnaryExp->Identifier() && currentUnaryExp->LeftParenthesis()) {
-        // This is a function call, not a constant expression for initialization
         return result;
     }
 
-    // Now handle unary operators or primary expression
+    // Handle unary +/- operators
     CactParser::UnaryExpressionContext* unaryExpForPrimary = currentUnaryExp;
     if (currentUnaryExp->Plus()) {
         isPositive = true;
@@ -827,79 +925,138 @@ SemanticAnalyzer::ConstEvalResult SemanticAnalyzer::evaluateAddExpressionAsConst
         unaryExpForPrimary = currentUnaryExp->unaryExpression(); 
     }
     
-    // After stripping optional unary +/-, unaryExpForPrimary should be a PrimaryExpression or another function call.
-    // Re-check for function call if unary operators were stripped
+    // Function calls within unary expressions also cannot be evaluated at compile-time
     if (unaryExpForPrimary->Identifier() && unaryExpForPrimary->LeftParenthesis()){
-        return result; // Function call after unary op, not a const
+        return result;
     }
 
+    // Logical NOT operations are not supported for compile-time evaluation
     if (unaryExpForPrimary->ExclamationMark()) {
         return result; 
     }
     
+    // Now we handle the actual constant evaluation for primary expressions
     if (unaryExpForPrimary->primaryExpression()) {
         auto primExp = unaryExpForPrimary->primaryExpression();
+        // Case 1: Numeric or character literals
         if (primExp->number()) {
+            // Mark as a compile-time constant since we are processing a literal value
             result.isConst = true;
+            
+            // Integer constant - handles integer literals like 123, 42, etc.
             if (primExp->number()->IntegerConstant()) {
                 try {
+                    // Parse the integer value from the token text using standard library
+                    // This converts the string representation to an actual int value
                     int val = std::stoi(primExp->number()->IntegerConstant()->getText());
+                    // Apply unary minus operator if present in the expression (e.g., -123)
                     if (isNegative) val = -val;
+                    // Store the computed value and mark that we have a valid value
                     result.value = val; result.hasValue = true;
+                    // Set the type to const int since integer literals are inherently constants
                     result.type = Type::getInt(true); 
-                } catch (...) { result.isConst = false; }
+                } catch (...) { 
+                    // Handle parsing errors, e.g., integer value too large for int type
+                    // or malformed integer literal that cannot be parsed
+                    result.isConst = false; 
+                }
+            // Float constant - handles floating point literals like 3.14, 2.5e-10, etc.
             } else if (primExp->number()->FloatConstant()) {
-                 try {
+                try {
+                    // Parse the floating point value from the token text using standard library
+                    // This converts the string representation to an actual float value
                     float val = std::stof(primExp->number()->FloatConstant()->getText());
+                    // Apply unary minus operator if present in the expression (e.g., -3.14)
                     if (isNegative) val = -val;
+                    // Store the computed value and mark that we have a valid value
                     result.value = val; result.hasValue = true;
+                    // Set the type to const float since float literals are inherently constants
                     result.type = Type::getFloat(true);
-                } catch (...) { result.isConst = false; }
+                } catch (...) { 
+                    // Handle parsing errors, e.g., float too large
+                    result.isConst = false; 
+                }
+            // Character constant
             } else if (primExp->number()->CharacterConstant()) {
+                // Extract the raw text of the character literal from the token
+                // This includes the surrounding single quotes (e.g., 'a', '\n')
                 std::string text = primExp->number()->CharacterConstant()->getText();
+                
+                // In CACT, unary +/- operators are not permitted on character literals
+                // For example, +'a' or -'a' are invalid expressions
                 if (isNegative || isPositive) { 
                     addError("Unary '+' or '-' cannot be applied to character constant.", primExp->number()->getStart());
+                    // Mark as invalid and set error type
                     result.isConst = false; result.hasValue = false; result.type = Type::getError();
-                } else if (text.length() >= 3 && text.front() == '\'' && text.back() == '\'') {
+                } 
+                // Validate the character literal format: must start and end with single quotes
+                // and have at least one character between them
+                else if (text.length() >= 3 && text.front() == '\'' && text.back() == '\'') {
+                    // Case 1: Simple character (e.g., 'a', 'Z', '5')
+                    // Format must be exactly 3 characters: opening quote, character, closing quote
                     if (text.length() == 3) { 
-                        result.value = text[1]; result.hasValue = true;
+                        // Store the character value (the middle character between quotes)
+                        result.value = text[1]; 
+                        result.hasValue = true;
+                        // Set the type to const char
                         result.type = Type::getChar(true);
-                    } else if (text.length() == 4 && text[1] == '\\') { 
+                    } 
+                    // Case 2: Escape sequence (e.g., '\n', '\t', '\\')
+                    // Format must be exactly 4 characters: opening quote, backslash, escape char, closing quote
+                    else if (text.length() == 4 && text[1] == '\\') { 
                         char unescaped_char;
                         bool recognized_escape = true;
+                        
+                        // Convert escape sequence to the corresponding character value
+                        // CACT supports a standard set of C-style escape sequences
                         switch (text[2]) {
-                            case 'n': unescaped_char = '\n'; break;
-                            case 't': unescaped_char = '\t'; break;
-                            case 'r': unescaped_char = '\r'; break;
-                            case '\\': unescaped_char = '\\'; break;
-                            case '\'': unescaped_char = '\''; break;
-                            case '0': unescaped_char = '\0'; break;
-                            default: recognized_escape = false; break;
+                            case 'n': unescaped_char = '\n'; break;  // Newline
+                            case 't': unescaped_char = '\t'; break;  // Tab
+                            case 'r': unescaped_char = '\r'; break;  // Carriage return
+                            case '\\': unescaped_char = '\\'; break; // Backslash
+                            case '\'': unescaped_char = '\''; break; // Single quote
+                            case '0': unescaped_char = '\0'; break;  // Null character
+                            default: recognized_escape = false; break; // Unrecognized escape sequence
                         }
+                        
+                        // If the escape sequence is valid, store the character value
                         if (recognized_escape) {
-                            result.value = unescaped_char; result.hasValue = true;
+                            result.value = unescaped_char; 
+                            result.hasValue = true;
                             result.type = Type::getChar(true);
-                        } else {
+                        } 
+                        // Report error for invalid escape sequences (e.g., '\x')
+                        else {
                             addError("Unrecognized character escape sequence: '" + text + "'.", primExp->number()->CharacterConstant()->getSymbol());
                             result.isConst = false; result.hasValue = false; result.type = Type::getError();
                         }
-                    } else {
+                    } 
+                    // Case 3: Invalid character format - wrong length or not an escape sequence
+                    // For example: 'abc' (too many characters) or '\abc' (invalid escape)
+                    else {
                         addError("Invalid character literal format: '" + text + "'.", primExp->number()->CharacterConstant()->getSymbol());
                         result.isConst = false; result.hasValue = false; result.type = Type::getError();
                     }
-                } else {
+                } 
+                // Case 4: Invalid character format - missing quotes or empty character
+                // For example: a' or 'a or '' or non-quoted text
+                else {
                     addError("Invalid character literal format: '" + text + "'.", primExp->number()->CharacterConstant()->getSymbol());
                     result.isConst = false; result.hasValue = false; result.type = Type::getError();
                 }
             }
             return result;
+        // Case 2: References to constant identifiers
         } else if (primExp->leftValue()) {
+            // Cannot apply unary operators to identifiers in compile-time evaluation
             if (isNegative || isPositive) { 
                  return result; 
             }
+            // Only simple identifier references (not array elements) can be compile-time constants
             if (primExp->leftValue()->Identifier() && primExp->leftValue()->LeftBracket().empty()) {
                 std::string name = primExp->leftValue()->Identifier()->getText();
                 auto symbol = currentScope->resolve(name);
+                // The referenced identifier must be a constant with a known value
                 if (symbol && symbol->kind == SymbolInfo::CONSTANT && symbol->hasConstValue) {
                     result.isConst = true;
                     result.value = symbol->constValue;
@@ -913,7 +1070,28 @@ SemanticAnalyzer::ConstEvalResult SemanticAnalyzer::evaluateAddExpressionAsConst
     return result;
 }
 
-
+/**
+ * @brief Validates initializers for constants and variables
+ * 
+ * This method ensures that:
+ * 1. The initializer expression is a compile-time constant
+ * 2. The initializer type is compatible with the variable/constant type
+ * 3. For arrays, that nested initializer lists match array dimensions
+ * 
+ * @param ctx The constant initialization value context
+ * @return Either a ConstEvalResult for scalar initializers, or a boolean for array initializers
+ */
+/**
+ * @brief Validates initializers for constants and variables
+ * 
+ * This method ensures that:
+ * 1. The initializer expression is a compile-time constant
+ * 2. The initializer type is compatible with the variable/constant type
+ * 3. For arrays, that nested initializer lists match array dimensions
+ * 
+ * @param ctx The constant initialization value context
+ * @return Either a ConstEvalResult for scalar initializers, or a boolean for array initializers
+ */
 antlrcpp::Any SemanticAnalyzer::visitConstantInitializationValue(CactParser::ConstantInitializationValueContext *ctx) {
     if (!expectingConstantInitializer || !expectedInitializerType) {
         addError("Internal error: visitConstantInitializationValue called without proper context.", ctx->getStart());
@@ -921,49 +1099,51 @@ antlrcpp::Any SemanticAnalyzer::visitConstantInitializationValue(CactParser::Con
     }
 
     if (ctx->constantExpression()) {
+        // Case 1: Scalar initializer (like '= 5' or '= 'c'')
+        // Evaluate the constant expression and verify it's a compile-time constant
         ConstEvalResult evalRes = evaluateAddExpressionAsConstant(ctx->constantExpression()->addExpression()); 
         if (!evalRes.isConst) {
             addError("Initializer must be a compile-time constant.", ctx->constantExpression()->getStart());
             return evalRes; 
         }
         
-        // 检查：不允许直接使用标量值初始化数组（必须用大括号）
-        // 例如：int d[4] = 1; 是非法的，应该报错
         if (expectedInitializerType->baseType == Type::ARRAY) { 
+            // Arrays cannot be initialized directly with a scalar value
+            // For example: int arr[3] = 5; is not allowed
             addError("Cannot initialize array with a scalar value directly in this form (use '{...}').", ctx->getStart());
             return ConstEvalResult{Type::getError(), {}, false, false};
         }
         
         if (expectedInitializerType->baseType != Type::ARRAY) { 
+            // For scalar types, verify that the initializer type matches the expected type
+            // For example, an int variable must be initialized with an int constant
             if (!evalRes.type->equals(*expectedInitializerType)) {
-                bool compatible = false;
-                if (expectedInitializerType->baseType == Type::CHAR && evalRes.type->baseType == Type::INT) {
-                    // Spec: "types must be identical"
-                }
-                if (!compatible) {
-                    addError("Initializer type '" + evalRes.type->toString() + 
-                             "' does not match expected type '" + expectedInitializerType->toString() + "'.", 
-                             ctx->constantExpression()->getStart());
-                    // 返回一个带有错误类型但保留原始常量属性的结果
-                    // 这样可以避免触发"必须是编译时常量"的错误
-                    ConstEvalResult errorResult = evalRes;
-                    errorResult.type = Type::getError();
-                    return errorResult;
-                }
+                addError("Initializer type '" + evalRes.type->toString() + 
+                            "' does not match expected type '" + expectedInitializerType->toString() + "'.", 
+                            ctx->constantExpression()->getStart());
+                ConstEvalResult errorResult = evalRes;
+                errorResult.type = Type::getError();
+                return errorResult;
             }
         }
         return evalRes;
 
     } else if (ctx->LeftBrace()) { 
+        // Case 2: Array initializer (like '= {1, 2, 3}' or '= {{1, 2}, {3, 4}}')
         if (expectedInitializerType->baseType != Type::ARRAY) {
+            // Cannot use array initializer for non-array types
+            // For example: int x = {1}; is not allowed
             addError("Array initializer used for non-array type '" + expectedInitializerType->toString() + "'.", ctx->LeftBrace()->getSymbol());
             return false; 
         }
+        // For array initializers, we need to check each element recursively
         std::vector<ConstEvalResult> flatInitializers;
         std::shared_ptr<Type> originalExpectedType = expectedInitializerType; 
+        // Validate all array elements using recursive checking
         int initCount = checkArrayInitializerRecursive(ctx, expectedInitializerType->elementType, expectedInitializerType->dimensions, 0, flatInitializers);
         expectedInitializerType = originalExpectedType; 
         if (initCount < 0) { 
+            // Negative return value indicates an error in the array initializer
             return false; 
         }
         return true; 
@@ -971,136 +1151,185 @@ antlrcpp::Any SemanticAnalyzer::visitConstantInitializationValue(CactParser::Con
     return SemanticAnalyzer::ConstEvalResult{Type::getError(), {}, false, false};
 }
 
-// Recursive helper for array initializers
-// Returns number of elements successfully processed, or -1 on error.
+/**
+ * @brief Recursively validates initializers for multi-dimensional arrays
+ * 
+ * This method:
+ * 1. Verifies that array initializer dimensions match array dimensions
+ * 2. Validates that each scalar initializer in the array is a compile-time constant
+ * 3. Validates that each scalar initializer type matches the array's element type
+ * 4. Collects all initializers in a flattened list for later use
+ * 
+ * @param initCtx The initializer context to check
+ * @param expectedElementType The expected element type for the array
+ * @param dimensions The dimensions of the array
+ * @param currentDimensionIndex The current dimension being processed
+ * @param flatInitializers Output parameter collecting all initializer values
+ * @return The number of elements processed at the current level
+ */
+/**
+ * @brief Recursively validates initializers for multi-dimensional arrays
+ * 
+ * This method:
+ * 1. Verifies that array initializer dimensions match array dimensions
+ * 2. Validates that each scalar initializer in the array is a compile-time constant
+ * 3. Validates that each scalar initializer type matches the array's element type
+ * 4. Collects all initializers in a flattened list for later use
+ * 
+ * @param initCtx The initializer context to check
+ * @param expectedElementType The expected element type for the array
+ * @param dimensions The dimensions of the array
+ * @param currentDimensionIndex The current dimension being processed
+ * @param flatInitializers Output parameter collecting all initializer values
+ * @return The number of elements processed at the current level, or -1 on error
+ */
 int SemanticAnalyzer::checkArrayInitializerRecursive(
     CactParser::ConstantInitializationValueContext* initCtx, 
-    std::shared_ptr<Type> expectedElementType, // Expected type of elements at current nesting level
+    std::shared_ptr<Type> expectedElementType, 
     const std::vector<int>& dimensions, 
     int currentDimensionIndex,
     std::vector<ConstEvalResult>& flatInitializers) 
 {
-    if (!initCtx || !initCtx->LeftBrace()) { // Should be a braced list for recursive calls
-        // This case handles a scalar value within a list, e.g., {1, 2} where 1 and 2 are ConstExp
+    
+    // Case 1: If we've reached a scalar initializer (not a brace-enclosed list)
+    if (!initCtx || !initCtx->LeftBrace()) {
         if (initCtx && initCtx->constantExpression()) {
-            // 扁平化初始化：这里我们需要确保能够处理不管嵌套多少层的初始化
-            // Get the base element type of the array (the ultimate scalar type)
-            std::shared_ptr<Type> ultimateElementType = expectedInitializerType; // The overall array type
+            // Find the ultimate element type (for multi-dimensional arrays)
+            // For example, in int[2][3], the ultimate element type is int
+            std::shared_ptr<Type> ultimateElementType = expectedInitializerType;
             while(ultimateElementType->baseType == Type::ARRAY) {
                 ultimateElementType = ultimateElementType->elementType;
             }
 
             if (!ultimateElementType) {
-                // Ensure elementType is not null - this fixes the "array element type is null" error
                 addError("Internal error: array ultimate element type is null.", initCtx->getStart());
                 return -1;
             }
 
-            std::shared_ptr<Type> oldExpected = expectedInitializerType; // Save context
-            expectedInitializerType = ultimateElementType; // Set context for scalar element
+            // Save and restore the expected initializer type during validation
+            std::shared_ptr<Type> oldExpected = expectedInitializerType;
+            expectedInitializerType = ultimateElementType;
 
+            // Recursively evaluate the constant expression
             ConstEvalResult val = std::any_cast<ConstEvalResult>(visitConstantInitializationValue(initCtx));
             
-            expectedInitializerType = oldExpected; // Restore context
+            expectedInitializerType = oldExpected;
 
-            if (!val.isConst) { /* Error already reported by deeper call */ return -1; }
+            // Check that the expression is a compile-time constant
+            if (!val.isConst) { return -1; }
             if (val.type->baseType == Type::ERROR_TYPE) return -1;
 
-            // Type check val.type against ultimateElementType (the actual element type of the array)
+            // Verify the type matches what we expect at this position in the array
             if (!val.type->equals(*ultimateElementType)) {
                  addError("Type mismatch in array initializer: expected element of type '" + 
                           ultimateElementType->toString() + "', got '" + val.type->toString() + "'.", 
                           initCtx->constantExpression()->getStart());
                  return -1;
             }
+            // Add the validated element to our flat list of initializers
             flatInitializers.push_back(val);
-            return 1; // 1 element processed
+            return 1;
         }
         addError("Invalid array initializer: expected '{...}' or constant expression.", initCtx ? initCtx->getStart() : nullptr);
         return -1;
     }
 
-    // We are at LeftBrace context.
+    // Verify we haven't exceeded the number of dimensions of the array
     if (currentDimensionIndex >= dimensions.size()) {
         addError("Too many nested initializers for array.", initCtx->LeftBrace()->getSymbol());
         return -1;
     }
 
+    // Count how many elements we've processed at this dimension level
     int count = 0;
-    int maxElementsInThisDimension = (dimensions[currentDimensionIndex] == -1) ? -1 : dimensions[currentDimensionIndex]; // -1 for implicit first dim of param
+    // Determine the maximum number of elements allowed in this dimension
+    // -1 means unlimited (like in function parameter declarations: int func(int arr[][10]))
+    int maxElementsInThisDimension = (dimensions[currentDimensionIndex] == -1) ? -1 : dimensions[currentDimensionIndex];
 
+    // Process each sub-initializer in this brace-enclosed list
     for (auto* subInitCtx : initCtx->constantInitializationValue()) {
-        // 允许部分初始化: 移除对元素数量的严格限制，允许少于维度大小的元素
-        // 注意：我们仍然检查是否超过最大元素数量，但不再将其作为错误处理
+        // Check if we've exceeded the allowed number of elements in this dimension
         if (maxElementsInThisDimension != -1 && count >= maxElementsInThisDimension) {
-            // 这里不再报错，而是直接返回已处理的元素数量
-            // 允许部分初始化，未初始化的元素默认设为0
-            return count;
+            addError("Too many initializers for array dimension of size " + 
+                     std::to_string(maxElementsInThisDimension) + ".", subInitCtx->getStart());
+            return -1;
         }
 
         int subCount;
-        if (subInitCtx->LeftBrace()) { // Nested initializer: { ... }
-            // This means we are initializing a sub-array.
-            // The expected element type for this level is an array of one less dimension.
+        // Case 2a: This element is itself a brace-enclosed initializer (for multi-dimensional arrays)
+        if (subInitCtx->LeftBrace()) {
+            // Verify we haven't exceeded the number of dimensions
             if (currentDimensionIndex + 1 >= dimensions.size() && dimensions.size() > 0) { 
-                // 不再将过深的初始化列表视为错误，而是尝试扁平处理
-                // 这种情况可能是用户提供了比数组维度更深的嵌套，例如 int a[2] = {{1}}
-                // 我们可以考虑将其展平处理为 a[0] = 1，但目前简单地返回已处理的元素数
-                return count;
+                addError("Too many nested initializers for array - array has fewer dimensions than the initializer.", subInitCtx->getStart());
+                return -1;
             }
 
             if (!expectedElementType) {
-                // Ensure elementType is not null
                 addError("Internal error: array element type is null.", subInitCtx->getStart());
                 return -1;
             }
 
+            // Recursively check the next level of array initializers
             subCount = checkArrayInitializerRecursive(subInitCtx, expectedElementType, dimensions, currentDimensionIndex + 1, flatInitializers);
-        } else { // Scalar initializer: ConstExp
-             // This scalar should initialize an element of the current sub-array.
-             // The expected type for this scalar is `expectedElementType`.
-            std::shared_ptr<Type> oldExpected = expectedInitializerType; // Save context
+        } else {
+            // Case 2b: This element is a scalar value
+            std::shared_ptr<Type> oldExpected = expectedInitializerType;
             
-            // 确保元素类型不为空
             if (!expectedElementType) {
                 addError("Internal error: array element type is null.", subInitCtx->getStart());
                 return -1;
             }
             
-            // 如果我们正在处理数组，我们需要获取最基本的元素类型
+            // Find the ultimate element type for this position in the array
             std::shared_ptr<Type> ultimateElementType = expectedElementType;
             while(ultimateElementType->baseType == Type::ARRAY) {
                 ultimateElementType = ultimateElementType->elementType;
             }
             
-            expectedInitializerType = ultimateElementType; // Set context for scalar element
+            expectedInitializerType = ultimateElementType;
 
+            // Validate the scalar element
             ConstEvalResult val = std::any_cast<ConstEvalResult>(visitConstantInitializationValue(subInitCtx));
             
-            expectedInitializerType = oldExpected; // Restore context
+            expectedInitializerType = oldExpected;
 
-            if (!val.isConst) { /* error reported */ return -1; }
+            // Check that the expression is a compile-time constant
+            if (!val.isConst) { return -1; }
             if (val.type->baseType == Type::ERROR_TYPE) return -1;
             
-            // Type check val.type against expectedElementType
+            // Verify the type matches what we expect
             if (!val.type->equals(*ultimateElementType)) {
                  addError("Type mismatch in array initializer: expected element of type '" + 
                           ultimateElementType->toString() + "', got '" + val.type->toString() + "'.", 
                           subInitCtx->constantExpression()->getStart());
                  return -1;
             }
+            // Add the validated element to our flat list of initializers
             flatInitializers.push_back(val);
             subCount = 1;
         }
 
-        if (subCount < 0) return -1; // Propagate error
+        // If any sub-initializer had an error, propagate the error
+        if (subCount < 0) return -1;
+        // Otherwise, count the elements we've processed
         count += subCount;
     }
+    // Return the total number of elements processed at this level
     return count;
 }
 
-
+/**
+ * @brief Processes and type-checks expressions
+ * 
+ * This method evaluates the type of an expression and checks for type errors.
+ * It handles various expression types including arithmetic, logical, and relational expressions.
+ * 
+ * @param ctx The expression context
+ * @return The type of the expression
+ */
 antlrcpp::Any SemanticAnalyzer::visitExpression(CactParser::ExpressionContext *ctx) {
+    // This method analyzes general expressions in the CACT language
+    // It delegates to visitAddExpression for actual type checking and validation
     if (ctx->addExpression()) {
         return visitAddExpression(ctx->addExpression());
     }
@@ -1108,20 +1337,42 @@ antlrcpp::Any SemanticAnalyzer::visitExpression(CactParser::ExpressionContext *c
     return Type::getError();
 }
 
+/**
+ * @brief Processes constant expressions
+ * 
+ * This method analyzes constant expressions, which are used in initializers and array dimensions.
+ * It validates that the expression is well-formed and returns its type.
+ * 
+ * @param ctx The constant expression context
+ * @return The type of the constant expression
+ */
 antlrcpp::Any SemanticAnalyzer::visitConstantExpression(CactParser::ConstantExpressionContext *ctx) {
+    // This method analyzes constant expressions, which are used in initializers and array dimensions
+    // It validates that the expression is well-formed and returns its type
     if (ctx->addExpression()) {
         auto type = std::any_cast<std::shared_ptr<Type>>(visitAddExpression(ctx->addExpression()));
-        // Const-ness is checked by evaluateAddExpressionAsConstant during initializer processing.
         return type;
     }
     addError("Invalid constant expression structure.", ctx->getStart());
     return Type::getError();
 }
 
+/**
+ * @brief Processes conditions in if/while statements
+ * 
+ * This method analyzes conditions in if/while statements by:
+ * 1. Setting a flag to indicate we're in a condition context (needed for logical operators)
+ * 2. Validating that the condition expression has a valid type that can be evaluated as boolean
+ * 3. Restoring the condition context flag when finished
+ * 
+ * @param ctx The condition context
+ * @return The type of the condition expression
+ */
 antlrcpp::Any SemanticAnalyzer::visitCondition(CactParser::ConditionContext *ctx) {
-    // 保存旧的上下文状态
+    // This method analyzes conditions in if/while statements
+    // It sets a flag to indicate we're in a condition context (needed for logical operators)
+    // and validates that the condition expression has a valid type that can be evaluated as boolean
     bool oldInConditionContext = inConditionContext;
-    // 设置为条件表达式上下文
     inConditionContext = true;
     
     std::shared_ptr<Type> result;
@@ -1132,12 +1383,26 @@ antlrcpp::Any SemanticAnalyzer::visitCondition(CactParser::ConditionContext *ctx
         result = Type::getError();
     }
     
-    // 恢复原来的上下文状态
     inConditionContext = oldInConditionContext;
     return result;
 }
 
+/**
+ * @brief Processes left-value expressions (variables and array elements)
+ * 
+ * This method handles variable references (identifiers and array elements) by:
+ * 1. Verifying that the referenced identifier exists and has the appropriate type
+ * 2. Checking that array accesses have valid indices and dimensions
+ * 3. Setting the isLValue flag to indicate the expression can be assigned to
+ * 4. Preserving constness information from the original declaration
+ * 
+ * @param ctx The left value context
+ * @return The type of the left value (with isLValue flag set)
+ */
 antlrcpp::Any SemanticAnalyzer::visitLeftValue(CactParser::LeftValueContext *ctx) {
+    // This method handles variable references (identifiers and array elements)
+    // It verifies that the referenced identifier exists and has the appropriate type
+    // Also checks that array accesses have valid indices and dimensions
     std::string name = ctx->Identifier()->getText();
     auto symbol = currentScope->resolve(name);
 
@@ -1155,6 +1420,7 @@ antlrcpp::Any SemanticAnalyzer::visitLeftValue(CactParser::LeftValueContext *ctx
     currentType->isLValue = true; 
 
     if (!ctx->LeftBracket().empty()) { 
+        // Handle array element access (e.g., arr[i][j])
         if (currentType->baseType != Type::ARRAY) {
             addError("'" + name + "' is not an array.", ctx->Identifier()->getSymbol());
             return Type::getError();
@@ -1167,22 +1433,22 @@ antlrcpp::Any SemanticAnalyzer::visitLeftValue(CactParser::LeftValueContext *ctx
         
         std::shared_ptr<Type> resultType = currentType->elementType;
         
-        // 确保元素类型不为空
         if (!resultType) {
             addError("Internal error: array element type is null.", ctx->getStart());
             return Type::getError();
         }
         
-        // 检查所有数组索引的类型和范围
+        // Validate each array index expression
         for (size_t i = 0; i < ctx->expression().size(); ++i) {
             auto indexType = std::any_cast<std::shared_ptr<Type>>(visitExpression(ctx->expression()[i]));
             
+            // Array indices must be integers
             if (indexType->baseType != Type::INT) {
                 addError("Array index must be an integer.", ctx->expression()[i]->getStart());
                 return Type::getError();
             }
             
-            // 检查是否为整数常量，如果是，检查范围
+            // If the index is a constant, check if it's within the array bounds
             auto indexExp = ctx->expression()[i]->addExpression();
             if (indexExp && indexExp->multiplicativeExpression() && 
                 !indexExp->multiplicativeExpression()->multiplicativeExpression() &&
@@ -1191,23 +1457,19 @@ antlrcpp::Any SemanticAnalyzer::visitLeftValue(CactParser::LeftValueContext *ctx
                 indexExp->multiplicativeExpression()->unaryExpression()->primaryExpression()->number() &&
                 indexExp->multiplicativeExpression()->unaryExpression()->primaryExpression()->number()->IntegerConstant()) {
                 
-                // 提取数组索引常量值
                 std::string indexStr = indexExp->multiplicativeExpression()->unaryExpression()->primaryExpression()->number()->IntegerConstant()->getText();
                 int indexValue;
                 
-                // 解析整数值（处理十进制、八进制和十六进制）
+                // Handle hexadecimal (0x...), octal (0...), and decimal number formats
                 if (indexStr.size() > 2 && (indexStr.substr(0, 2) == "0x" || indexStr.substr(0, 2) == "0X")) {
-                    // 十六进制
                     indexValue = std::stoi(indexStr, nullptr, 16);
                 } else if (indexStr.size() > 1 && indexStr[0] == '0') {
-                    // 八进制
                     indexValue = std::stoi(indexStr, nullptr, 8);
                 } else {
-                    // 十进制
                     indexValue = std::stoi(indexStr);
                 }
                 
-                // 检查数组索引是否越界
+                // Verify array bounds (unless dimension is -1, which means unrestricted size)
                 if (currentType->dimensions[i] != -1 && (indexValue < 0 || indexValue >= currentType->dimensions[i])) {
                     addError("Array index " + std::to_string(indexValue) + " out of bounds [0," + 
                             std::to_string(currentType->dimensions[i]-1) + "].", 
@@ -1217,43 +1479,68 @@ antlrcpp::Any SemanticAnalyzer::visitLeftValue(CactParser::LeftValueContext *ctx
             }
         }
         
-        // 返回索引后的数组类型
-        // 如果索引数量等于维度数量，返回元素类型
-        // 如果索引数量小于维度数量，返回降维后的数组类型
+        // Return the appropriate type based on how many dimensions were accessed
         if (ctx->expression().size() == currentType->dimensions.size()) {
-            // 全部维度都被索引，返回最基本的元素类型
+            // Accessed all dimensions, return the element type (e.g., int from int[3][4])
             resultType->isLValue = true;
             resultType->isConst = symbol->type->isConst;
             return resultType;
         } else {
-            // 只有部分维度被索引，返回一个新的降维数组类型
+            // Accessed some dimensions, return a sub-array type (e.g., int[4] from int[3][4])
             std::shared_ptr<Type> newArrayType = std::make_shared<Type>(Type::ARRAY);
             newArrayType->elementType = currentType->elementType;
             newArrayType->isLValue = true;
             newArrayType->isConst = symbol->type->isConst;
             
-            // 复制未被索引的维度
+            // Include remaining dimensions in the type
             for (size_t i = ctx->expression().size(); i < currentType->dimensions.size(); ++i) {
                 newArrayType->dimensions.push_back(currentType->dimensions[i]);
             }
-            
-            // 调试信息已移除
-                      
+                                  
             return newArrayType;
         }
     }
+    // Simple variable reference (not an array element)
     return symbol->type; 
 }
 
+/**
+ * @brief Processes numeric literals (int, float, char)
+ * 
+ * This method determines the type of a numeric literal and returns
+ * the appropriate built-in type object.
+ * 
+ * @param ctx The number context
+ * @return The type of the number literal (int, float, or char)
+ */
 antlrcpp::Any SemanticAnalyzer::visitNumber(CactParser::NumberContext *ctx) {
+    // This method determines the type of a numeric literal (int, float, or char)
+    // It returns the appropriate built-in type object
     if (ctx->IntegerConstant()) return Type::getInt();
     if (ctx->FloatConstant()) return Type::getFloat();
     if (ctx->CharacterConstant()) return Type::getChar();
     return Type::getError();
 }
 
+/**
+ * @brief Processes primary expressions
+ * 
+ * This method handles primary expressions, which can be:
+ * 1. Parenthesized expressions - (expr)
+ * 2. Variable references - x, arr[i]
+ * 3. Literals - 42, 3.14, 'c'
+ * 
+ * Each sub-expression is delegated to the appropriate visitor method.
+ * 
+ * @param ctx The primary expression context
+ * @return The type of the primary expression
+ */
 antlrcpp::Any SemanticAnalyzer::visitPrimaryExpression(CactParser::PrimaryExpressionContext *ctx) {
-    if (ctx->expression()) { // ( Exp )
+    // This method handles primary expressions, which can be:
+    // 1. Parenthesized expressions - (expr)
+    // 2. Variable references - x, arr[i]
+    // 3. Literals - 42, 3.14, 'c'
+    if (ctx->expression()) {
         return visitExpression(ctx->expression());
     }
     if (ctx->leftValue()) {
@@ -1265,24 +1552,44 @@ antlrcpp::Any SemanticAnalyzer::visitPrimaryExpression(CactParser::PrimaryExpres
     return Type::getError();
 }
 
+/**
+ * @brief Processes unary expressions
+ * 
+ * This method handles:
+ * 1. Primary expressions (literals, variables, parenthesized expressions)
+ * 2. Unary operators (+, -, !) with type checking
+ * 3. Function calls with parameter type validation
+ * 
+ * For unary operators, it verifies that the operand type is compatible with the operator.
+ * For function calls, it checks that the function exists, parameter count and types match,
+ * and handles special cases like array parameter passing.
+ * 
+ * @param ctx The unary expression context
+ * @return The type of the unary expression
+ */
 antlrcpp::Any SemanticAnalyzer::visitUnaryExpression(CactParser::UnaryExpressionContext *ctx) {
+    // This method handles unary expressions:
+    // 1. Primary expressions (literals, variables, parenthesized expressions)
+    // 2. Unary operators (+, -, !)
+    // 3. Function calls
     if (ctx->primaryExpression()) {
         return visitPrimaryExpression(ctx->primaryExpression());
     }
-    if (ctx->unaryExpression()) { // Unary op UnaryExp
+    if (ctx->unaryExpression()) {
         std::shared_ptr<Type> operandType = std::any_cast<std::shared_ptr<Type>>(visitUnaryExpression(ctx->unaryExpression()));
         if (operandType->baseType == Type::ERROR_TYPE) return Type::getError();
 
-        if (ctx->Plus() || ctx->Minus()) { // +Exp, -Exp
+        // Handle unary plus and minus operators
+        if (ctx->Plus() || ctx->Minus()) {
             if (operandType->baseType != Type::INT && operandType->baseType != Type::FLOAT) {
                 addError("Unary '+' or '-' must be applied to numeric type, got '" + operandType->toString() + "'.", 
                          (ctx->Plus() ? ctx->Plus()->getSymbol() : ctx->Minus()->getSymbol()) );
                 return Type::getError();
             }
-            return operandType; // Type remains the same
+            return operandType;
         }
-        if (ctx->ExclamationMark()) { // !Exp
-            // Spec: "!仅出现在条件表达式中" - implies it operates on something bool-like (numeric in CACT)
+        // Handle logical NOT operator
+        if (ctx->ExclamationMark()) {
             if (!inConditionContext) {
                 addError("Logical NOT '!' operator can only be used in condition expressions.", ctx->ExclamationMark()->getSymbol());
                 return Type::getError();
@@ -1292,10 +1599,11 @@ antlrcpp::Any SemanticAnalyzer::visitUnaryExpression(CactParser::UnaryExpression
                 addError("Logical NOT '!' must be applied to numeric type, got '" + operandType->toString() + "'.", ctx->ExclamationMark()->getSymbol());
                 return Type::getError();
             }
-            return Type::getInt(); // Result of logical NOT is effectively an int (0 or 1)
+            return Type::getInt();
         }
     }
-    if (ctx->Identifier() && ctx->LeftParenthesis()) { // Function call: Ident '(' [FuncRParams] ')'
+    // Handle function calls
+    if (ctx->Identifier() && ctx->LeftParenthesis()) {
         std::string funcName = ctx->Identifier()->getText();
         auto symbol = currentScope->resolve(funcName);
         if (!symbol) {
@@ -1310,42 +1618,33 @@ antlrcpp::Any SemanticAnalyzer::visitUnaryExpression(CactParser::UnaryExpression
         std::shared_ptr<Type> funcType = symbol->type;
         std::vector<std::shared_ptr<Type>> expectedParamTypes = funcType->paramTypes;
         std::vector<std::shared_ptr<Type>> actualParamTypes;
-
-        // 调试信息已移除
         
+        // Collect and validate all function arguments
         if (ctx->functionRealParameters()) {
             for (auto* expCtx : ctx->functionRealParameters()->expression()) {
                 actualParamTypes.push_back(std::any_cast<std::shared_ptr<Type>>(visitExpression(expCtx)));
             }
         }
         
-        // 调试信息已移除
-
+        // Check if the number of arguments matches the function declaration
         if (actualParamTypes.size() != expectedParamTypes.size()) {
             addError("Function '" + funcName + "' called with incorrect number of arguments. Expected " +
                      std::to_string(expectedParamTypes.size()) + ", got " + std::to_string(actualParamTypes.size()) + ".",
                      ctx->Identifier()->getSymbol());
-            return funcType->elementType; // Return function's return type to reduce cascaded errors
+            return funcType->elementType;
         }
 
         for (size_t i = 0; i < expectedParamTypes.size(); ++i) {
-            if (actualParamTypes[i]->baseType == Type::ERROR_TYPE) continue; // Error in arg already reported
+            if (actualParamTypes[i]->baseType == Type::ERROR_TYPE) continue;
             
-            // Type check: "实参和形参类型必须完全相同"
-            // Create temporary non-const versions for comparison
             auto tempExpected = std::make_shared<Type>(*expectedParamTypes[i]); tempExpected->isConst = false;
             auto tempActual = std::make_shared<Type>(*actualParamTypes[i]); tempActual->isConst = false;
 
-            // 针对数组类型参数错误提供更友好的错误信息
-            // 首先检查是否可能是数组第一维度可变的特殊情况
             bool skipErrorReport = false;
             
             if (tempExpected->baseType == Type::ARRAY && tempActual->baseType == Type::ARRAY) {
-                // 如果维度数量相同
                 if (tempExpected->dimensions.size() == tempActual->dimensions.size()) {
-                    // 如果第一维是隐式的（-1）或者可能隐式，检查其他维度是否匹配
                     if (tempExpected->dimensions[0] == -1 || tempActual->dimensions[0] == -1) {
-                        // 确认是否所有其他维度都匹配
                         bool otherDimensionsMatch = true;
                         for (size_t dim = 1; dim < tempExpected->dimensions.size(); ++dim) {
                             if (tempExpected->dimensions[dim] != tempActual->dimensions[dim]) {
@@ -1354,7 +1653,6 @@ antlrcpp::Any SemanticAnalyzer::visitUnaryExpression(CactParser::UnaryExpression
                             }
                         }
                         
-                        // 如果其他维度匹配且元素类型匹配，则这是允许的情况
                         if (otherDimensionsMatch && tempExpected->elementType->equals(*tempActual->elementType)) {
                             skipErrorReport = true;
                         }
@@ -1365,11 +1663,9 @@ antlrcpp::Any SemanticAnalyzer::visitUnaryExpression(CactParser::UnaryExpression
             if (!skipErrorReport && !tempExpected->equals(*tempActual)) {
                 std::string errorMsg = "Type mismatch for argument " + std::to_string(i + 1) + " of function '" + funcName + "'. ";
                 
-                // 打印预期类型和实际类型的详细信息
                 errorMsg += "Expected '" + expectedParamTypes[i]->toString() + "', got '" + 
                           actualParamTypes[i]->toString() + "'. ";
                           
-                // 如果是数组类型，打印每个维度的信息
                 if (tempExpected->baseType == Type::ARRAY && tempActual->baseType == Type::ARRAY) {
                     errorMsg += "Expected dimensions: [";
                     for (size_t dim = 0; dim < tempExpected->dimensions.size(); ++dim) {
@@ -1391,14 +1687,28 @@ antlrcpp::Any SemanticAnalyzer::visitUnaryExpression(CactParser::UnaryExpression
                 addError(errorMsg, ctx->functionRealParameters()->expression(i)->getStart());
             }
         }
-        return funcType->elementType; // Return type of the function
+        return funcType->elementType;
     }
     return Type::getError();
 }
 
-// Default implementations for other expression types, can be overridden if specific logic is needed
+/**
+ * @brief Processes multiplicative expressions (*, /, %)
+ * 
+ * This method handles multiplicative operations by:
+ * 1. Verifying that the operands have compatible types
+ * 2. Enforcing special rules (e.g., % only works with integer operands)
+ * 3. Ensuring no implicit type conversions (operands must be the same type)
+ * 4. Determining the result type of the operation
+ * 
+ * @param ctx The multiplicative expression context
+ * @return The type of the multiplicative expression
+ */
 antlrcpp::Any SemanticAnalyzer::visitMultiplicativeExpression(CactParser::MultiplicativeExpressionContext *ctx) {
-    if (ctx->multiplicativeExpression()) { // MulExp ('*' | '/' | '%') UnaryExp
+    // This method handles multiplicative operations: *, /, and %
+    // It verifies that the operands have compatible types and the operation is valid
+    // For example, % can only be applied to integer operands, not floating-point values
+    if (ctx->multiplicativeExpression()) {
         std::shared_ptr<Type> left = std::any_cast<std::shared_ptr<Type>>(visitMultiplicativeExpression(ctx->multiplicativeExpression()));
         std::shared_ptr<Type> right = std::any_cast<std::shared_ptr<Type>>(visitUnaryExpression(ctx->unaryExpression()));
 
@@ -1406,15 +1716,14 @@ antlrcpp::Any SemanticAnalyzer::visitMultiplicativeExpression(CactParser::Multip
             return Type::getError();
         }
 
-        // 特别检查：取余(%)运算符不能用于浮点数
+        // Modulo operation only works with integer operands
         if (ctx->Percent() && (left->baseType == Type::FLOAT || right->baseType == Type::FLOAT)) {
             addError("Modulo operator '%' cannot be applied to floating-point operands.", 
                      ctx->Percent()->getSymbol());
             return Type::getError();
         }
 
-        // Check types: must be numeric, result type is usually common type (e.g. float if one is float)
-        // CACT spec: "操作数必须是int或float类型"
+        // Verify both operands are numeric (int or float)
         if (!((left->baseType == Type::INT || left->baseType == Type::FLOAT) && 
               (right->baseType == Type::INT || right->baseType == Type::FLOAT))) {
             antlr4::Token* opToken = nullptr;
@@ -1428,7 +1737,7 @@ antlrcpp::Any SemanticAnalyzer::visitMultiplicativeExpression(CactParser::Multip
             return Type::getError();
         }
         
-        // CACT不支持任何形式的类型转换，确保操作数类型相同
+        // CACT requires operands of the same type (no implicit type conversion)
         if (left->baseType != right->baseType) {
             antlr4::Token* opToken = nullptr;
             if (ctx->Asterisk()) opToken = ctx->Asterisk()->getSymbol();
@@ -1441,15 +1750,33 @@ antlrcpp::Any SemanticAnalyzer::visitMultiplicativeExpression(CactParser::Multip
             return Type::getError();
         }
         
-        // 现在，左右操作数类型一定相同
+        // Binary operation returns the same type as the operands
         return std::make_shared<Type>(*left);
-    } else { // UnaryExp
+    } else {
+        // If there's no binary operation, just evaluate the unary expression
         return visitUnaryExpression(ctx->unaryExpression());
     }
 }
 
+/**
+ * @brief Processes additive expressions (+, -)
+ * 
+ * This method validates addition and subtraction operations by:
+ * 1. Ensuring both operands are numeric types (int or float)
+ * 2. Checking that operands are of the same type (no implicit conversions)
+ * 3. Determining the result type of the operation
+ * 
+ * CACT does not support automatic type conversions between int and float,
+ * so this method enforces strict type compatibility.
+ * 
+ * @param ctx The add expression context
+ * @return The type of the additive expression
+ */
 antlrcpp::Any SemanticAnalyzer::visitAddExpression(CactParser::AddExpressionContext *ctx) {
-    if (ctx->addExpression()) { // AddExp ('+' | '-') MulExp
+    // This method validates addition and subtraction operations
+    // It ensures that both operands are numeric types and of the same type (int or float)
+    // CACT does not support automatic type conversions between int and float
+    if (ctx->addExpression()) {
         std::shared_ptr<Type> left = std::any_cast<std::shared_ptr<Type>>(visitAddExpression(ctx->addExpression()));
         std::shared_ptr<Type> right = std::any_cast<std::shared_ptr<Type>>(visitMultiplicativeExpression(ctx->multiplicativeExpression()));
 
@@ -1457,7 +1784,7 @@ antlrcpp::Any SemanticAnalyzer::visitAddExpression(CactParser::AddExpressionCont
             return Type::getError();
         }
 
-        // CACT spec: "操作数必须是int或float类型"
+        // Both operands must be numeric (int or float)
         if (!((left->baseType == Type::INT || left->baseType == Type::FLOAT) &&
               (right->baseType == Type::INT || right->baseType == Type::FLOAT))) {
             antlr4::Token* opToken = nullptr;
@@ -1470,7 +1797,7 @@ antlrcpp::Any SemanticAnalyzer::visitAddExpression(CactParser::AddExpressionCont
             return Type::getError();
         }
         
-        // CACT不支持任何形式的类型转换，确保操作数类型相同
+        // Both operands must be of the same type (no implicit conversion)
         if (left->baseType != right->baseType) {
             antlr4::Token* opToken = nullptr;
             if (ctx->Plus()) opToken = ctx->Plus()->getSymbol();
@@ -1482,22 +1809,38 @@ antlrcpp::Any SemanticAnalyzer::visitAddExpression(CactParser::AddExpressionCont
             return Type::getError();
         }
         
-        // 现在，左右操作数类型一定相同
+        // Result has the same type as the operands
         return std::make_shared<Type>(*left);
-    } else { // MulExp
+    } else {
+        // If no binary operation, just evaluate the multiplicative expression
         return visitMultiplicativeExpression(ctx->multiplicativeExpression());
     }
 }
 
+/**
+ * @brief Processes relational expressions (<, >, <=, >=)
+ * 
+ * This method validates relational operations by:
+ * 1. Ensuring operands are of compatible types (both numeric or both char)
+ * 2. Enforcing type-specific rules (e.g., chars can only be compared with chars)
+ * 3. Checking that numeric operands are of the same type (no implicit conversions)
+ * 4. Setting the result type to int (representing boolean true/false)
+ * 
+ * @param ctx The relational expression context
+ * @return The type of the relational expression (always int)
+ */
 antlrcpp::Any SemanticAnalyzer::visitRelationalExpression(CactParser::RelationalExpressionContext *ctx) {
-    if (ctx->relationalExpression()) { // RelExp ('<' | '>' | '<=' | '>=') AddExp
+    // This method validates relational operations (<, >, <=, >=)
+    // It ensures operands are of compatible types (both numeric or both char)
+    // and returns an int type representing the boolean result
+    if (ctx->relationalExpression()) {
         std::shared_ptr<Type> left = std::any_cast<std::shared_ptr<Type>>(visitRelationalExpression(ctx->relationalExpression()));
         std::shared_ptr<Type> right = std::any_cast<std::shared_ptr<Type>>(visitAddExpression(ctx->addExpression()));
 
         if (left->baseType == Type::ERROR_TYPE || right->baseType == Type::ERROR_TYPE) {
             return Type::getError();
         }
-        // CACT spec: "操作数必须是int、float或char类型"
+        // Both operands must be numeric (int, float) or character types
         bool left_ok = (left->baseType == Type::INT || left->baseType == Type::FLOAT || left->baseType == Type::CHAR);
         bool right_ok = (right->baseType == Type::INT || right->baseType == Type::FLOAT || right->baseType == Type::CHAR);
 
@@ -1513,7 +1856,7 @@ antlrcpp::Any SemanticAnalyzer::visitRelationalExpression(CactParser::Relational
                      opToken);
             return Type::getError();
         }
-        // Spec: "如果操作数之一是char类型，则另一个操作数也必须是char类型"
+        // If one operand is char, the other must also be char (can't compare char with int/float)
         if ((left->baseType == Type::CHAR && right->baseType != Type::CHAR) ||
             (right->baseType == Type::CHAR && left->baseType != Type::CHAR)) {
             antlr4::Token* opToken = nullptr;
@@ -1528,7 +1871,7 @@ antlrcpp::Any SemanticAnalyzer::visitRelationalExpression(CactParser::Relational
             return Type::getError();
         }
         
-        // CACT不支持任何形式的类型转换，确保非char操作数类型相同
+        // For numeric types, both operands must be of the same type (no implicit conversion)
         if (left->baseType != Type::CHAR && right->baseType != left->baseType) {
             antlr4::Token* opToken = nullptr;
             if (ctx->Less()) opToken = ctx->Less()->getSymbol();
@@ -1541,14 +1884,27 @@ antlrcpp::Any SemanticAnalyzer::visitRelationalExpression(CactParser::Relational
                      opToken);
             return Type::getError();
         }
-        return Type::getInt(); // Result of relational expression is int (boolean)
-    } else { // AddExp
+        // Relational operations always return an int type (representing boolean true/false)
+        return Type::getInt();
+    } else {
         return visitAddExpression(ctx->addExpression());
     }
 }
 
+/**
+ * @brief Processes equality expressions (==, !=)
+ * 
+ * This method validates equality operations by:
+ * 1. Ensuring operands are of compatible types (both numeric or both char)
+ * 2. Enforcing type-specific rules (e.g., chars can only be compared with chars)
+ * 3. Checking that numeric operands are of the same type (no implicit conversions)
+ * 4. Setting the result type to int (representing boolean true/false)
+ * 
+ * @param ctx The equality expression context
+ * @return The type of the equality expression (always int)
+ */
 antlrcpp::Any SemanticAnalyzer::visitEqualityExpression(CactParser::EqualityExpressionContext *ctx) {
-    if (ctx->equalityExpression()) { // EqExp ('==' | '!=') RelExp
+    if (ctx->equalityExpression()) {
         std::shared_ptr<Type> left = std::any_cast<std::shared_ptr<Type>>(visitEqualityExpression(ctx->equalityExpression()));
         std::shared_ptr<Type> right = std::any_cast<std::shared_ptr<Type>>(visitRelationalExpression(ctx->relationalExpression()));
 
@@ -1556,7 +1912,6 @@ antlrcpp::Any SemanticAnalyzer::visitEqualityExpression(CactParser::EqualityExpr
             return Type::getError();
         }
 
-        // CACT spec: "操作数必须是int、float或char类型"
         bool left_ok = (left->baseType == Type::INT || left->baseType == Type::FLOAT || left->baseType == Type::CHAR);
         bool right_ok = (right->baseType == Type::INT || right->baseType == Type::FLOAT || right->baseType == Type::CHAR);
         
@@ -1570,7 +1925,6 @@ antlrcpp::Any SemanticAnalyzer::visitEqualityExpression(CactParser::EqualityExpr
                      opToken);
             return Type::getError();
         }
-        // Spec: "如果操作数之一是char类型，则另一个操作数也必须是char类型"
         if ((left->baseType == Type::CHAR && right->baseType != Type::CHAR) ||
             (right->baseType == Type::CHAR && left->baseType != Type::CHAR)) {
             antlr4::Token* opToken = nullptr;
@@ -1583,7 +1937,6 @@ antlrcpp::Any SemanticAnalyzer::visitEqualityExpression(CactParser::EqualityExpr
             return Type::getError();
         }
         
-        // CACT不支持任何形式的类型转换，确保非char操作数类型相同
         if (left->baseType != Type::CHAR && right->baseType != left->baseType) {
             antlr4::Token* opToken = nullptr;
             if (ctx->LogicalEqual()) opToken = ctx->LogicalEqual()->getSymbol();
@@ -1594,49 +1947,83 @@ antlrcpp::Any SemanticAnalyzer::visitEqualityExpression(CactParser::EqualityExpr
                      opToken);
             return Type::getError();
         }
-        return Type::getInt(); // Result of equality expression is int (boolean)
-    } else { // RelExp
+        return Type::getInt();
+    } else {
         return visitRelationalExpression(ctx->relationalExpression());
     }
 }
 
+/**
+ * @brief Processes logical AND expressions (&&)
+ * 
+ * This method validates logical AND operations by:
+ * 1. Ensuring both operands are of numeric or char types
+ *    (which can be implicitly converted to boolean values)
+ * 2. Setting the result type to int (representing boolean true/false)
+ * 
+ * In CACT, numeric and char values can be used in logical contexts,
+ * but arrays, structs, and other complex types cannot.
+ * 
+ * @param ctx The logical AND expression context
+ * @return The type of the logical AND expression (always int)
+ */
 antlrcpp::Any SemanticAnalyzer::visitLogicalAndExpression(CactParser::LogicalAndExpressionContext *ctx) {
-    if (ctx->logicalAndExpression()) { // LAndExp '&&' EqExp
+    if (ctx->logicalAndExpression()) {
         std::shared_ptr<Type> left = std::any_cast<std::shared_ptr<Type>>(visitLogicalAndExpression(ctx->logicalAndExpression()));
         std::shared_ptr<Type> right = std::any_cast<std::shared_ptr<Type>>(visitEqualityExpression(ctx->equalityExpression()));
 
         if (left->baseType == Type::ERROR_TYPE || right->baseType == Type::ERROR_TYPE) return Type::getError();
-        // Operands must be convertible to bool (numeric in CACT)
         if (!((left->baseType == Type::INT || left->baseType == Type::FLOAT || left->baseType == Type::CHAR) && 
               (right->baseType == Type::INT || right->baseType == Type::FLOAT || right->baseType == Type::CHAR))) {
             addError("Operands for '&&' must be numeric or char.", ctx->LogicalAnd()->getSymbol());
             return Type::getError();
         }
-        return Type::getInt(); // Result is int (0 or 1)
-    } else { // EqExp
+        return Type::getInt();
+    } else {
         return visitEqualityExpression(ctx->equalityExpression());
     }
 }
 
+/**
+ * @brief Processes logical OR expressions (||)
+ * 
+ * This method validates logical OR operations by:
+ * 1. Ensuring both operands are of numeric or char types
+ *    (which can be implicitly converted to boolean values)
+ * 2. Setting the result type to int (representing boolean true/false)
+ * 
+ * In CACT, numeric and char values can be used in logical contexts,
+ * but arrays, structs, and other complex types cannot.
+ * 
+ * @param ctx The logical OR expression context
+ * @return The type of the logical OR expression (always int)
+ */
 antlrcpp::Any SemanticAnalyzer::visitLogicalOrExpression(CactParser::LogicalOrExpressionContext *ctx) {
-    if (ctx->logicalOrExpression()) { // LOrExp '||' LAndExp
+    if (ctx->logicalOrExpression()) {
         std::shared_ptr<Type> left = std::any_cast<std::shared_ptr<Type>>(visitLogicalOrExpression(ctx->logicalOrExpression()));
         std::shared_ptr<Type> right = std::any_cast<std::shared_ptr<Type>>(visitLogicalAndExpression(ctx->logicalAndExpression()));
 
         if (left->baseType == Type::ERROR_TYPE || right->baseType == Type::ERROR_TYPE) return Type::getError();
-        // Operands must be convertible to bool (numeric in CACT)
         if (!((left->baseType == Type::INT || left->baseType == Type::FLOAT || left->baseType == Type::CHAR) && 
               (right->baseType == Type::INT || right->baseType == Type::FLOAT || right->baseType == Type::CHAR))) {
             addError("Operands for '||' must be numeric or char.", ctx->LogicalOr()->getSymbol());
             return Type::getError();
         }
-        return Type::getInt(); // Result is int (0 or 1)
-    } else { // LAndExp
+        return Type::getInt();
+    } else {
         return visitLogicalAndExpression(ctx->logicalAndExpression());
     }
 }
 
-// visitTerminal, visitErrorNode, visitDeclaration should be correctly defined as before
+/**
+ * @brief Routes declaration processing to the appropriate handler
+ * 
+ * This method delegates processing to either visitConstantDeclaration
+ * or visitVariableDeclaration based on the declaration type.
+ * 
+ * @param ctx The declaration context
+ * @return The result from the delegated visitor method (usually nullptr)
+ */
 antlrcpp::Any SemanticAnalyzer::visitDeclaration(CactParser::DeclarationContext *ctx) {
     if (ctx->constantDeclaration()) {
         return visitConstantDeclaration(ctx->constantDeclaration());
@@ -1646,10 +2033,28 @@ antlrcpp::Any SemanticAnalyzer::visitDeclaration(CactParser::DeclarationContext 
     return visitChildren(ctx); 
 }
 
+/**
+ * @brief Handles terminal nodes in the parse tree
+ * 
+ * This is a fallback method for handling terminal nodes that don't have
+ * specific visitor methods. It delegates to the base visitor implementation.
+ * 
+ * @param node The terminal node
+ * @return The result from the base visitor method
+ */
 antlrcpp::Any SemanticAnalyzer::visitTerminal(antlr4::tree::TerminalNode *node) {
     return CactParserBaseVisitor::visitTerminal(node); 
 }
 
+/**
+ * @brief Handles error nodes in the parse tree
+ * 
+ * This method is called when the parser encounters a syntax error.
+ * It records the error and delegates to the base visitor implementation.
+ * 
+ * @param node The error node
+ * @return The result from the base visitor method
+ */
 antlrcpp::Any SemanticAnalyzer::visitErrorNode(antlr4::tree::ErrorNode *node) {
     addError("Syntax error: unexpected token or parse error near \"" + node->getText() + "\"", node->getSymbol());
     return CactParserBaseVisitor::visitErrorNode(node); 
