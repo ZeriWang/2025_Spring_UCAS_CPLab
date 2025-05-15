@@ -3526,30 +3526,6 @@ src/SemanticAnalyzer.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/compiler.dir/build.make CMakeFiles/compiler.dir/src/SemanticAnalyzer.cpp.s
 .PHONY : src/SemanticAnalyzer.cpp.s
 
-src/SymbolTable.o: src/SymbolTable.cpp.o
-.PHONY : src/SymbolTable.o
-
-# target to build an object file
-src/SymbolTable.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/compiler.dir/build.make CMakeFiles/compiler.dir/src/SymbolTable.cpp.o
-.PHONY : src/SymbolTable.cpp.o
-
-src/SymbolTable.i: src/SymbolTable.cpp.i
-.PHONY : src/SymbolTable.i
-
-# target to preprocess a source file
-src/SymbolTable.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/compiler.dir/build.make CMakeFiles/compiler.dir/src/SymbolTable.cpp.i
-.PHONY : src/SymbolTable.cpp.i
-
-src/SymbolTable.s: src/SymbolTable.cpp.s
-.PHONY : src/SymbolTable.s
-
-# target to generate assembly for a file
-src/SymbolTable.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/compiler.dir/build.make CMakeFiles/compiler.dir/src/SymbolTable.cpp.s
-.PHONY : src/SymbolTable.cpp.s
-
 src/main.o: src/main.cpp.o
 .PHONY : src/main.o
 
@@ -4031,9 +4007,6 @@ help:
 	@echo "... src/SemanticAnalyzer.o"
 	@echo "... src/SemanticAnalyzer.i"
 	@echo "... src/SemanticAnalyzer.s"
-	@echo "... src/SymbolTable.o"
-	@echo "... src/SymbolTable.i"
-	@echo "... src/SymbolTable.s"
 	@echo "... src/main.o"
 	@echo "... src/main.i"
 	@echo "... src/main.s"

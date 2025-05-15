@@ -142,24 +142,10 @@ CMakeFiles/compiler.dir/src/SemanticAnalyzer.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/compiler.dir/src/SemanticAnalyzer.cpp.s"
 	/Library/Developer/CommandLineTools/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/src/SemanticAnalyzer.cpp -o CMakeFiles/compiler.dir/src/SemanticAnalyzer.cpp.s
 
-CMakeFiles/compiler.dir/src/SymbolTable.cpp.o: CMakeFiles/compiler.dir/flags.make
-CMakeFiles/compiler.dir/src/SymbolTable.cpp.o: /Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/src/SymbolTable.cpp
-CMakeFiles/compiler.dir/src/SymbolTable.cpp.o: CMakeFiles/compiler.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_6) "Building CXX object CMakeFiles/compiler.dir/src/SymbolTable.cpp.o"
-	/Library/Developer/CommandLineTools/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/compiler.dir/src/SymbolTable.cpp.o -MF CMakeFiles/compiler.dir/src/SymbolTable.cpp.o.d -o CMakeFiles/compiler.dir/src/SymbolTable.cpp.o -c /Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/src/SymbolTable.cpp
-
-CMakeFiles/compiler.dir/src/SymbolTable.cpp.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/compiler.dir/src/SymbolTable.cpp.i"
-	/Library/Developer/CommandLineTools/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/src/SymbolTable.cpp > CMakeFiles/compiler.dir/src/SymbolTable.cpp.i
-
-CMakeFiles/compiler.dir/src/SymbolTable.cpp.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/compiler.dir/src/SymbolTable.cpp.s"
-	/Library/Developer/CommandLineTools/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/src/SymbolTable.cpp -o CMakeFiles/compiler.dir/src/SymbolTable.cpp.s
-
 CMakeFiles/compiler.dir/src/main.cpp.o: CMakeFiles/compiler.dir/flags.make
 CMakeFiles/compiler.dir/src/main.cpp.o: /Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/src/main.cpp
 CMakeFiles/compiler.dir/src/main.cpp.o: CMakeFiles/compiler.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_7) "Building CXX object CMakeFiles/compiler.dir/src/main.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_6) "Building CXX object CMakeFiles/compiler.dir/src/main.cpp.o"
 	/Library/Developer/CommandLineTools/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/compiler.dir/src/main.cpp.o -MF CMakeFiles/compiler.dir/src/main.cpp.o.d -o CMakeFiles/compiler.dir/src/main.cpp.o -c /Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/src/main.cpp
 
 CMakeFiles/compiler.dir/src/main.cpp.i: cmake_force
@@ -173,7 +159,7 @@ CMakeFiles/compiler.dir/src/main.cpp.s: cmake_force
 CMakeFiles/compiler.dir/src/syntax_error_listener.cpp.o: CMakeFiles/compiler.dir/flags.make
 CMakeFiles/compiler.dir/src/syntax_error_listener.cpp.o: /Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/src/syntax_error_listener.cpp
 CMakeFiles/compiler.dir/src/syntax_error_listener.cpp.o: CMakeFiles/compiler.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_8) "Building CXX object CMakeFiles/compiler.dir/src/syntax_error_listener.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_7) "Building CXX object CMakeFiles/compiler.dir/src/syntax_error_listener.cpp.o"
 	/Library/Developer/CommandLineTools/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/compiler.dir/src/syntax_error_listener.cpp.o -MF CMakeFiles/compiler.dir/src/syntax_error_listener.cpp.o.d -o CMakeFiles/compiler.dir/src/syntax_error_listener.cpp.o -c /Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/cact/src/syntax_error_listener.cpp
 
 CMakeFiles/compiler.dir/src/syntax_error_listener.cpp.i: cmake_force
@@ -191,7 +177,6 @@ compiler_OBJECTS = \
 "CMakeFiles/compiler.dir/grammar/CactParserBaseVisitor.cpp.o" \
 "CMakeFiles/compiler.dir/grammar/CactParserVisitor.cpp.o" \
 "CMakeFiles/compiler.dir/src/SemanticAnalyzer.cpp.o" \
-"CMakeFiles/compiler.dir/src/SymbolTable.cpp.o" \
 "CMakeFiles/compiler.dir/src/main.cpp.o" \
 "CMakeFiles/compiler.dir/src/syntax_error_listener.cpp.o"
 
@@ -203,13 +188,12 @@ compiler: CMakeFiles/compiler.dir/grammar/CactParser.cpp.o
 compiler: CMakeFiles/compiler.dir/grammar/CactParserBaseVisitor.cpp.o
 compiler: CMakeFiles/compiler.dir/grammar/CactParserVisitor.cpp.o
 compiler: CMakeFiles/compiler.dir/src/SemanticAnalyzer.cpp.o
-compiler: CMakeFiles/compiler.dir/src/SymbolTable.cpp.o
 compiler: CMakeFiles/compiler.dir/src/main.cpp.o
 compiler: CMakeFiles/compiler.dir/src/syntax_error_listener.cpp.o
 compiler: CMakeFiles/compiler.dir/build.make
 compiler: libantlr.a
 compiler: CMakeFiles/compiler.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir=/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_9) "Linking CXX executable compiler"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir=/Users/zhangjiawei/Desktop/2025_Spring_UCAS_CPLab/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_8) "Linking CXX executable compiler"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/compiler.dir/link.txt --verbose=$(VERBOSE)
 
 # Rule to build all files generated by this target.

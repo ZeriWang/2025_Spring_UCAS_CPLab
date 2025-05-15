@@ -9,8 +9,6 @@ file(REMOVE_RECURSE
   "CMakeFiles/compiler.dir/grammar/CactParserVisitor.cpp.o.d"
   "CMakeFiles/compiler.dir/src/SemanticAnalyzer.cpp.o"
   "CMakeFiles/compiler.dir/src/SemanticAnalyzer.cpp.o.d"
-  "CMakeFiles/compiler.dir/src/SymbolTable.cpp.o"
-  "CMakeFiles/compiler.dir/src/SymbolTable.cpp.o.d"
   "CMakeFiles/compiler.dir/src/main.cpp.o"
   "CMakeFiles/compiler.dir/src/main.cpp.o.d"
   "CMakeFiles/compiler.dir/src/syntax_error_listener.cpp.o"
