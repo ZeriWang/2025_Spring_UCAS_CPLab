@@ -76,8 +76,15 @@ bool Type::equals(const Type& other) const {
 
 // --- Scope Implementation ---
 bool Scope::define(const std::string& name, std::shared_ptr<SymbolInfo> symbol) {
-    if (symbols.count(name)) {
-        return false; // Redefinition in the same scope
+    auto it = symbols.find(name);
+    if (it != symbols.end()) {
+        // 如果已存在同名符号，检查类型
+        // 只有当符号类型相同时，才视为重定义
+        if ((it->second->kind == SymbolInfo::FUNCTION_DEF && symbol->kind == SymbolInfo::FUNCTION_DEF) ||
+            (it->second->kind != SymbolInfo::FUNCTION_DEF && symbol->kind != SymbolInfo::FUNCTION_DEF)) {
+            return false; // 相同类型的同名符号，视为重定义
+        }
+        // 否则允许不同类型符号同名（如变量和函数）
     }
     symbols[name] = symbol;
     return true;
@@ -533,19 +540,34 @@ antlrcpp::Any SemanticAnalyzer::visitBlock(CactParser::BlockContext *ctx) {
     }
 
     // 先遍历所有blockItem执行语义检查
+    bool allPathsReturn = true; // 假设所有路径都返回，除非我们发现一个未返回的路径
+    bool hasReturnStatement = false; // 是否有任何return语句
+    
     for (auto* item : ctx->blockItem()) {
         if (item->declaration()) {
             visitDeclaration(item->declaration());
         } else if (item->statement()) {
+            // 记录每条语句前的返回状态
+            bool prevReturn = currentFunctionHasReturn;
+            
             visitStatement(item->statement());
+            
+            // 如果这条语句包含return，记录下来
+            if (!prevReturn && currentFunctionHasReturn) {
+                hasReturnStatement = true;
+            }
+            
+            // 如果语句改变了返回状态并且不是块的最后一条语句，则不是所有路径都返回
+            if (item != ctx->blockItem().back() && currentFunctionHasReturn) {
+                // 后面的语句永远不会被执行，所以我们已经知道所有路径都返回了
+                break;
+            }
         }
     }
-
-    // 额外检查：在函数体块中，尝试确定最后一个语句是否是return语句
-    // 在简单的直接执行流中（没有if-else或循环），如果最后一个语句是return，
-    // 则函数必定有返回值。这是一个简单但不完整的检查。
-    if (isFunctionBodyBlock) {
-        // 这种场景下我们不需要返回检查结果，因为visitFunctionDefinition已经在跟踪currentFunctionHasReturn
+    
+    // 如果块中有return语句但不是所有路径都返回，则块整体不保证返回
+    if (!hasReturnStatement) {
+        allPathsReturn = false;
     }
 
     if (!isFunctionBodyBlock) {
@@ -624,9 +646,29 @@ antlrcpp::Any SemanticAnalyzer::visitStatement(CactParser::StatementContext *ctx
             // CACT does not have a boolean type. Conditions are numeric.
             addError("Condition for 'if' statement must be a numeric type, got '" + condType->toString() + "'.", ctx->condition()->getStart());
         }
+        
+        // 记录访问前的返回状态
+        bool oldHasReturn = currentFunctionHasReturn;
+        bool thenBranchReturns = false;
+        bool elseBranchReturns = false;
+        
+        currentFunctionHasReturn = false; // 重置为分支分析
         visitStatement(ctx->statement(0)); // Then branch
+        thenBranchReturns = currentFunctionHasReturn;
+        
+        currentFunctionHasReturn = false; // 为else分支重置
         if (ctx->Else()) {
             visitStatement(ctx->statement(1)); // Else branch
+            elseBranchReturns = currentFunctionHasReturn;
+        }
+        
+        // 只有当两个分支都返回时，或者恢复到调用前的状态
+        if (ctx->Else()) {
+            // 有else分支时，只有两个分支都返回才算整体有返回
+            currentFunctionHasReturn = thenBranchReturns && elseBranchReturns;
+        } else {
+            // 没有else分支时，不能保证有返回（因为if条件可能为假）
+            currentFunctionHasReturn = oldHasReturn;
         }
     } else if (ctx->While()) { // While statement: 'while' '(' Cond ')' Stmt
         std::shared_ptr<Type> condType = std::any_cast<std::shared_ptr<Type>>(visitCondition(ctx->condition()));
@@ -640,7 +682,10 @@ antlrcpp::Any SemanticAnalyzer::visitStatement(CactParser::StatementContext *ctx
         Scope* preLoopScope = currentScope;
         currentScope = new Scope(preLoopScope, preLoopScope->isFunction(), true); // New scope is a loop scope
 
+        // 对于while循环，不能保证循环体会执行，因此不会影响返回状态
+        bool oldHasReturn = currentFunctionHasReturn;
         visitStatement(ctx->statement(0)); // Loop body
+        currentFunctionHasReturn = oldHasReturn; // 恢复到之前的返回状态
 
         Scope* temp = currentScope;
         currentScope = preLoopScope; // Restore previous scope
