@@ -158,6 +158,61 @@ std::shared_ptr<Type> SemanticAnalyzer::getTypeFromFunctionTypeCtx(CactParser::F
 antlrcpp::Any SemanticAnalyzer::visitCompilationUnit(CactParser::CompilationUnitContext *ctx) {
     enterScope(); // Global scope
 
+    // 添加CACT内置函数到全局作用域
+    // 1. void print_int(int)
+    {
+        auto returnType = Type::getVoid();
+        std::vector<std::shared_ptr<Type>> paramTypes = { Type::getInt() };
+        auto funcType = Type::getFunction(returnType, paramTypes);
+        auto funcSymbol = std::make_shared<SymbolInfo>("print_int", funcType, SymbolInfo::FUNCTION_DEF, nullptr);
+        currentScope->define("print_int", funcSymbol);
+    }
+    
+    // 2. void print_float(float)
+    {
+        auto returnType = Type::getVoid();
+        std::vector<std::shared_ptr<Type>> paramTypes = { Type::getFloat() };
+        auto funcType = Type::getFunction(returnType, paramTypes);
+        auto funcSymbol = std::make_shared<SymbolInfo>("print_float", funcType, SymbolInfo::FUNCTION_DEF, nullptr);
+        currentScope->define("print_float", funcSymbol);
+    }
+    
+    // 3. void print_char(char)
+    {
+        auto returnType = Type::getVoid();
+        std::vector<std::shared_ptr<Type>> paramTypes = { Type::getChar() };
+        auto funcType = Type::getFunction(returnType, paramTypes);
+        auto funcSymbol = std::make_shared<SymbolInfo>("print_char", funcType, SymbolInfo::FUNCTION_DEF, nullptr);
+        currentScope->define("print_char", funcSymbol);
+    }
+    
+    // 4. int get_int()
+    {
+        auto returnType = Type::getInt();
+        std::vector<std::shared_ptr<Type>> paramTypes = { };
+        auto funcType = Type::getFunction(returnType, paramTypes);
+        auto funcSymbol = std::make_shared<SymbolInfo>("get_int", funcType, SymbolInfo::FUNCTION_DEF, nullptr);
+        currentScope->define("get_int", funcSymbol);
+    }
+    
+    // 5. float get_float()
+    {
+        auto returnType = Type::getFloat();
+        std::vector<std::shared_ptr<Type>> paramTypes = { };
+        auto funcType = Type::getFunction(returnType, paramTypes);
+        auto funcSymbol = std::make_shared<SymbolInfo>("get_float", funcType, SymbolInfo::FUNCTION_DEF, nullptr);
+        currentScope->define("get_float", funcSymbol);
+    }
+    
+    // 6. char get_char()
+    {
+        auto returnType = Type::getChar();
+        std::vector<std::shared_ptr<Type>> paramTypes = { };
+        auto funcType = Type::getFunction(returnType, paramTypes);
+        auto funcSymbol = std::make_shared<SymbolInfo>("get_char", funcType, SymbolInfo::FUNCTION_DEF, nullptr);
+        currentScope->define("get_char", funcSymbol);
+    }
+
     for (auto* item : ctx->declaration()) {
         visitDeclaration(item);
     }
