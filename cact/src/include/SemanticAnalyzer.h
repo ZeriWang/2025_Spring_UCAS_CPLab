@@ -59,6 +59,9 @@ struct Type {
         return t;
     }
 
+    // 用于比较函数参数中数组类型的辅助函数
+    bool compareArrayDimensions(const std::vector<int>& expected, const std::vector<int>& actual) const;
+
     std::string toString() const;
     bool equals(const Type& other) const;
 };

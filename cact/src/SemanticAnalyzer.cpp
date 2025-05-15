@@ -15,11 +15,8 @@ std::string Type::toString() const {
         case VOID: baseStr = "void"; break;
         case ARRAY: {
             baseStr = (elementType ? elementType->toString() : "unknown_element_type");
-            // 确保按照C/C++语言规范的方式输出数组维度
-            // 例如：int a[2][3] 应该输出为 "int[2][3]"，而不是 "int[3][2]"
-            // 而 int a[][3] 应该输出为 "int[][3]"，而不是 "int[3][]"
             
-            // 我们按照首先显示第一维度，然后是第二维度的顺序输出
+            // 按照正确的维度顺序输出：第一维，然后第二维...
             for (size_t i = 0; i < dimensions.size(); ++i) {
                 int dim = dimensions[i];
                 baseStr += "[";
@@ -49,6 +46,27 @@ std::string Type::toString() const {
     return (isConst ? "const " : "") + baseStr;
 }
 
+// 辅助函数，用于比较数组维度，特别处理函数参数中数组的第一维
+bool Type::compareArrayDimensions(const std::vector<int>& expected, const std::vector<int>& actual) const {
+    if (expected.size() != actual.size()) {
+        return false;
+    }
+    
+    for (size_t i = 0; i < expected.size(); ++i) {
+        // 对于函数参数的数组，第一维度可以被省略（用-1表示）
+        // 如果预期类型或实际类型的第一维是-1，则允许匹配
+        if (i == 0 && (expected[i] == -1 || actual[i] == -1)) {
+            continue; // 允许第一维不匹配
+        }
+        
+        // 非第一维或第一维不是隐式的，必须严格匹配
+        if (expected[i] != actual[i]) {
+            return false;
+        }
+    }
+    return true;
+}
+
 bool Type::equals(const Type& other) const {
     if (baseType != other.baseType) return false;
     if (isConst != other.isConst && baseType != FUNCTION) { 
@@ -64,25 +82,8 @@ bool Type::equals(const Type& other) const {
             // 比较元素类型
             if (!elementType->equals(*other.elementType)) return false;
             
-            // 比较维度数量
-            if (dimensions.size() != other.dimensions.size()) return false;
-            
-            // 对于函数参数的数组，我们需要特殊处理：
-            // 对于数组参数，C语言风格是允许第一维是隐式的（不指定大小）
-            // 例如：int func(int arr[][3]) 可以接受 int arr[2][3] 类型的参数
-            // 因为在传递多维数组时，第一维的大小信息会丢失
-            for (size_t i = 0; i < dimensions.size(); ++i) {
-                // 如果是第一维度且任一方是隐式的(-1)，则视为匹配
-                if (i == 0 && (dimensions[i] == -1 || other.dimensions[i] == -1)) {
-                    continue; // 允许第一维不匹配
-                }
-                
-                // 非第一维必须严格匹配
-                if (dimensions[i] != other.dimensions[i]) {
-                    return false;
-                }
-            }
-            return true;
+            // 使用辅助函数比较维度
+            return compareArrayDimensions(dimensions, other.dimensions);
         }
         case FUNCTION:
             if (!elementType || !other.elementType || !elementType->equals(*other.elementType)) return false; // Return type
@@ -437,14 +438,24 @@ antlrcpp::Any SemanticAnalyzer::visitVariableDeclaration(CactParser::VariableDec
         std::vector<int> dimensions;
 
         if (!varDefCtx->LeftBracket().empty()) { // Array
+            // 调试输出：记录原始表达形式
+            std::string origForm = name;
+            
             for (auto* intConst : varDefCtx->IntegerConstant()) {
+                 origForm += "[";
                  try {
-                    dimensions.push_back(std::stoi(intConst->getText()));
-                } catch (const std::out_of_range& oor) {
+                    int dim = std::stoi(intConst->getText());
+                    dimensions.push_back(dim);
+                    origForm += intConst->getText();
+                 } catch (const std::out_of_range& oor) {
                     addError("Array dimension '" + intConst->getText() + "' is too large.", intConst->getSymbol());
                     dimensions.push_back(0); // Error recovery
-                }
+                 }
+                 origForm += "]";
             }
+            
+            // 调试信息已移除
+            
             // 直接创建数组类型，而不是使用 Type::getArray
             actualType = std::make_shared<Type>(Type::ARRAY);
             actualType->elementType = baseType;
@@ -519,27 +530,58 @@ antlrcpp::Any SemanticAnalyzer::visitFunctionFormalParameter(CactParser::Functio
         std::vector<int> dimensions;
         
         // 处理数组参数
-        // 在C/C++中，数组参数如 int arr[][3] 表示第一维度不固定，第二维度是3
+        // 在C/C++中，数组参数如 int a[][2] 表示第一维度不固定，第二维度是2
         // 维度顺序应该与声明顺序一致
-        for (size_t i = 0; i < ctx->LeftBracket().size(); ++i) {
+        
+        // 调试输出：记录原始表达形式
+        std::string origForm = name;
+        
+        // 根据文法，我们可以直接判断每个括号对的常量值情况
+        // 语法规则：functionFormalParameter: basicType Identifier (LeftBracket IntegerConstant? RightBracket (LeftBracket IntegerConstant RightBracket)*)?;
+        // 这表明第一个括号对可以有或没有常量(IntegerConstant?)，其余括号对必须有常量(IntegerConstant)
+        
+        // 获取所有括号对数量
+        int bracketPairCount = ctx->LeftBracket().size();
+        
+        // 获取所有常量表达式
+        auto intConstants = ctx->IntegerConstant();
+        
+        // 一个简单的规则：
+        // 如果常量数量 < 括号对数量，则第一维是隐式的(-1)
+        // 此时其他维度的常量索引需要适当调整
+        bool firstDimImplicit = intConstants.size() < bracketPairCount;
+        
+        for (int i = 0; i < bracketPairCount; i++) {
             int dimension = -1; // 默认为隐式维度
+            origForm += "[";
             
-            // 如果有明确的维度值
-            if (i < ctx->IntegerConstant().size() && ctx->IntegerConstant(i) != nullptr && 
-                !ctx->IntegerConstant(i)->getText().empty()) {
-                try {
-                    dimension = std::stoi(ctx->IntegerConstant(i)->getText());
-                } catch (const std::out_of_range& oor) {
-                    addError("Integer constant for array dimension is out of range.", ctx->IntegerConstant(i)->getSymbol());
-                    dimension = 0; // 错误标记
-                } catch (const std::invalid_argument& ia) {
-                    addError("Invalid integer constant for array dimension.", ctx->IntegerConstant(i)->getSymbol());
-                    dimension = 0;
+            // 确定当前维度应该使用哪个常量，或者是否为隐式维度
+            if (i == 0 && firstDimImplicit) {
+                // 第一维是隐式的，不需要从常量列表中获取值
+                dimension = -1;
+            } else {
+                // 常量索引需要考虑第一维是否为隐式的
+                int constantIndex = firstDimImplicit ? i - 1 : i;
+                
+                if (constantIndex >= 0 && constantIndex < intConstants.size()) {
+                    try {
+                        dimension = std::stoi(intConstants[constantIndex]->getText());
+                        origForm += intConstants[constantIndex]->getText();
+                    } catch (const std::out_of_range& oor) {
+                        addError("Integer constant for array dimension is out of range.", intConstants[constantIndex]->getSymbol());
+                        dimension = 0; // 错误标记
+                    } catch (const std::invalid_argument& ia) {
+                        addError("Invalid integer constant for array dimension.", intConstants[constantIndex]->getSymbol());
+                        dimension = 0;
+                    }
                 }
             }
             
+            origForm += "]";
             dimensions.push_back(dimension);
         }
+        
+        // 调试信息已移除
         
         // 直接创建数组类型，确保维度顺序正确
         actualType = std::make_shared<Type>(Type::ARRAY);
@@ -1175,10 +1217,30 @@ antlrcpp::Any SemanticAnalyzer::visitLeftValue(CactParser::LeftValueContext *ctx
             }
         }
         
-        // 返回数组的元素类型
-        resultType->isLValue = true;
-        resultType->isConst = symbol->type->isConst;
-        return resultType;
+        // 返回索引后的数组类型
+        // 如果索引数量等于维度数量，返回元素类型
+        // 如果索引数量小于维度数量，返回降维后的数组类型
+        if (ctx->expression().size() == currentType->dimensions.size()) {
+            // 全部维度都被索引，返回最基本的元素类型
+            resultType->isLValue = true;
+            resultType->isConst = symbol->type->isConst;
+            return resultType;
+        } else {
+            // 只有部分维度被索引，返回一个新的降维数组类型
+            std::shared_ptr<Type> newArrayType = std::make_shared<Type>(Type::ARRAY);
+            newArrayType->elementType = currentType->elementType;
+            newArrayType->isLValue = true;
+            newArrayType->isConst = symbol->type->isConst;
+            
+            // 复制未被索引的维度
+            for (size_t i = ctx->expression().size(); i < currentType->dimensions.size(); ++i) {
+                newArrayType->dimensions.push_back(currentType->dimensions[i]);
+            }
+            
+            // 调试信息已移除
+                      
+            return newArrayType;
+        }
     }
     return symbol->type; 
 }
@@ -1249,11 +1311,15 @@ antlrcpp::Any SemanticAnalyzer::visitUnaryExpression(CactParser::UnaryExpression
         std::vector<std::shared_ptr<Type>> expectedParamTypes = funcType->paramTypes;
         std::vector<std::shared_ptr<Type>> actualParamTypes;
 
+        // 调试信息已移除
+        
         if (ctx->functionRealParameters()) {
             for (auto* expCtx : ctx->functionRealParameters()->expression()) {
                 actualParamTypes.push_back(std::any_cast<std::shared_ptr<Type>>(visitExpression(expCtx)));
             }
         }
+        
+        // 调试信息已移除
 
         if (actualParamTypes.size() != expectedParamTypes.size()) {
             addError("Function '" + funcName + "' called with incorrect number of arguments. Expected " +
@@ -1271,37 +1337,55 @@ antlrcpp::Any SemanticAnalyzer::visitUnaryExpression(CactParser::UnaryExpression
             auto tempActual = std::make_shared<Type>(*actualParamTypes[i]); tempActual->isConst = false;
 
             // 针对数组类型参数错误提供更友好的错误信息
-            if (!tempExpected->equals(*tempActual)) {
-                std::string errorMsg = "Type mismatch for argument " + std::to_string(i + 1) + " of function '" + funcName + "'. ";
-                
-                // 对于数组参数，我们特别检查维度是否匹配
-                if (tempExpected->baseType == Type::ARRAY && tempActual->baseType == Type::ARRAY) {
-                    // 检查是否是维度的问题
-                    if (tempExpected->dimensions.size() == tempActual->dimensions.size()) {
-                        // 仅第一维不匹配但其它维度匹配的情况
-                        bool onlyFirstDimensionMismatch = true;
+            // 首先检查是否可能是数组第一维度可变的特殊情况
+            bool skipErrorReport = false;
+            
+            if (tempExpected->baseType == Type::ARRAY && tempActual->baseType == Type::ARRAY) {
+                // 如果维度数量相同
+                if (tempExpected->dimensions.size() == tempActual->dimensions.size()) {
+                    // 如果第一维是隐式的（-1）或者可能隐式，检查其他维度是否匹配
+                    if (tempExpected->dimensions[0] == -1 || tempActual->dimensions[0] == -1) {
+                        // 确认是否所有其他维度都匹配
+                        bool otherDimensionsMatch = true;
                         for (size_t dim = 1; dim < tempExpected->dimensions.size(); ++dim) {
                             if (tempExpected->dimensions[dim] != tempActual->dimensions[dim]) {
-                                onlyFirstDimensionMismatch = false;
+                                otherDimensionsMatch = false;
                                 break;
                             }
                         }
                         
-                        if (onlyFirstDimensionMismatch) {
-                            if (tempExpected->dimensions[0] == -1 || tempActual->dimensions[0] == -1) {
-                                // 这种情况应该在equals方法中已经允许，不应该走到这里
-                                errorMsg += "For array parameters, the first dimension should be ignored. ";
-                            } else {
-                                errorMsg += "For array parameters, only first dimension mismatch detected. ";
-                            }
+                        // 如果其他维度匹配且元素类型匹配，则这是允许的情况
+                        if (otherDimensionsMatch && tempExpected->elementType->equals(*tempActual->elementType)) {
+                            skipErrorReport = true;
                         }
                     }
-                    
-                    errorMsg += "Expected '" + expectedParamTypes[i]->toString() + "', got '" + 
-                              actualParamTypes[i]->toString() + "'.";
-                } else {
-                    errorMsg += "Expected '" + expectedParamTypes[i]->toString() + "', got '" + 
-                              actualParamTypes[i]->toString() + "'.";
+                }
+            }
+            
+            if (!skipErrorReport && !tempExpected->equals(*tempActual)) {
+                std::string errorMsg = "Type mismatch for argument " + std::to_string(i + 1) + " of function '" + funcName + "'. ";
+                
+                // 打印预期类型和实际类型的详细信息
+                errorMsg += "Expected '" + expectedParamTypes[i]->toString() + "', got '" + 
+                          actualParamTypes[i]->toString() + "'. ";
+                          
+                // 如果是数组类型，打印每个维度的信息
+                if (tempExpected->baseType == Type::ARRAY && tempActual->baseType == Type::ARRAY) {
+                    errorMsg += "Expected dimensions: [";
+                    for (size_t dim = 0; dim < tempExpected->dimensions.size(); ++dim) {
+                        errorMsg += std::to_string(tempExpected->dimensions[dim]);
+                        if (dim < tempExpected->dimensions.size() - 1) {
+                            errorMsg += ",";
+                        }
+                    }
+                    errorMsg += "], Actual dimensions: [";
+                    for (size_t dim = 0; dim < tempActual->dimensions.size(); ++dim) {
+                        errorMsg += std::to_string(tempActual->dimensions[dim]);
+                        if (dim < tempActual->dimensions.size() - 1) {
+                            errorMsg += ",";
+                        }
+                    }
+                    errorMsg += "]";
                 }
                 
                 addError(errorMsg, ctx->functionRealParameters()->expression(i)->getStart());
