@@ -50,15 +50,6 @@ struct Type {
         t->elementType = elemType;
         t->dimensions = dims;
         t->isConst = is_const; // Const applies to elements for arrays in C-like languages
-        
-        // 确保元素类型正确
-        if (dims.size() > 1) {
-            // 对于多维数组，我们需要确保元素类型是正确的
-            // 例如：对于int a[3][2][1]，我们需要确保a的元素类型是int[2][1]
-            std::vector<int> subDims(dims.begin() + 1, dims.end());
-            t->elementType = getArray(elemType, subDims, is_const);
-        }
-        
         return t;
     }
     static std::shared_ptr<Type> getFunction(std::shared_ptr<Type> retType, const std::vector<std::shared_ptr<Type>>& pTypes) {

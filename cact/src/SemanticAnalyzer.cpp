@@ -13,15 +13,26 @@ std::string Type::toString() const {
         case FLOAT: baseStr = "float"; break;
         case CHAR: baseStr = "char"; break;
         case VOID: baseStr = "void"; break;
-        case ARRAY:
+        case ARRAY: {
             baseStr = (elementType ? elementType->toString() : "unknown_element_type");
-            for (int dim : dimensions) {
+            // 确保按照C/C++语言规范的方式输出数组维度
+            // 例如：int a[2][3] 应该输出为 "int[2][3]"，而不是 "int[3][2]"
+            // 而 int a[][3] 应该输出为 "int[][3]"，而不是 "int[3][]"
+            
+            // 我们按照首先显示第一维度，然后是第二维度的顺序输出
+            for (size_t i = 0; i < dimensions.size(); ++i) {
+                int dim = dimensions[i];
                 baseStr += "[";
-                if (dim == -1) baseStr += ""; // Implicit first dimension for params
-                else baseStr += std::to_string(dim);
+                if (dim == -1) {
+                    // 隐式维度不显示大小，常见于函数参数的第一维
+                    baseStr += "";
+                } else {
+                    baseStr += std::to_string(dim);
+                }
                 baseStr += "]";
             }
             break;
+        }
         case FUNCTION:
             baseStr = (elementType ? elementType->toString() : "unknown_ret_type"); // elementType is return type
             baseStr += "(";
@@ -40,28 +51,39 @@ std::string Type::toString() const {
 
 bool Type::equals(const Type& other) const {
     if (baseType != other.baseType) return false;
-    if (isConst != other.isConst && baseType != FUNCTION) { // Const-ness of function itself is not a thing
-         // Allow assigning non-const to const, but not const to non-const for LValues
-         // For general equality, they should match or if one is const, it's more specific.
-         // For type matching in assignments (LHS = RHS), LHS.equals(RHS)
-         // if LHS is const, RHS must also be effectively const or a literal.
-         // if LHS is non-const, RHS can be const or non-const.
-         // This basic equals should be strict for now.
+    if (isConst != other.isConst && baseType != FUNCTION) { 
+        // Const-ness checking can be implemented here if needed
+        // For now we just ignore it to focus on fixing the array issues
     }
 
     switch (baseType) {
-        case ARRAY:
-            if (!elementType || !other.elementType || !elementType->equals(*other.elementType)) return false;
+        case ARRAY: {
+            // 特殊处理函数参数中的数组类型
+            if (!elementType || !other.elementType) return false;
+            
+            // 比较元素类型
+            if (!elementType->equals(*other.elementType)) return false;
+            
+            // 比较维度数量
             if (dimensions.size() != other.dimensions.size()) return false;
+            
+            // 对于函数参数的数组，我们需要特殊处理：
+            // 对于数组参数，C语言风格是允许第一维是隐式的（不指定大小）
+            // 例如：int func(int arr[][3]) 可以接受 int arr[2][3] 类型的参数
+            // 因为在传递多维数组时，第一维的大小信息会丢失
             for (size_t i = 0; i < dimensions.size(); ++i) {
-                // For function parameters, the outermost dimension can be implicit on one side
-                // and explicit on the other, or both implicit.
-                // For now, require exact match unless one is -1 (implicit)
-                if (dimensions[i] != other.dimensions[i] && dimensions[i] != -1 && other.dimensions[i] != -1) {
+                // 如果是第一维度且任一方是隐式的(-1)，则视为匹配
+                if (i == 0 && (dimensions[i] == -1 || other.dimensions[i] == -1)) {
+                    continue; // 允许第一维不匹配
+                }
+                
+                // 非第一维必须严格匹配
+                if (dimensions[i] != other.dimensions[i]) {
                     return false;
                 }
             }
             return true;
+        }
         case FUNCTION:
             if (!elementType || !other.elementType || !elementType->equals(*other.elementType)) return false; // Return type
             if (paramTypes.size() != other.paramTypes.size()) return false;
@@ -329,7 +351,11 @@ antlrcpp::Any SemanticAnalyzer::visitConstantDeclaration(CactParser::ConstantDec
                     dimensions.push_back(0); // Error recovery
                 }
             }
-            actualType = Type::getArray(baseType, dimensions, true);
+            // 直接创建数组类型，而不是使用 Type::getArray
+            actualType = std::make_shared<Type>(Type::ARRAY);
+            actualType->elementType = baseType;
+            actualType->dimensions = dimensions;
+            actualType->isConst = true;
         } else {
              actualType = std::make_shared<Type>(*baseType); // Create a new type instance for scalar
              actualType->isConst = true;
@@ -419,7 +445,10 @@ antlrcpp::Any SemanticAnalyzer::visitVariableDeclaration(CactParser::VariableDec
                     dimensions.push_back(0); // Error recovery
                 }
             }
-            actualType = Type::getArray(baseType, dimensions);
+            // 直接创建数组类型，而不是使用 Type::getArray
+            actualType = std::make_shared<Type>(Type::ARRAY);
+            actualType->elementType = baseType;
+            actualType->dimensions = dimensions;
         } else { // Scalar
             actualType = std::make_shared<Type>(*baseType); // Make a copy for scalar
         }
@@ -488,41 +517,38 @@ antlrcpp::Any SemanticAnalyzer::visitFunctionFormalParameter(CactParser::Functio
 
     if (!ctx->LeftBracket().empty()) { // Array parameter
         std::vector<int> dimensions;
-        // First dimension can be implicit
-        if (ctx->IntegerConstant().empty() || !ctx->IntegerConstant(0) || ctx->IntegerConstant(0)->getText().empty()) {
-             if (ctx->RightBracket().size() > 0 && ctx->LeftBracket().size() > 0) {
-                dimensions.clear(); // Start fresh
-                for (size_t i = 0; i < ctx->LeftBracket().size(); ++i) {
-                    if (i < ctx->IntegerConstant().size() && ctx->IntegerConstant(i) != nullptr && 
-                        ctx->IntegerConstant(i)->getSymbol()->getTokenIndex() < ctx->RightBracket(i)->getSymbol()->getTokenIndex() &&
-                        !ctx->IntegerConstant(i)->getText().empty()) {
-                        try {
-                            dimensions.push_back(std::stoi(ctx->IntegerConstant(i)->getText()));
-                        } catch (const std::out_of_range& oor) {
-                            addError("Integer constant for array dimension is out of range.", ctx->IntegerConstant(i)->getSymbol());
-                            dimensions.push_back(0); // Error marker, or handle differently
-                        } catch (const std::invalid_argument& ia) {
-                            addError("Invalid integer constant for array dimension.", ctx->IntegerConstant(i)->getSymbol());
-                            dimensions.push_back(0);
-                        }
-                    } else if (i == 0) { // First dimension can be implicit
-                        dimensions.push_back(-1);
-                    } else {
-                        addError("Missing dimension size for array parameter.", ctx->RightBracket(i-1)->getSymbol());
-                        return std::make_shared<SymbolInfo>(name, Type::getError(), SymbolInfo::PARAMETER, ctx);
-                    }
+        
+        // 处理数组参数
+        // 在C/C++中，数组参数如 int arr[][3] 表示第一维度不固定，第二维度是3
+        // 维度顺序应该与声明顺序一致
+        for (size_t i = 0; i < ctx->LeftBracket().size(); ++i) {
+            int dimension = -1; // 默认为隐式维度
+            
+            // 如果有明确的维度值
+            if (i < ctx->IntegerConstant().size() && ctx->IntegerConstant(i) != nullptr && 
+                !ctx->IntegerConstant(i)->getText().empty()) {
+                try {
+                    dimension = std::stoi(ctx->IntegerConstant(i)->getText());
+                } catch (const std::out_of_range& oor) {
+                    addError("Integer constant for array dimension is out of range.", ctx->IntegerConstant(i)->getSymbol());
+                    dimension = 0; // 错误标记
+                } catch (const std::invalid_argument& ia) {
+                    addError("Invalid integer constant for array dimension.", ctx->IntegerConstant(i)->getSymbol());
+                    dimension = 0;
                 }
-            } else { // Single dimension, possibly implicit e.g. int arr[]
-                 dimensions.push_back(-1);
             }
+            
+            dimensions.push_back(dimension);
         }
-        actualType = Type::getArray(baseType, dimensions);
+        
+        // 直接创建数组类型，确保维度顺序正确
+        actualType = std::make_shared<Type>(Type::ARRAY);
+        actualType->elementType = baseType;
+        actualType->dimensions = dimensions;
     } else { // Scalar parameter
         actualType = std::make_shared<Type>(*baseType); // Make a copy
     }
     
-    // Parameters are like variables in the function's scope. They are not const by default.
-    // They are initialized by the caller.
     auto paramSymbol = std::make_shared<SymbolInfo>(name, actualType, SymbolInfo::PARAMETER, ctx);
     paramSymbol->isInitialized = true; // Considered initialized by function call mechanism
     return paramSymbol;
@@ -1088,39 +1114,70 @@ antlrcpp::Any SemanticAnalyzer::visitLeftValue(CactParser::LeftValueContext *ctx
 
     if (!ctx->LeftBracket().empty()) { 
         if (currentType->baseType != Type::ARRAY) {
-            addError("'" + name + "' is not an array, cannot use array indexing.", ctx->Identifier()->getSymbol());
+            addError("'" + name + "' is not an array.", ctx->Identifier()->getSymbol());
             return Type::getError();
         }
 
         if (ctx->expression().size() > currentType->dimensions.size()) {
-            addError("Too many dimensions for array '" + name + "'.", ctx->LeftBracket(0)->getSymbol());
+            addError("Too many array indices for '" + name + "'.", ctx->LeftBracket()[0]->getSymbol());
             return Type::getError();
         }
         
+        std::shared_ptr<Type> resultType = currentType->elementType;
+        
+        // 确保元素类型不为空
+        if (!resultType) {
+            addError("Internal error: array element type is null.", ctx->getStart());
+            return Type::getError();
+        }
+        
+        // 检查所有数组索引的类型和范围
         for (size_t i = 0; i < ctx->expression().size(); ++i) {
-            auto* expCtx = ctx->expression(i);
-            std::shared_ptr<Type> indexType = std::any_cast<std::shared_ptr<Type>>(visitExpression(expCtx));
+            auto indexType = std::any_cast<std::shared_ptr<Type>>(visitExpression(ctx->expression()[i]));
+            
             if (indexType->baseType != Type::INT) {
-                addError("Array index must be an integer, got '" + indexType->toString() + "'.", expCtx->getStart());
-                return Type::getError();
-            }
-
-            // 确保currentType有elementType
-            if (!currentType->elementType) {
-                // 这种情况应当在Type::getArray中避免，确保数组类型的elementType总是存在
-                // 在这里我们提供更好的错误处理
-                addError("Internal error: array element type is null for '" + name + "'. This might be an issue with array initialization.", ctx->Identifier()->getSymbol());
+                addError("Array index must be an integer.", ctx->expression()[i]->getStart());
                 return Type::getError();
             }
             
-            currentType = currentType->elementType;
+            // 检查是否为整数常量，如果是，检查范围
+            auto indexExp = ctx->expression()[i]->addExpression();
+            if (indexExp && indexExp->multiplicativeExpression() && 
+                !indexExp->multiplicativeExpression()->multiplicativeExpression() &&
+                indexExp->multiplicativeExpression()->unaryExpression() &&
+                indexExp->multiplicativeExpression()->unaryExpression()->primaryExpression() &&
+                indexExp->multiplicativeExpression()->unaryExpression()->primaryExpression()->number() &&
+                indexExp->multiplicativeExpression()->unaryExpression()->primaryExpression()->number()->IntegerConstant()) {
+                
+                // 提取数组索引常量值
+                std::string indexStr = indexExp->multiplicativeExpression()->unaryExpression()->primaryExpression()->number()->IntegerConstant()->getText();
+                int indexValue;
+                
+                // 解析整数值（处理十进制、八进制和十六进制）
+                if (indexStr.size() > 2 && (indexStr.substr(0, 2) == "0x" || indexStr.substr(0, 2) == "0X")) {
+                    // 十六进制
+                    indexValue = std::stoi(indexStr, nullptr, 16);
+                } else if (indexStr.size() > 1 && indexStr[0] == '0') {
+                    // 八进制
+                    indexValue = std::stoi(indexStr, nullptr, 8);
+                } else {
+                    // 十进制
+                    indexValue = std::stoi(indexStr);
+                }
+                
+                // 检查数组索引是否越界
+                if (currentType->dimensions[i] != -1 && (indexValue < 0 || indexValue >= currentType->dimensions[i])) {
+                    addError("Array index " + std::to_string(indexValue) + " out of bounds [0," + 
+                            std::to_string(currentType->dimensions[i]-1) + "].", 
+                            ctx->expression()[i]->getStart());
+                    return Type::getError();
+                }
+            }
         }
-        // After indexing, the result is an LValue if the original array elements are not const.
-        // The type of the expression is the element type.
-        auto resultType = std::make_shared<Type>(*currentType);
-        resultType->isLValue = true; 
-        resultType->isConst = symbol->type->isConst; // If 'const int a[]', then a[i] is const.
-                                                  // If underlying element type was const, it remains const.
+        
+        // 返回数组的元素类型
+        resultType->isLValue = true;
+        resultType->isConst = symbol->type->isConst;
         return resultType;
     }
     return symbol->type; 
@@ -1213,11 +1270,41 @@ antlrcpp::Any SemanticAnalyzer::visitUnaryExpression(CactParser::UnaryExpression
             auto tempExpected = std::make_shared<Type>(*expectedParamTypes[i]); tempExpected->isConst = false;
             auto tempActual = std::make_shared<Type>(*actualParamTypes[i]); tempActual->isConst = false;
 
+            // 针对数组类型参数错误提供更友好的错误信息
             if (!tempExpected->equals(*tempActual)) {
-                addError("Type mismatch for argument " + std::to_string(i + 1) + " of function '" + funcName +
-                         "'. Expected '" + expectedParamTypes[i]->toString() + "', got '" +
-                         actualParamTypes[i]->toString() + "'.",
-                         ctx->functionRealParameters()->expression(i)->getStart());
+                std::string errorMsg = "Type mismatch for argument " + std::to_string(i + 1) + " of function '" + funcName + "'. ";
+                
+                // 对于数组参数，我们特别检查维度是否匹配
+                if (tempExpected->baseType == Type::ARRAY && tempActual->baseType == Type::ARRAY) {
+                    // 检查是否是维度的问题
+                    if (tempExpected->dimensions.size() == tempActual->dimensions.size()) {
+                        // 仅第一维不匹配但其它维度匹配的情况
+                        bool onlyFirstDimensionMismatch = true;
+                        for (size_t dim = 1; dim < tempExpected->dimensions.size(); ++dim) {
+                            if (tempExpected->dimensions[dim] != tempActual->dimensions[dim]) {
+                                onlyFirstDimensionMismatch = false;
+                                break;
+                            }
+                        }
+                        
+                        if (onlyFirstDimensionMismatch) {
+                            if (tempExpected->dimensions[0] == -1 || tempActual->dimensions[0] == -1) {
+                                // 这种情况应该在equals方法中已经允许，不应该走到这里
+                                errorMsg += "For array parameters, the first dimension should be ignored. ";
+                            } else {
+                                errorMsg += "For array parameters, only first dimension mismatch detected. ";
+                            }
+                        }
+                    }
+                    
+                    errorMsg += "Expected '" + expectedParamTypes[i]->toString() + "', got '" + 
+                              actualParamTypes[i]->toString() + "'.";
+                } else {
+                    errorMsg += "Expected '" + expectedParamTypes[i]->toString() + "', got '" + 
+                              actualParamTypes[i]->toString() + "'.";
+                }
+                
+                addError(errorMsg, ctx->functionRealParameters()->expression(i)->getStart());
             }
         }
         return funcType->elementType; // Return type of the function
@@ -1232,6 +1319,13 @@ antlrcpp::Any SemanticAnalyzer::visitMultiplicativeExpression(CactParser::Multip
         std::shared_ptr<Type> right = std::any_cast<std::shared_ptr<Type>>(visitUnaryExpression(ctx->unaryExpression()));
 
         if (left->baseType == Type::ERROR_TYPE || right->baseType == Type::ERROR_TYPE) {
+            return Type::getError();
+        }
+
+        // 特别检查：取余(%)运算符不能用于浮点数
+        if (ctx->Percent() && (left->baseType == Type::FLOAT || right->baseType == Type::FLOAT)) {
+            addError("Modulo operator '%' cannot be applied to floating-point operands.", 
+                     ctx->Percent()->getSymbol());
             return Type::getError();
         }
 
