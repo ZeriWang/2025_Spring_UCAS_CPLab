@@ -3,9 +3,9 @@
 
 #include "CactParserBaseVisitor.h"
 #include "antlr4-runtime.h"
+#include "SymbolTable.h"
 #include <string>
 #include <vector>
-#include <map>
 #include <memory>
 #include <variant>
 #include <iostream> // For error printing
@@ -14,99 +14,6 @@
 namespace cact_parser {
     class CactParser;
 }
-class Scope; // Forward declaration
-
-// Type representation
-struct Type {
-    enum Base { UNKNOWN, INT, FLOAT, CHAR, VOID, ARRAY, FUNCTION, ERROR_TYPE } baseType;
-    std::shared_ptr<Type> elementType; // For arrays or function return type
-    std::vector<int> dimensions;       // For arrays, stores sizes. -1 for implicit first dim in param.
-    std::vector<std::shared_ptr<Type>> paramTypes; // For functions
-
-    bool isConst = false; // Indicates if the type itself is const (e.g. const int)
-    bool isLValue = false; // Indicates if an expression yields an LValue
-
-    Type(Base b = UNKNOWN) : baseType(b) {}
-
-    static std::shared_ptr<Type> getInt(bool is_const = false) { 
-        auto t = std::make_shared<Type>(INT); 
-        t->isConst = is_const; 
-        return t; 
-    }
-    static std::shared_ptr<Type> getFloat(bool is_const = false) { 
-        auto t = std::make_shared<Type>(FLOAT); 
-        t->isConst = is_const; 
-        return t; 
-    }
-    static std::shared_ptr<Type> getChar(bool is_const = false) { 
-        auto t = std::make_shared<Type>(CHAR); 
-        t->isConst = is_const; 
-        return t; 
-    }
-    static std::shared_ptr<Type> getVoid() { return std::make_shared<Type>(VOID); }
-    static std::shared_ptr<Type> getError() { return std::make_shared<Type>(ERROR_TYPE); }
-    static std::shared_ptr<Type> getArray(std::shared_ptr<Type> elemType, const std::vector<int>& dims, bool is_const = false) {
-        auto t = std::make_shared<Type>(ARRAY);
-        t->elementType = elemType;
-        t->dimensions = dims;
-        t->isConst = is_const; // Const applies to elements for arrays in C-like languages
-        return t;
-    }
-    static std::shared_ptr<Type> getFunction(std::shared_ptr<Type> retType, const std::vector<std::shared_ptr<Type>>& pTypes) {
-        auto t = std::make_shared<Type>(FUNCTION);
-        t->elementType = retType; // Using elementType for return type
-        t->paramTypes = pTypes;
-        return t;
-    }
-
-    // 用于比较函数参数中数组类型的辅助函数
-    bool compareArrayDimensions(const std::vector<int>& expected, const std::vector<int>& actual) const;
-
-    std::string toString() const;
-    bool equals(const Type& other) const;
-};
-
-// Symbol information
-struct SymbolInfo {
-    std::string name;
-    std::shared_ptr<Type> type;
-    enum Kind { VARIABLE, CONSTANT, FUNCTION_DEF, PARAMETER } kind;
-    antlr4::ParserRuleContext* definitionNode; // For location, redefinition checks
-    bool isInitialized = false; 
-    // For compile-time constant values (optional)
-    std::variant<int, float, char> constValue; 
-    bool hasConstValue = false;
-
-    SymbolInfo(std::string n, std::shared_ptr<Type> t, Kind k, antlr4::ParserRuleContext* node)
-        : name(std::move(n)), type(std::move(t)), kind(k), definitionNode(node) {
-        if (k == CONSTANT) type->isConst = true;
-    }
-};
-
-// Scope management
-class Scope {
-public:
-    Scope(Scope* parent = nullptr, bool isFunctionScope = false, bool isLoopScope = false) 
-        : parent_scope(parent), is_function_scope(isFunctionScope), is_loop_scope(isLoopScope) {}
-
-    bool define(const std::string& name, std::shared_ptr<SymbolInfo> symbol);
-    std::shared_ptr<SymbolInfo> resolve(const std::string& name) const;
-    std::shared_ptr<SymbolInfo> resolveCurrent(const std::string& name) const;
-    Scope* getParent() const { return parent_scope; }
-    bool isFunction() const { return is_function_scope; }
-    bool isLoop() const { 
-        if (is_loop_scope) return true;
-        if (parent_scope) return parent_scope->isLoop();
-        return false;
-    }
-
-
-private:
-    std::map<std::string, std::shared_ptr<SymbolInfo>> symbols;
-    Scope* parent_scope;
-    bool is_function_scope;
-    bool is_loop_scope;
-};
 
 class SemanticAnalyzer : public CactParserBaseVisitor {
 public:
