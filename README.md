@@ -6,8 +6,8 @@
 
 ```bash
 cd cact/grammar
-java -jar ../deps/antlr-4.13.1-complete.jar -Dlanguage=Cpp
-    \ CactLexer.g4 CactParser.g4 -visitor -no-listener
+java -jar ../deps/antlr-4.13.1-complete.jar -Dlanguage=Cpp \
+    CactLexer.g4 CactParser.g4 -visitor -no-listener
 ```
 
 2. 使用 `CMake` 构建项目
