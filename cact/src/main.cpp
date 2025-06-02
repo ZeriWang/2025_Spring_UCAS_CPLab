@@ -7,6 +7,7 @@
 #include "CactParser.h"         // 语法分析器
 #include "include/syntax_error_listener.h"  // 自定义语法错误监听器
 #include "include/SemanticAnalyzer.h"       // 语义分析器
+#include "include/IRGenerator.h"            // IR代码生成器
 
 // 递归打印语法树，包含语法单元类型
 void printParseTree(antlr4::tree::ParseTree *tree, antlr4::Parser *parser, const std::string &prefix = "", bool isLast = true) {
@@ -98,8 +99,37 @@ int main(int argc, const char *argv[]) {
             return 1;
         }
 
-        // 输出成功信息
-        std::cout << filename << ": Parsing and semantic analysis succeeded." << std::endl << std::endl;
+        std::cout << filename << ": Parsing and semantic analysis succeeded." << std::endl;
+
+        // IR代码生成
+        std::cout << "开始IR代码生成..." << std::endl;
+        IRGenerator irGenerator;
+        
+        // 提取模块名（去除路径和扩展名）
+        std::string moduleName = std::filesystem::path(filename).stem().string();
+        
+        if (irGenerator.generateIR(tree, moduleName)) {
+            std::cout << filename << ": IR generation succeeded." << std::endl;
+            
+            // 输出IR到文件
+            std::string irFilename = moduleName + ".ll";
+            if (irGenerator.writeIRToFile(irFilename)) {
+                std::cout << "IR代码已保存到: " << irFilename << std::endl;
+            } else {
+                std::cerr << "警告: 无法写入IR文件: " << irFilename << std::endl;
+            }
+            
+            // 也输出到控制台用于调试
+            std::cout << "生成的IR代码:" << std::endl;
+            std::cout << irGenerator.getIRString() << std::endl;
+            
+        } else {
+            std::cerr << filename << ": IR generation failed." << std::endl;
+            irGenerator.printErrors();
+            std::cerr << "----------------------------------------" << std::endl<< std::endl; // 分隔线
+            return 1;
+        }
+
         std::cerr << "----------------------------------------" << std::endl<< std::endl; // 分隔线
     } catch (const antlr4::RecognitionException &e) {
         // 处理 ANTLR 特定的异常
