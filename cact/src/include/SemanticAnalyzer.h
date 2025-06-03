@@ -100,6 +100,7 @@ private:
     // This helps guide visitConstantExpression and its children.
     bool expectingConstantInitializer = false;
     std::shared_ptr<Type> expectedInitializerType; // Type context for initializer
+    bool isVariableInitializer = false; // Flag to distinguish variable vs constant initialization
     
     // Flag to indicate if we are currently evaluating a condition expression
     // This is used to check if logical not (!) operator is used in correct context

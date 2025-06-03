@@ -380,6 +380,7 @@ antlrcpp::Any SemanticAnalyzer::visitConstantDeclaration(CactParser::ConstantDec
             // Reset initializer context
             expectingConstantInitializer = false;
             expectedInitializerType = nullptr;
+            isVariableInitializer = false; // 重置标志
         }
         
         // Constants are always considered initialized (even if with error)
@@ -447,6 +448,7 @@ antlrcpp::Any SemanticAnalyzer::visitVariableDeclaration(CactParser::VariableDec
             // Set up context for initializer validation
             expectingConstantInitializer = true;
             expectedInitializerType = actualType;
+            isVariableInitializer = true; // 标记这是变量初始化
 
             // Validate the initializer
             antlrcpp::Any initValueAny = visitConstantInitializationValue(varDefCtx->constantInitializationValue());
@@ -461,8 +463,12 @@ antlrcpp::Any SemanticAnalyzer::visitVariableDeclaration(CactParser::VariableDec
                  // For scalar variables, verify the initializer type and value
                  if (initValueAny.type() == typeid(ConstEvalResult)) {
                     ConstEvalResult initVal = std::any_cast<ConstEvalResult>(initValueAny);
-                    if (!initVal.isConst) {
-                        addError("Initializer for variable '" + name + "' must be a compile-time constant expression.", 
+                    
+                    // 检查是否是全局作用域 - 只有全局变量需要编译时常量
+                    bool isGlobalScope = (currentScope && currentScope->getParent() == nullptr);
+                    
+                    if (!initVal.isConst && isGlobalScope) {
+                        addError("Initializer for global variable '" + name + "' must be a compile-time constant expression.", 
                                  varDefCtx->constantInitializationValue()->getStart());
                     } else if (!initVal.type->equals(*actualType) && initVal.type->baseType != Type::ERROR_TYPE) {
                          addError("Initializer type '" + initVal.type->toString() + 
@@ -478,6 +484,7 @@ antlrcpp::Any SemanticAnalyzer::visitVariableDeclaration(CactParser::VariableDec
             // Reset initializer context
             expectingConstantInitializer = false;
             expectedInitializerType = nullptr;
+            isVariableInitializer = false; // 重置标志
         } else {
             // No initializer present - mark as uninitialized
             symbol->isInitialized = false;
@@ -837,6 +844,19 @@ SemanticAnalyzer::ConstEvalResult SemanticAnalyzer::evaluateAddExpressionAsConst
 
     // Function calls cannot be evaluated at compile-time
     if (currentUnaryExp->Identifier() && currentUnaryExp->LeftParenthesis()) {
+        // 在变量初始化上下文中，尽管函数调用不是编译时常量，但可以用作局部变量的初始化值
+        if (isVariableInitializer) {
+            std::string funcName = currentUnaryExp->Identifier()->getText();
+            auto symbol = currentScope->resolve(funcName);
+            
+            if (symbol && symbol->kind == SymbolInfo::FUNCTION_DEF) {
+                // 返回函数的返回类型，但标记为非常量
+                result.isConst = false;
+                result.hasValue = false;
+                result.type = symbol->type->elementType; // 函数的返回类型
+                return result;
+            }
+        }
         return result;
     }
 
@@ -852,6 +872,19 @@ SemanticAnalyzer::ConstEvalResult SemanticAnalyzer::evaluateAddExpressionAsConst
     
     // Nested function calls cannot be compile-time constants
     if (unaryExpForPrimary->Identifier() && unaryExpForPrimary->LeftParenthesis()){
+        // 在变量初始化上下文中，处理嵌套函数调用
+        if (isVariableInitializer) {
+            std::string funcName = unaryExpForPrimary->Identifier()->getText();
+            auto symbol = currentScope->resolve(funcName);
+            
+            if (symbol && symbol->kind == SymbolInfo::FUNCTION_DEF) {
+                // 返回函数的返回类型，但标记为非常量
+                result.isConst = false;
+                result.hasValue = false;
+                result.type = symbol->type->elementType; // 函数的返回类型
+                return result;
+            }
+        }
         return result;
     }
 
@@ -987,13 +1020,22 @@ SemanticAnalyzer::ConstEvalResult SemanticAnalyzer::evaluateAddExpressionAsConst
                 std::string name = primExp->leftValue()->Identifier()->getText();
                 auto symbol = currentScope->resolve(name);
                 
-                // Only constants with known values can be used in constant expressions
-                if (symbol && symbol->kind == SymbolInfo::CONSTANT && symbol->hasConstValue) {
-                    result.isConst = true;
-                    result.value = symbol->constValue;
-                    result.hasValue = true;
-                    result.type = symbol->type; 
-                    return result;
+                if (symbol) {
+                    // 常量符号：如果有已知值，返回编译时常量
+                    if (symbol->kind == SymbolInfo::CONSTANT && symbol->hasConstValue) {
+                        result.isConst = true;
+                        result.value = symbol->constValue;
+                        result.hasValue = true;
+                        result.type = symbol->type; 
+                        return result;
+                    }
+                    // 变量符号：在变量初始化上下文中，返回类型信息但标记为非常量
+                    else if (symbol->kind == SymbolInfo::VARIABLE && isVariableInitializer) {
+                        result.isConst = false; // 不是编译时常量
+                        result.hasValue = false; // 没有已知值
+                        result.type = symbol->type; // 但有正确的类型
+                        return result;
+                    }
                 }
             }
         }
@@ -1023,8 +1065,21 @@ antlrcpp::Any SemanticAnalyzer::visitConstantInitializationValue(CactParser::Con
         // Case 1: Scalar initializer expression (e.g., '= 5', '= x + 2')
         // Attempt to statically evaluate the expression
         ConstEvalResult evalRes = evaluateAddExpressionAsConstant(ctx->constantExpression()->addExpression()); 
-        if (!evalRes.isConst) {
-            addError("Initializer must be a compile-time constant.", ctx->constantExpression()->getStart());
+        
+        // 检查是否需要强制常量
+        bool requiresConstant = !isVariableInitializer; // 常量声明需要编译时常量
+        if (isVariableInitializer) {
+            // 变量初始化：只有全局变量需要编译时常量，局部变量可以用运行时值
+            bool isGlobalScope = (currentScope && currentScope->getParent() == nullptr);
+            requiresConstant = isGlobalScope;
+        }
+        
+        if (!evalRes.isConst && requiresConstant) {
+            if (isVariableInitializer) {
+                addError("Initializer for global variable must be a compile-time constant.", ctx->constantExpression()->getStart());
+            } else {
+                addError("Initializer must be a compile-time constant.", ctx->constantExpression()->getStart());
+            }
             return evalRes; 
         }
         

@@ -51,6 +51,7 @@ public:
     antlrcpp::Any visitBlock(CactParser::BlockContext *ctx) override;
     antlrcpp::Any visitDeclaration(CactParser::DeclarationContext *ctx) override;
     antlrcpp::Any visitVariableDeclaration(CactParser::VariableDeclarationContext *ctx) override;
+    antlrcpp::Any visitConstantDeclaration(CactParser::ConstantDeclarationContext *ctx) override;
     antlrcpp::Any visitConstantInitializationValue(CactParser::ConstantInitializationValueContext *ctx) override;
     antlrcpp::Any visitConstantExpression(CactParser::ConstantExpressionContext *ctx) override;
     antlrcpp::Any visitStatement(CactParser::StatementContext *ctx) override;
@@ -78,13 +79,19 @@ private:
     
     // Current function being processed
     llvm::Function* currentFunction;
+    
+    // 变量表：变量名 -> AllocaInst*（局部变量）
+    std::map<std::string, llvm::AllocaInst*> variables;
+    
+    // 全局变量表：变量名 -> GlobalVariable*
+    std::map<std::string, llvm::GlobalVariable*> globalVariables;
+#else
+    // 变量表：变量名 -> 局部变量名字符串
+    std::map<std::string, std::string> variables;
 #endif
     
     std::vector<std::string> errors;
     std::stringstream irOutput;  // 用于模拟IR输出
-    
-    // 变量表：变量名 -> 值（用于模拟）
-    std::map<std::string, std::string> variables;
     
     // 数组表：数组名 -> 元素值映射
     std::map<std::string, std::map<int, std::string>> arrays;
@@ -110,6 +117,12 @@ private:
     
     // Initialize LLVM components
     void initializeLLVM(const std::string& moduleName);
+    
+    // 全局变量声明处理
+    antlrcpp::Any visitGlobalVariableDeclaration(CactParser::VariableDeclarationContext *ctx);
+    
+    // 全局常量声明处理
+    antlrcpp::Any visitGlobalConstantDeclaration(CactParser::ConstantDeclarationContext *ctx);
 #endif
 
     // 模拟IR生成的辅助方法
