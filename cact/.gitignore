@@ -1,6 +1,7 @@
 .DS_Store
 .vscode
 build
+*.ll
 grammar/*
 !gramma/*.g4
 test_results/*

@@ -201,11 +201,36 @@ antlrcpp::Any IRGenerator::visitGlobalConstantDeclaration(CactParser::ConstantDe
             llvm::Constant* initValue = nullptr;
             if (constDef->constantInitializationValue()) {
                 // 处理数组初始化值列表
-                initValue = llvm::ConstantAggregateZero::get(arrayType);
-                
-                // TODO: 解析具体的初始化值列表
                 auto initResult = visit(constDef->constantInitializationValue());
-                // 这里需要更复杂的处理来解析 {0,1,2,3,4} 格式
+                if (initResult.has_value()) {
+                    try {
+                        // 尝试获取初始化值列表
+                        std::vector<llvm::Value*> initValues = std::any_cast<std::vector<llvm::Value*>>(initResult);
+                        
+                        // 将Value*转换为Constant*并创建数组常量
+                        std::vector<llvm::Constant*> constants;
+                        for (llvm::Value* val : initValues) {
+                            if (llvm::Constant* constVal = llvm::dyn_cast<llvm::Constant>(val)) {
+                                constants.push_back(constVal);
+                            } else {
+                                // 如果不是常量，使用默认值
+                                constants.push_back(llvm::ConstantInt::get(elementType, 0));
+                            }
+                        }
+                        
+                        // 创建数组常量
+                        if (!constants.empty()) {
+                            initValue = llvm::ConstantArray::get(llvm::cast<llvm::ArrayType>(arrayType), constants);
+                        } else {
+                            initValue = llvm::ConstantAggregateZero::get(arrayType);
+                        }
+                    } catch (...) {
+                        // 如果转换失败，使用零初始化
+                        initValue = llvm::ConstantAggregateZero::get(arrayType);
+                    }
+                } else {
+                    initValue = llvm::ConstantAggregateZero::get(arrayType);
+                }
             } else {
                 initValue = llvm::ConstantAggregateZero::get(arrayType);
             }
@@ -432,74 +457,24 @@ antlrcpp::Any IRGenerator::visitStatement(CactParser::StatementContext *ctx) {
         llvm::Value* condition = nullptr;
         if (ctx->condition()) {
             auto condResult = visit(ctx->condition());
-            if (condResult.has_value()) {
-                try {
-                    std::string condText = std::any_cast<std::string>(condResult);
-                    
-                    // 处理比较表达式，如 a > 3
-                    if (condText.find('>') != std::string::npos) {
-                        size_t gtPos = condText.find('>');
-                        std::string leftVar = condText.substr(0, gtPos);
-                        std::string rightVal = condText.substr(gtPos + 1);
-                        
-                        // 加载左操作数（变量）
-                        llvm::Value* leftValue = nullptr;
-                        if (variables.find(leftVar) != variables.end()) {
-                            for (auto& BB : *currentFunction) {
-                                for (auto& I : BB) {
-                                    if (auto* alloca = llvm::dyn_cast<llvm::AllocaInst>(&I)) {
-                                        if (alloca->getName() == leftVar) {
-                                            leftValue = builder->CreateLoad(getCactType("int"), alloca);
-                                            break;
-                                        }
-                                    }
-                                }
-                                if (leftValue) break;
-                            }
-                        }
-                        
-                        // 创建右操作数（常量）
-                        llvm::Value* rightValue = createConstant(rightVal, getCactType("int"));
-                        
-                        if (leftValue && rightValue) {
-                            condition = builder->CreateICmpSGT(leftValue, rightValue);
-                        }
-                    } else if (condText.find('<') != std::string::npos) {
-                        size_t ltPos = condText.find('<');
-                        std::string leftVar = condText.substr(0, ltPos);
-                        std::string rightVal = condText.substr(ltPos + 1);
-                        
-                        // 加载左操作数（变量）
-                        llvm::Value* leftValue = nullptr;
-                        if (variables.find(leftVar) != variables.end()) {
-                            for (auto& BB : *currentFunction) {
-                                for (auto& I : BB) {
-                                    if (auto* alloca = llvm::dyn_cast<llvm::AllocaInst>(&I)) {
-                                        if (alloca->getName() == leftVar) {
-                                            leftValue = builder->CreateLoad(getCactType("int"), alloca);
-                                            break;
-                                        }
-                                    }
-                                }
-                                if (leftValue) break;
-                            }
-                        }
-                        
-                        // 创建右操作数（常量）
-                        llvm::Value* rightValue = createConstant(rightVal, getCactType("int"));
-                        
-                        if (leftValue && rightValue) {
-                            condition = builder->CreateICmpSLT(leftValue, rightValue);
-                        }
-                    }
-                } catch (...) {
-                    condition = llvm::ConstantInt::get(llvm::Type::getInt1Ty(*context), 1);
+            try {
+                condition = std::any_cast<llvm::Value*>(condResult);
+                
+                // 如果条件返回的是int类型，需要转换为i1类型
+                if (condition && condition->getType()->isIntegerTy() && 
+                    !condition->getType()->isIntegerTy(1)) {
+                    // 非零为真，零为假
+                    llvm::Value* zero = llvm::ConstantInt::get(condition->getType(), 0);
+                    condition = builder->CreateICmpNE(condition, zero);
                 }
+            } catch (...) {
+                addError("条件表达式类型错误: " + ctx->condition()->getText());
+                condition = llvm::ConstantInt::get(llvm::Type::getInt1Ty(*context), 0);
             }
         }
         
         if (!condition) {
-            condition = llvm::ConstantInt::get(llvm::Type::getInt1Ty(*context), 1);
+            condition = llvm::ConstantInt::get(llvm::Type::getInt1Ty(*context), 0);
         }
         
         // 创建条件分支
@@ -615,18 +590,74 @@ antlrcpp::Any IRGenerator::visitStatement(CactParser::StatementContext *ctx) {
     // 检查是否是赋值语句
     else if (ctx->leftValue() && ctx->Equal() && ctx->expression()) {
         std::cout << "处理赋值语句" << std::endl;
+        
+        // 获取左值的地址（而不是值）
+        llvm::Value* targetPtr = nullptr;
         std::string varName = ctx->leftValue()->Identifier()->getText();
         
-        // 查找目标变量（局部变量优先）
-        llvm::Value* targetPtr = nullptr;
-        if (variables.find(varName) != variables.end()) {
-            targetPtr = variables[varName];
-        } else if (globalVariables.find(varName) != globalVariables.end()) {
-            targetPtr = globalVariables[varName];
+        if (!ctx->leftValue()->expression().empty()) {
+            // 数组元素赋值
+            std::vector<llvm::Value*> indices;
+            
+            // 处理每个数组维度的索引
+            for (auto* exprCtx : ctx->leftValue()->expression()) {
+                auto indexResult = visit(exprCtx);
+                llvm::Value* indexValue = nullptr;
+                try {
+                    if (indexResult.has_value()) {
+                        indexValue = std::any_cast<llvm::Value*>(indexResult);
+                    }
+                } catch (...) {
+                    indexValue = llvm::ConstantInt::get(getCactType("int"), 0);
+                }
+                if (indexValue) {
+                    indices.push_back(indexValue);
+                }
+            }
+            
+            // 查找数组（局部优先，然后全局）
+            llvm::Value* arrayPtr = nullptr;
+            llvm::Type* arrayType = nullptr;
+            
+            if (variables.find(varName) != variables.end()) {
+                arrayPtr = variables[varName]; // 局部数组
+                if (auto allocaInst = llvm::dyn_cast<llvm::AllocaInst>(arrayPtr)) {
+                    arrayType = allocaInst->getAllocatedType();
+                }
+            } else if (globalVariables.find(varName) != globalVariables.end()) {
+                arrayPtr = globalVariables[varName]; // 全局数组
+                if (auto globalVar = llvm::dyn_cast<llvm::GlobalVariable>(arrayPtr)) {
+                    arrayType = globalVar->getValueType();
+                }
+            }
+            
+            if (arrayPtr && arrayType && !indices.empty()) {
+                // 构建GEP指令的索引列表
+                std::vector<llvm::Value*> gepIndices;
+                
+                // 第一个索引总是0（用于访问数组本身）
+                llvm::Value* zero = llvm::ConstantInt::get(getCactType("int"), 0);
+                gepIndices.push_back(zero);
+                
+                // 添加用户提供的索引
+                for (auto* index : indices) {
+                    gepIndices.push_back(index);
+                }
+                
+                // 使用GEP指令获取数组元素的地址
+                targetPtr = builder->CreateGEP(arrayType, arrayPtr, gepIndices);
+            }
+        } else {
+            // 简单变量赋值
+            if (variables.find(varName) != variables.end()) {
+                targetPtr = variables[varName];
+            } else if (globalVariables.find(varName) != globalVariables.end()) {
+                targetPtr = globalVariables[varName];
+            }
         }
         
         if (!targetPtr) { 
-            addError("未找到变量: " + varName); 
+            addError("未找到变量或数组访问失败: " + varName); 
             return nullptr; 
         }
         
@@ -663,8 +694,43 @@ antlrcpp::Any IRGenerator::visitCondition(CactParser::ConditionContext *ctx) {
 antlrcpp::Any IRGenerator::visitLogicalOrExpression(CactParser::LogicalOrExpressionContext *ctx) {
     std::cout << "访问逻辑或表达式: " << ctx->getText() << std::endl;
     
-    // 检查是否有逻辑与表达式
-    if (ctx->logicalAndExpression()) {
+    // 检查是否有逻辑或运算符
+    if (ctx->logicalOrExpression() && ctx->logicalAndExpression()) {
+        // 这是一个逻辑或操作：logicalOrExpression || logicalAndExpression
+        auto leftResult = visit(ctx->logicalOrExpression());
+        auto rightResult = visit(ctx->logicalAndExpression());
+        
+        llvm::Value* left = nullptr;
+        llvm::Value* right = nullptr;
+        
+        try {
+            left = std::any_cast<llvm::Value*>(leftResult);
+        } catch (...) {
+            // 如果不是Value*，尝试作为常量处理
+            addError("逻辑或表达式左操作数类型错误");
+            left = llvm::ConstantInt::get(getCactType("int"), 0);
+        }
+        
+        try {
+            right = std::any_cast<llvm::Value*>(rightResult);
+        } catch (...) {
+            addError("逻辑或表达式右操作数类型错误");
+            right = llvm::ConstantInt::get(getCactType("int"), 0);
+        }
+        
+        if (left && right) {
+            // 将操作数转换为布尔值（非零为真，零为假）
+            llvm::Value* leftBool = builder->CreateICmpNE(left, llvm::ConstantInt::get(left->getType(), 0));
+            llvm::Value* rightBool = builder->CreateICmpNE(right, llvm::ConstantInt::get(right->getType(), 0));
+            
+            // 执行逻辑或操作
+            llvm::Value* result = builder->CreateOr(leftBool, rightBool);
+            
+            // 将布尔结果扩展为int类型（0或1）
+            return builder->CreateZExt(result, getCactType("int"));
+        }
+    } else if (ctx->logicalAndExpression()) {
+        // 只有一个逻辑与表达式，直接访问
         return visit(ctx->logicalAndExpression());
     }
     
@@ -674,8 +740,42 @@ antlrcpp::Any IRGenerator::visitLogicalOrExpression(CactParser::LogicalOrExpress
 antlrcpp::Any IRGenerator::visitLogicalAndExpression(CactParser::LogicalAndExpressionContext *ctx) {
     std::cout << "访问逻辑与表达式: " << ctx->getText() << std::endl;
     
-    // 检查是否有相等表达式
-    if (ctx->equalityExpression()) {
+    // 检查是否有逻辑与运算符
+    if (ctx->logicalAndExpression() && ctx->equalityExpression()) {
+        // 这是一个逻辑与操作：logicalAndExpression && equalityExpression
+        auto leftResult = visit(ctx->logicalAndExpression());
+        auto rightResult = visit(ctx->equalityExpression());
+        
+        llvm::Value* left = nullptr;
+        llvm::Value* right = nullptr;
+        
+        try {
+            left = std::any_cast<llvm::Value*>(leftResult);
+        } catch (...) {
+            addError("逻辑与表达式左操作数类型错误");
+            left = llvm::ConstantInt::get(getCactType("int"), 0);
+        }
+        
+        try {
+            right = std::any_cast<llvm::Value*>(rightResult);
+        } catch (...) {
+            addError("逻辑与表达式右操作数类型错误");
+            right = llvm::ConstantInt::get(getCactType("int"), 0);
+        }
+        
+        if (left && right) {
+            // 将操作数转换为布尔值（非零为真，零为假）
+            llvm::Value* leftBool = builder->CreateICmpNE(left, llvm::ConstantInt::get(left->getType(), 0));
+            llvm::Value* rightBool = builder->CreateICmpNE(right, llvm::ConstantInt::get(right->getType(), 0));
+            
+            // 执行逻辑与操作
+            llvm::Value* result = builder->CreateAnd(leftBool, rightBool);
+            
+            // 将布尔结果扩展为int类型（0或1）
+            return builder->CreateZExt(result, getCactType("int"));
+        }
+    } else if (ctx->equalityExpression()) {
+        // 只有一个相等表达式，直接访问
         return visit(ctx->equalityExpression());
     }
     
@@ -685,8 +785,46 @@ antlrcpp::Any IRGenerator::visitLogicalAndExpression(CactParser::LogicalAndExpre
 antlrcpp::Any IRGenerator::visitEqualityExpression(CactParser::EqualityExpressionContext *ctx) {
     std::cout << "访问相等表达式: " << ctx->getText() << std::endl;
     
-    // 检查是否有关系表达式
-    if (ctx->relationalExpression()) {
+    // 检查是否有相等运算符
+    if (ctx->equalityExpression() && ctx->relationalExpression()) {
+        // 这是一个相等比较操作：equalityExpression == relationalExpression 或 equalityExpression != relationalExpression
+        auto leftResult = visit(ctx->equalityExpression());
+        auto rightResult = visit(ctx->relationalExpression());
+        
+        llvm::Value* left = nullptr;
+        llvm::Value* right = nullptr;
+        
+        try {
+            left = std::any_cast<llvm::Value*>(leftResult);
+        } catch (...) {
+            addError("相等表达式左操作数类型错误");
+            left = llvm::ConstantInt::get(getCactType("int"), 0);
+        }
+        
+        try {
+            right = std::any_cast<llvm::Value*>(rightResult);
+        } catch (...) {
+            addError("相等表达式右操作数类型错误");
+            right = llvm::ConstantInt::get(getCactType("int"), 0);
+        }
+        
+        if (left && right) {
+            llvm::Value* result = nullptr;
+            if (ctx->LogicalEqual()) {
+                // == 运算符
+                result = builder->CreateICmpEQ(left, right);
+            } else if (ctx->NotEqual()) {
+                // != 运算符
+                result = builder->CreateICmpNE(left, right);
+            }
+            
+            if (result) {
+                // 将布尔结果扩展为int类型（0或1）
+                return builder->CreateZExt(result, getCactType("int"));
+            }
+        }
+    } else if (ctx->relationalExpression()) {
+        // 只有一个关系表达式，直接访问
         return visit(ctx->relationalExpression());
     }
     
@@ -702,35 +840,52 @@ antlrcpp::Any IRGenerator::visitRelationalExpression(CactParser::RelationalExpre
         auto leftResult = visit(ctx->relationalExpression());
         auto rightResult = visit(ctx->addExpression());
         
-        std::string leftStr = "0", rightStr = "0";
-        try {
-            if (leftResult.has_value()) {
-                leftStr = std::any_cast<std::string>(leftResult);
-            }
-        } catch (...) {}
+        llvm::Value* left = nullptr;
+        llvm::Value* right = nullptr;
         
         try {
-            if (rightResult.has_value()) {
-                rightStr = std::any_cast<std::string>(rightResult);
+            left = std::any_cast<llvm::Value*>(leftResult);
+        } catch (...) {
+            // 兼容性处理：如果是字符串，尝试转换为常量
+            try {
+                std::string leftStr = std::any_cast<std::string>(leftResult);
+                left = llvm::ConstantInt::get(getCactType("int"), std::stoi(leftStr));
+            } catch (...) {
+                addError("关系表达式左操作数类型错误");
+                left = llvm::ConstantInt::get(getCactType("int"), 0);
             }
-        } catch (...) {}
-        
-        std::cout << "比较操作: " << leftStr << " 与 " << rightStr << std::endl;
-        
-        // 返回比较表达式的文本形式，供while循环处理
-        std::string comparison = leftStr;
-        if (ctx->Less()) {
-            comparison += "<" + rightStr;
-        } else if (ctx->Greater()) {
-            comparison += ">" + rightStr;
-        } else if (ctx->LessEqual()) {
-            comparison += "<=" + rightStr;
-        } else if (ctx->GreaterEqual()) {
-            comparison += ">=" + rightStr;
         }
         
-        std::cout << "生成比较表达式: " << comparison << std::endl;
-        return comparison;
+        try {
+            right = std::any_cast<llvm::Value*>(rightResult);
+        } catch (...) {
+            // 兼容性处理：如果是字符串，尝试转换为常量
+            try {
+                std::string rightStr = std::any_cast<std::string>(rightResult);
+                right = llvm::ConstantInt::get(getCactType("int"), std::stoi(rightStr));
+            } catch (...) {
+                addError("关系表达式右操作数类型错误");
+                right = llvm::ConstantInt::get(getCactType("int"), 0);
+            }
+        }
+        
+        if (left && right) {
+            llvm::Value* result = nullptr;
+            if (ctx->Less()) {
+                result = builder->CreateICmpSLT(left, right);
+            } else if (ctx->Greater()) {
+                result = builder->CreateICmpSGT(left, right);
+            } else if (ctx->LessEqual()) {
+                result = builder->CreateICmpSLE(left, right);
+            } else if (ctx->GreaterEqual()) {
+                result = builder->CreateICmpSGE(left, right);
+            }
+            
+            if (result) {
+                // 将布尔结果扩展为int类型（0或1）
+                return builder->CreateZExt(result, getCactType("int"));
+            }
+        }
     } else if (ctx->addExpression()) {
         // 只有一个加法表达式，不是比较
         return visit(ctx->addExpression());
@@ -752,41 +907,65 @@ antlrcpp::Any IRGenerator::visitLeftValue(CactParser::LeftValueContext *ctx) {
     std::string varName = ctx->Identifier()->getText();
     if (!ctx->expression().empty()) {
         // 数组访问
-        auto indexResult = visit(ctx->expression(0));
-        llvm::Value* indexValue = nullptr;
-        try {
-            if (indexResult.has_value()) {
-                indexValue = std::any_cast<llvm::Value*>(indexResult);
+        std::vector<llvm::Value*> indices;
+        
+        // 处理每个数组维度的索引
+        for (auto* exprCtx : ctx->expression()) {
+            auto indexResult = visit(exprCtx);
+            llvm::Value* indexValue = nullptr;
+            try {
+                if (indexResult.has_value()) {
+                    indexValue = std::any_cast<llvm::Value*>(indexResult);
+                }
+            } catch (...) {
+                indexValue = llvm::ConstantInt::get(getCactType("int"), 0);
             }
-        } catch (...) {
-            indexValue = llvm::ConstantInt::get(getCactType("int"), 0);
+            if (indexValue) {
+                indices.push_back(indexValue);
+            }
         }
         
         // 查找数组（局部优先，然后全局）
         llvm::Value* arrayPtr = nullptr;
+        llvm::Type* arrayType = nullptr;
+        
         if (variables.find(varName) != variables.end()) {
             arrayPtr = variables[varName]; // 局部数组
-        } else if (globalVariables.find(varName) != globalVariables.end()) {
-            arrayPtr = globalVariables[varName]; // 全局数组
-        }
-        
-        if (arrayPtr && indexValue) {
-            llvm::Value* zero = llvm::ConstantInt::get(getCactType("int"), 0);
-            
-            // 获取数组类型
-            llvm::Type* arrayType = nullptr;
             if (auto allocaInst = llvm::dyn_cast<llvm::AllocaInst>(arrayPtr)) {
                 arrayType = allocaInst->getAllocatedType();
-            } else if (auto globalVar = llvm::dyn_cast<llvm::GlobalVariable>(arrayPtr)) {
+            }
+        } else if (globalVariables.find(varName) != globalVariables.end()) {
+            arrayPtr = globalVariables[varName]; // 全局数组
+            if (auto globalVar = llvm::dyn_cast<llvm::GlobalVariable>(arrayPtr)) {
                 arrayType = globalVar->getValueType();
             }
+        }
+        
+        if (arrayPtr && arrayType && !indices.empty()) {
+            // 构建GEP指令的索引列表
+            std::vector<llvm::Value*> gepIndices;
             
-            if (arrayType && arrayType->isArrayTy()) {
-                // 使用GEP指令访问数组元素
-                llvm::Value* elementPtr = builder->CreateGEP(arrayType, arrayPtr, {zero, indexValue});
-                llvm::Value* result = builder->CreateLoad(getCactType("int"), elementPtr);
-                return result;
+            // 第一个索引总是0（用于访问数组本身）
+            llvm::Value* zero = llvm::ConstantInt::get(getCactType("int"), 0);
+            gepIndices.push_back(zero);
+            
+            // 添加用户提供的索引
+            for (auto* index : indices) {
+                gepIndices.push_back(index);
             }
+            
+            // 使用GEP指令访问数组元素
+            llvm::Value* elementPtr = builder->CreateGEP(arrayType, arrayPtr, gepIndices);
+            
+            // 确定最终元素的类型
+            llvm::Type* elementType = arrayType;
+            for (size_t i = 0; i < indices.size() && elementType->isArrayTy(); i++) {
+                elementType = elementType->getArrayElementType();
+            }
+            
+            // 加载元素值
+            llvm::Value* result = builder->CreateLoad(elementType, elementPtr);
+            return result;
         }
         
         addError("数组访问失败: " + varName);
@@ -894,7 +1073,92 @@ antlrcpp::Any IRGenerator::visitUnaryExpression(CactParser::UnaryExpressionConte
         std::string funcName = ctx->Identifier()->getText();
         std::cout << "访问函数调用: " << funcName << std::endl;
         
-        // 查找函数
+        // 特殊处理内置打印函数，使用printf实现
+        if (funcName == "print_int" || funcName == "print_float" || funcName == "print_char") {
+            // 收集参数
+            std::vector<llvm::Value*> args;
+            if (ctx->functionRealParameters() && !ctx->functionRealParameters()->expression().empty()) {
+                auto* expr = ctx->functionRealParameters()->expression()[0]; // 只取第一个参数
+                auto argResult = visit(expr);
+                llvm::Value* argValue = nullptr;
+                try {
+                    argValue = std::any_cast<llvm::Value*>(argResult);
+                } catch (...) {
+                    if (funcName == "print_int") {
+                        argValue = llvm::ConstantInt::get(getCactType("int"), 0);
+                    } else if (funcName == "print_float") {
+                        argValue = llvm::ConstantFP::get(getCactType("float"), 0.0);
+                    } else { // print_char
+                        argValue = llvm::ConstantInt::get(getCactType("char"), 0);
+                    }
+                }
+                
+                // 使用printf实现打印功能
+                llvm::Function* printfFunc = module->getFunction("printf");
+                if (printfFunc) {
+                    std::vector<llvm::Value*> printfArgs;
+                    
+                    if (funcName == "print_int") {
+                        // 获取格式字符串 "%d\n"
+                        auto formatStr = module->getGlobalVariable(".str.int");
+                        if (!formatStr) {
+                            // 如果还没有创建格式字符串，创建一个
+                            llvm::ArrayType* arrayType = llvm::ArrayType::get(llvm::Type::getInt8Ty(*context), 4);
+                            formatStr = new llvm::GlobalVariable(*module, arrayType, true, 
+                                llvm::GlobalValue::PrivateLinkage, 
+                                llvm::ConstantArray::get(arrayType, {
+                                    llvm::ConstantInt::get(llvm::Type::getInt8Ty(*context), '%'),
+                                    llvm::ConstantInt::get(llvm::Type::getInt8Ty(*context), 'd'),
+                                    llvm::ConstantInt::get(llvm::Type::getInt8Ty(*context), '\n'),
+                                    llvm::ConstantInt::get(llvm::Type::getInt8Ty(*context), 0)
+                                }), ".str.int");
+                        }
+                        printfArgs.push_back(builder->CreatePointerCast(formatStr, llvm::PointerType::get(llvm::Type::getInt8Ty(*context), 0)));
+                        printfArgs.push_back(argValue);
+                    } else if (funcName == "print_float") {
+                        auto formatStr = module->getGlobalVariable(".str.float");
+                        if (!formatStr) {
+                            llvm::ArrayType* arrayType = llvm::ArrayType::get(llvm::Type::getInt8Ty(*context), 4);
+                            formatStr = new llvm::GlobalVariable(*module, arrayType, true, 
+                                llvm::GlobalValue::PrivateLinkage, 
+                                llvm::ConstantArray::get(arrayType, {
+                                    llvm::ConstantInt::get(llvm::Type::getInt8Ty(*context), '%'),
+                                    llvm::ConstantInt::get(llvm::Type::getInt8Ty(*context), 'f'),
+                                    llvm::ConstantInt::get(llvm::Type::getInt8Ty(*context), '\n'),
+                                    llvm::ConstantInt::get(llvm::Type::getInt8Ty(*context), 0)
+                                }), ".str.float");
+                        }
+                        printfArgs.push_back(builder->CreatePointerCast(formatStr, llvm::PointerType::get(llvm::Type::getInt8Ty(*context), 0)));
+                        // 将float提升为double给printf
+                        llvm::Value* doubleVal = builder->CreateFPExt(argValue, llvm::Type::getDoubleTy(*context));
+                        printfArgs.push_back(doubleVal);
+                    } else { // print_char
+                        auto formatStr = module->getGlobalVariable(".str.char");
+                        if (!formatStr) {
+                            llvm::ArrayType* arrayType = llvm::ArrayType::get(llvm::Type::getInt8Ty(*context), 4);
+                            formatStr = new llvm::GlobalVariable(*module, arrayType, true, 
+                                llvm::GlobalValue::PrivateLinkage, 
+                                llvm::ConstantArray::get(arrayType, {
+                                    llvm::ConstantInt::get(llvm::Type::getInt8Ty(*context), '%'),
+                                    llvm::ConstantInt::get(llvm::Type::getInt8Ty(*context), 'c'),
+                                    llvm::ConstantInt::get(llvm::Type::getInt8Ty(*context), '\n'),
+                                    llvm::ConstantInt::get(llvm::Type::getInt8Ty(*context), 0)
+                                }), ".str.char");
+                        }
+                        printfArgs.push_back(builder->CreatePointerCast(formatStr, llvm::PointerType::get(llvm::Type::getInt8Ty(*context), 0)));
+                        printfArgs.push_back(argValue);
+                    }
+                    
+                    // 调用printf
+                    llvm::Value* result = builder->CreateCall(printfFunc, printfArgs);
+                    return result;
+                }
+            }
+            // 如果没有参数或printf不可用，返回0
+            return llvm::ConstantInt::get(getCactType("int"), 0);
+        }
+        
+        // 查找普通函数
         llvm::Function* func = module->getFunction(funcName);
         if (!func) {
             addError("未找到函数: " + funcName);
@@ -965,8 +1229,23 @@ antlrcpp::Any IRGenerator::visitNumber(CactParser::NumberContext *ctx) {
     std::cout << "访问数字: " << ctx->getText() << std::endl;
     
     if (ctx->IntegerConstant()) {
-        llvm::Value* value = llvm::ConstantInt::get(getCactType("int"), std::stoi(ctx->getText()));
-        return value;
+        std::string text = ctx->getText();
+        int value = 0;
+        
+        // 处理不同进制的整数常量
+        if (text.length() >= 2 && text.substr(0, 2) == "0x") {
+            // 十六进制数字：0x...
+            value = std::stoi(text, nullptr, 16);
+        } else if (text.length() >= 2 && text[0] == '0' && text[1] >= '0' && text[1] <= '7') {
+            // 八进制数字：0...
+            value = std::stoi(text, nullptr, 8);
+        } else {
+            // 十进制数字
+            value = std::stoi(text, nullptr, 10);
+        }
+        
+        llvm::Value* llvmValue = llvm::ConstantInt::get(getCactType("int"), value);
+        return llvmValue;
     } else if (ctx->CharacterConstant()) {
         std::string charText = ctx->getText();
         // 处理字符常量，如 'a', ' ', '\n' 等
@@ -1186,27 +1465,164 @@ antlrcpp::Any IRGenerator::visitVariableDeclaration(CactParser::VariableDeclarat
     
 #ifdef LLVM_AVAILABLE
     // 使用真正的LLVM API
-    llvm::Type* llvmType = getCactType(baseType);
+    llvm::Type* elementType = getCactType(baseType);
     for (auto varDef : ctx->variableDefinition()) {
         std::string varName = varDef->Identifier()->getText();
         std::cout << "声明变量: " << varName << std::endl;
-        llvm::AllocaInst* alloca = builder->CreateAlloca(llvmType, nullptr, varName);
-        variables[varName] = alloca;
-        // 初始化
-        if (varDef->constantInitializationValue()) {
-            auto initResult = visit(varDef->constantInitializationValue());
-            if (initResult.has_value()) {
-                llvm::Value* initVal = nullptr;
-                try { 
-                    initVal = std::any_cast<llvm::Value*>(initResult); 
-                } catch (...) {
-                    // 尝试字符串转换为常量
+        
+        // 检查是否是数组
+        if (!varDef->LeftBracket().empty()) {
+            // 处理数组声明
+            std::vector<int> dimensions;
+            for (auto intConst : varDef->IntegerConstant()) {
+                int dimSize = std::stoi(intConst->getText());
+                dimensions.push_back(dimSize);
+            }
+            
+            // 创建数组类型
+            llvm::Type* arrayType = elementType;
+            for (int i = dimensions.size() - 1; i >= 0; i--) {
+                arrayType = llvm::ArrayType::get(arrayType, dimensions[i]);
+            }
+            
+            llvm::AllocaInst* alloca = builder->CreateAlloca(arrayType, nullptr, varName);
+            variables[varName] = alloca;
+            
+            // 初始化数组
+            if (varDef->constantInitializationValue()) {
+                // 处理数组初始化值
+                auto initResult = visit(varDef->constantInitializationValue());
+                
+                if (initResult.has_value()) {
                     try {
-                        std::string initStr = std::any_cast<std::string>(initResult);
-                        initVal = createConstant(initStr, llvmType);
-                    } catch (...) {}
+                        // 尝试获取初始化值列表
+                        std::vector<llvm::Value*> initValues = std::any_cast<std::vector<llvm::Value*>>(initResult);
+                        
+                        // 为多维数组设置初始化值
+                        // 对于 int arr[4][2] = {{1,2},{3,4},{5,6},{7,8}}
+                        // 需要按照 [0][0]=1, [0][1]=2, [1][0]=3, [1][1]=4, ... 的顺序设置
+                        
+                        int totalElements = 1;
+                        for (int dim : dimensions) {
+                            totalElements *= dim;
+                        }
+                        
+                        // 先用memset将数组清零
+                        // 计算数组的实际字节大小
+                        uint64_t elementSize = elementType->getPrimitiveSizeInBits() / 8;
+                        uint64_t arraySize = totalElements * elementSize;
+                        
+                        llvm::Value* size = llvm::ConstantInt::get(llvm::Type::getInt64Ty(*context), arraySize);
+                        llvm::Value* val = llvm::ConstantInt::get(llvm::Type::getInt8Ty(*context), 0);
+                        
+                        // 创建memset调用 - 使用LLVM内置的memset函数
+                        llvm::Function* memsetFunc = llvm::Intrinsic::getDeclaration(
+                            module.get(), llvm::Intrinsic::memset, 
+                            {llvm::PointerType::get(llvm::Type::getInt8Ty(*context), 0), llvm::Type::getInt64Ty(*context)});
+                        
+                        llvm::Value* arrayPtr = builder->CreateBitCast(alloca, llvm::PointerType::get(llvm::Type::getInt8Ty(*context), 0));
+                        builder->CreateCall(memsetFunc, {arrayPtr, val, size, llvm::ConstantInt::get(llvm::Type::getInt1Ty(*context), false)});
+                        
+                        // 设置具体的初始化值
+                        int flatIndex = 0;
+                        for (llvm::Value* value : initValues) {
+                            if (flatIndex >= totalElements) break;
+                            
+                            // 计算多维数组索引
+                            std::vector<llvm::Value*> indices;
+                            indices.push_back(llvm::ConstantInt::get(getCactType("int"), 0)); // 第一个索引总是0
+                            
+                            int temp = flatIndex;
+                            for (int i = dimensions.size() - 1; i >= 0; i--) {
+                                int dimIndex = temp % dimensions[i];
+                                indices.insert(indices.begin() + 1, llvm::ConstantInt::get(getCactType("int"), dimIndex));
+                                temp /= dimensions[i];
+                            }
+                            
+                            // 使用GEP获取元素地址并存储值
+                            llvm::Value* elementPtr = builder->CreateGEP(arrayType, alloca, indices);
+                            builder->CreateStore(value, elementPtr);
+                            
+                            flatIndex++;
+                        }
+                        
+                    } catch (...) {
+                        // 如果不是数组初始化列表，先清零数组
+                        llvm::Value* size = llvm::ConstantInt::get(llvm::Type::getInt64Ty(*context), 
+                            arrayType->getPrimitiveSizeInBits() / 8);
+                        llvm::Value* val = llvm::ConstantInt::get(llvm::Type::getInt8Ty(*context), 0);
+                        
+                        std::vector<llvm::Type*> memsetTypes = {
+                            llvm::PointerType::get(llvm::Type::getInt8Ty(*context), 0),
+                            llvm::Type::getInt32Ty(*context),
+                            llvm::Type::getInt64Ty(*context)
+                        };
+                        llvm::FunctionType* memsetFuncType = llvm::FunctionType::get(
+                            llvm::Type::getVoidTy(*context), memsetTypes, false);
+                        llvm::Function* memsetFunc = llvm::Function::Create(
+                            memsetFuncType, llvm::Function::ExternalLinkage, "llvm.memset.p0i8.i64", module.get());
+                        
+                        llvm::Value* arrayPtr = builder->CreateBitCast(alloca, llvm::PointerType::get(llvm::Type::getInt8Ty(*context), 0));
+                        builder->CreateCall(memsetFunc, {arrayPtr, val, size});
+                    }
+                } else {
+                    // 没有初始化值，清零数组
+                    llvm::Value* size = llvm::ConstantInt::get(llvm::Type::getInt64Ty(*context), 
+                        arrayType->getPrimitiveSizeInBits() / 8);
+                    llvm::Value* val = llvm::ConstantInt::get(llvm::Type::getInt8Ty(*context), 0);
+                    
+                    std::vector<llvm::Type*> memsetTypes = {
+                        llvm::PointerType::get(llvm::Type::getInt8Ty(*context), 0),
+                        llvm::Type::getInt32Ty(*context),
+                        llvm::Type::getInt64Ty(*context)
+                    };
+                    llvm::FunctionType* memsetFuncType = llvm::FunctionType::get(
+                        llvm::Type::getVoidTy(*context), memsetTypes, false);
+                    llvm::Function* memsetFunc = llvm::Function::Create(
+                        memsetFuncType, llvm::Function::ExternalLinkage, "llvm.memset.p0i8.i64", module.get());
+                    
+                    llvm::Value* arrayPtr = builder->CreateBitCast(alloca, llvm::PointerType::get(llvm::Type::getInt8Ty(*context), 0));
+                    builder->CreateCall(memsetFunc, {arrayPtr, val, size});
                 }
-                if (initVal) builder->CreateStore(initVal, alloca);
+            } else {
+                // 没有初始化值，清零数组
+                llvm::Value* size = llvm::ConstantInt::get(llvm::Type::getInt64Ty(*context), 
+                    arrayType->getPrimitiveSizeInBits() / 8);
+                llvm::Value* val = llvm::ConstantInt::get(llvm::Type::getInt8Ty(*context), 0);
+                
+                std::vector<llvm::Type*> memsetTypes = {
+                    llvm::PointerType::get(llvm::Type::getInt8Ty(*context), 0),
+                    llvm::Type::getInt32Ty(*context),
+                    llvm::Type::getInt64Ty(*context)
+                };
+                llvm::FunctionType* memsetFuncType = llvm::FunctionType::get(
+                    llvm::Type::getVoidTy(*context), memsetTypes, false);
+                llvm::Function* memsetFunc = llvm::Function::Create(
+                    memsetFuncType, llvm::Function::ExternalLinkage, "llvm.memset.p0i8.i64", module.get());
+                
+                llvm::Value* arrayPtr = builder->CreateBitCast(alloca, llvm::PointerType::get(llvm::Type::getInt8Ty(*context), 0));
+                builder->CreateCall(memsetFunc, {arrayPtr, val, size});
+            }
+        } else {
+            // 处理标量变量
+            llvm::AllocaInst* alloca = builder->CreateAlloca(elementType, nullptr, varName);
+            variables[varName] = alloca;
+            // 初始化
+            if (varDef->constantInitializationValue()) {
+                auto initResult = visit(varDef->constantInitializationValue());
+                if (initResult.has_value()) {
+                    llvm::Value* initVal = nullptr;
+                    try { 
+                        initVal = std::any_cast<llvm::Value*>(initResult); 
+                    } catch (...) {
+                        // 尝试字符串转换为常量
+                        try {
+                            std::string initStr = std::any_cast<std::string>(initResult);
+                            initVal = createConstant(initStr, elementType);
+                        } catch (...) {}
+                    }
+                    if (initVal) builder->CreateStore(initVal, alloca);
+                }
             }
         }
     }
@@ -1237,9 +1653,44 @@ antlrcpp::Any IRGenerator::visitVariableDeclaration(CactParser::VariableDeclarat
 
 antlrcpp::Any IRGenerator::visitConstantInitializationValue(CactParser::ConstantInitializationValueContext *ctx) {
     std::cout << "访问常量初始化值: " << ctx->getText() << std::endl;
+    
     if (ctx->constantExpression()) {
+        // 标量初始化值
         return visit(ctx->constantExpression());
+    } else if (ctx->LeftBrace()) {
+        // 数组初始化值列表 {1, 2, 3} 或 {{1, 2}, {3, 4}}
+        std::vector<llvm::Value*> flatValues;
+        
+        // 递归收集所有初始化值，将嵌套结构展开为扁平列表
+        for (auto* subInitCtx : ctx->constantInitializationValue()) {
+            auto subResult = visit(subInitCtx);
+            if (subResult.has_value()) {
+                try {
+                    // 尝试作为标量值
+                    llvm::Value* value = std::any_cast<llvm::Value*>(subResult);
+                    if (value) {
+                        flatValues.push_back(value);
+                    }
+                } catch (...) {
+                    try {
+                        // 尝试作为值列表（嵌套数组）
+                        std::vector<llvm::Value*> subValues = std::any_cast<std::vector<llvm::Value*>>(subResult);
+                        for (llvm::Value* val : subValues) {
+                            if (val) {
+                                flatValues.push_back(val);
+                            }
+                        }
+                    } catch (...) {
+                        // 忽略转换失败的值
+                    }
+                }
+            }
+        }
+        
+        // 返回扁平的初始化值列表
+        return flatValues;
     }
+    
     return visitChildren(ctx);
 }
 
