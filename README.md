@@ -19,4 +19,20 @@ cmake ..
 make -j4 # -j4表示使用4个线程进行编译
 ```
 
-等待编译完成即可。
+等待编译完成。
+
+3. 构建运行时库
+
+```bash
+cd ../test/samples_generateIR/runtime_lib
+clang -emit-llvm -S runtime.c -o runtime.ll
+```
+
+4. 运行测试
+
+```bash
+cd ../../..
+./test_ir.sh
+```
+
+测试脚本会自动链接运行时库，并执行所有测试用例。
