@@ -134,33 +134,87 @@ antlrcpp::Any IRGenerator::visitGlobalVariableDeclaration(CactParser::VariableDe
         std::string varName = varDef->Identifier()->getText();
         std::cout << "声明全局变量: " << varName << std::endl;
         
-        // 创建全局变量
+        // 检查是否是数组
+        llvm::Type* actualType = llvmType;
         llvm::Constant* initValue = nullptr;
-        if (varDef->constantInitializationValue()) {
-            auto initResult = visit(varDef->constantInitializationValue());
-            if (initResult.has_value()) {
-                try {
-                    // 优先尝试Value*转换
-                    llvm::Value* initVal = std::any_cast<llvm::Value*>(initResult);
-                    if (llvm::Constant* constVal = llvm::dyn_cast<llvm::Constant>(initVal)) {
-                        initValue = constVal;
-                    }
-                } catch (...) {
-                    // 尝试字符串转换为常量
+        
+        if (!varDef->LeftBracket().empty()) {
+            // 处理数组变量
+            std::vector<int> dimensions;
+            for (auto intConst : varDef->IntegerConstant()) {
+                int dimSize = std::stoi(intConst->getText());
+                dimensions.push_back(dimSize);
+                std::cout << "数组维度: " << dimSize << std::endl;
+            }
+            
+            // 构建数组类型
+            actualType = llvmType;
+            for (int i = dimensions.size() - 1; i >= 0; i--) {
+                actualType = llvm::ArrayType::get(actualType, dimensions[i]);
+            }
+            
+            // 处理数组初始化
+            if (varDef->constantInitializationValue()) {
+                auto initResult = visit(varDef->constantInitializationValue());
+                if (initResult.has_value()) {
                     try {
-                        std::string initStr = std::any_cast<std::string>(initResult);
-                        initValue = llvm::dyn_cast<llvm::Constant>(createConstant(initStr, llvmType));
+                        // 尝试获取初始化值列表
+                        std::vector<llvm::Value*> initValues = std::any_cast<std::vector<llvm::Value*>>(initResult);
+                        
+                        std::vector<llvm::Constant*> constants;
+                        for (llvm::Value* val : initValues) {
+                            if (llvm::Constant* constVal = llvm::dyn_cast<llvm::Constant>(val)) {
+                                constants.push_back(constVal);
+                            } else {
+                                // 如果不是常量，使用默认值
+                                constants.push_back(llvm::ConstantInt::get(llvmType, 0));
+                            }
+                        }
+                        
+                        // 创建数组常量
+                        if (!constants.empty()) {
+                            initValue = llvm::ConstantArray::get(llvm::cast<llvm::ArrayType>(actualType), constants);
+                        } else {
+                            initValue = llvm::ConstantAggregateZero::get(actualType);
+                        }
                     } catch (...) {
-                        initValue = llvm::ConstantInt::get(llvmType, 0);
+                        // 如果转换失败，使用零初始化
+                        initValue = llvm::ConstantAggregateZero::get(actualType);
                     }
+                } else {
+                    initValue = llvm::ConstantAggregateZero::get(actualType);
                 }
+            } else {
+                initValue = llvm::ConstantAggregateZero::get(actualType);
             }
         } else {
-            initValue = llvm::ConstantInt::get(llvmType, 0);
+            // 处理标量变量
+            if (varDef->constantInitializationValue()) {
+                auto initResult = visit(varDef->constantInitializationValue());
+                if (initResult.has_value()) {
+                    try {
+                        // 优先尝试Value*转换
+                        llvm::Value* initVal = std::any_cast<llvm::Value*>(initResult);
+                        if (llvm::Constant* constVal = llvm::dyn_cast<llvm::Constant>(initVal)) {
+                            initValue = constVal;
+                        }
+                    } catch (...) {
+                        // 尝试字符串转换为常量
+                        try {
+                            std::string initStr = std::any_cast<std::string>(initResult);
+                            initValue = llvm::dyn_cast<llvm::Constant>(createConstant(initStr, llvmType));
+                        } catch (...) {
+                            initValue = llvm::ConstantInt::get(llvmType, 0);
+                        }
+                    }
+                }
+            } else {
+                initValue = llvm::ConstantInt::get(llvmType, 0);
+            }
         }
         
         llvm::GlobalVariable* globalVar = new llvm::GlobalVariable(
-            *module, llvmType, false, llvm::GlobalValue::ExternalLinkage, 
+            *module, actualType, false, llvm::GlobalValue::ExternalLinkage, 
             initValue, varName);
         globalVar->setAlignment(llvm::MaybeAlign(4));
         
@@ -528,56 +582,40 @@ antlrcpp::Any IRGenerator::visitStatement(CactParser::StatementContext *ctx) {
             auto condResult = visit(ctx->condition());
             if (condResult.has_value()) {
                 try {
-                    std::string condText = std::any_cast<std::string>(condResult);
+                    condition = std::any_cast<llvm::Value*>(condResult);
                     
-                    // TODO: 完整实现条件表达式解析
-                    // 现在简化处理 i < 3 的情况
-                    if (condText.find('<') != std::string::npos) {
-                        size_t ltPos = condText.find('<');
-                        std::string leftVar = condText.substr(0, ltPos);
-                        std::string rightVal = condText.substr(ltPos + 1);
-                        
-                        // 加载左操作数（变量）
-                        llvm::Value* leftValue = nullptr;
-                        if (variables.find(leftVar) != variables.end()) {
-                            for (auto& BB : *currentFunction) {
-                                for (auto& I : BB) {
-                                    if (auto* alloca = llvm::dyn_cast<llvm::AllocaInst>(&I)) {
-                                        if (alloca->getName() == leftVar) {
-                                            leftValue = builder->CreateLoad(getCactType("int"), alloca);
-                                            break;
-                                        }
-                                    }
-                                }
-                                if (leftValue) break;
-                            }
-                        }
-                        
-                        // 创建右操作数（常量）
-                        llvm::Value* rightValue = createConstant(rightVal, getCactType("int"));
-                        
-                        if (leftValue && rightValue) {
-                            condition = builder->CreateICmpSLT(leftValue, rightValue);
-                        }
+                    // 如果条件不是布尔类型，进行转换
+                    if (condition && condition->getType()->isIntegerTy() && 
+                        !condition->getType()->isIntegerTy(1)) {
+                        // 非零为真，零为假
+                        llvm::Value* zero = llvm::ConstantInt::get(condition->getType(), 0);
+                        condition = builder->CreateICmpNE(condition, zero);
                     }
                 } catch (...) {
-                    condition = llvm::ConstantInt::get(llvm::Type::getInt1Ty(*context), 1);
+                    addError("while条件表达式类型错误: " + ctx->condition()->getText());
+                    condition = llvm::ConstantInt::get(llvm::Type::getInt1Ty(*context), 0);
                 }
             }
         }
         
         if (!condition) {
-            condition = llvm::ConstantInt::get(llvm::Type::getInt1Ty(*context), 1);
+            condition = llvm::ConstantInt::get(llvm::Type::getInt1Ty(*context), 0);
         }
         
         // 创建条件分支
         builder->CreateCondBr(condition, bodyBlock, exitBlock);
+        
+        // 将循环的继续和退出块压入栈中，供break/continue使用
+        loopStack.push(std::make_pair(condBlock, exitBlock));
         
         // 处理循环体
         builder->SetInsertPoint(bodyBlock);
         if (ctx->statement().size() > 0) {
             visit(ctx->statement(0));
         }
+        
+        // 弹出循环块栈
+        loopStack.pop();
         
         // 回到条件检查
         builder->CreateBr(condBlock);
@@ -674,6 +712,44 @@ antlrcpp::Any IRGenerator::visitStatement(CactParser::StatementContext *ctx) {
         if (value) {
             builder->CreateStore(value, targetPtr);
         }
+        return nullptr;
+    }
+    // 检查是否是break语句
+    else if (ctx->Break()) {
+        std::cout << "处理break语句" << std::endl;
+        
+        if (loopStack.empty()) {
+            addError("break语句不在循环内");
+            return nullptr;
+        }
+        
+        // 跳转到循环的退出块
+        llvm::BasicBlock* exitBlock = loopStack.top().second;
+        builder->CreateBr(exitBlock);
+        
+        // 创建一个无法到达的基本块，防止后续代码生成
+        llvm::BasicBlock* unreachableBlock = llvm::BasicBlock::Create(*context, "unreachable", currentFunction);
+        builder->SetInsertPoint(unreachableBlock);
+        
+        return nullptr;
+    }
+    // 检查是否是continue语句
+    else if (ctx->Continue()) {
+        std::cout << "处理continue语句" << std::endl;
+        
+        if (loopStack.empty()) {
+            addError("continue语句不在循环内");
+            return nullptr;
+        }
+        
+        // 跳转到循环的继续块（条件检查块）
+        llvm::BasicBlock* condBlock = loopStack.top().first;
+        builder->CreateBr(condBlock);
+        
+        // 创建一个无法到达的基本块，防止后续代码生成
+        llvm::BasicBlock* unreachableBlock = llvm::BasicBlock::Create(*context, "unreachable", currentFunction);
+        builder->SetInsertPoint(unreachableBlock);
+        
         return nullptr;
     }
     

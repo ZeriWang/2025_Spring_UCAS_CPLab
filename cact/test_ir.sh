@@ -75,22 +75,37 @@ run_ir() {
         return 1
     fi
     
+    # 检查是否需要运行时库
+    local runtime_lib="runtime.ll"
+    local final_ir_file="$ir_file"
+    
+    if grep -q "get_int\|get_float\|get_char" "$ir_file" 2>/dev/null; then
+        # 需要链接运行时库
+        if [ -f "$runtime_lib" ]; then
+            local linked_file="${ir_file%.ll}_linked.ll"
+            llvm-link "$ir_file" "$runtime_lib" -o "$linked_file" 2>/dev/null
+            if [ $? -eq 0 ]; then
+                final_ir_file="$linked_file"
+            fi
+        fi
+    fi
+    
     if [ -n "$input_file" ] && [ -f "$input_file" ]; then
         # 有输入文件的情况
-        "$LLI_PATH" "$ir_file" < "$input_file" > "$output_file" 2>/dev/null
+        "$LLI_PATH" "$final_ir_file" < "$input_file" > "$output_file" 2>/dev/null
         local exit_code=$?
         # 检查输出文件是否存在，不关心程序的退出码
         if [ ! -f "$output_file" ]; then
-            echo -e "${RED}IR执行失败: $ir_file (使用输入文件 $input_file)${NC}"
+            echo -e "${RED}IR执行失败: $final_ir_file (使用输入文件 $input_file)${NC}"
             return 1
         fi
     else
         # 没有输入文件的情况
-        "$LLI_PATH" "$ir_file" > "$output_file" 2>/dev/null
+        "$LLI_PATH" "$final_ir_file" > "$output_file" 2>/dev/null
         local exit_code=$?
         # 检查输出文件是否存在，不关心程序的退出码
         if [ ! -f "$output_file" ]; then
-            echo -e "${RED}IR执行失败: $ir_file${NC}"
+            echo -e "${RED}IR执行失败: $final_ir_file${NC}"
             return 1
         fi
     fi

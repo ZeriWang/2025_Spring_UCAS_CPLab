@@ -8,6 +8,7 @@
 #include <vector>
 #include <memory>
 #include <map>
+#include <stack>
 #include <sstream>
 
 // LLVM headers (will be included after LLVM is installed)
@@ -85,6 +86,9 @@ private:
     
     // 全局变量表：变量名 -> GlobalVariable*
     std::map<std::string, llvm::GlobalVariable*> globalVariables;
+    
+    // 循环控制块跟踪（用于break/continue语句）
+    std::stack<std::pair<llvm::BasicBlock*, llvm::BasicBlock*>> loopStack; // (continue_target, break_target)
 #else
     // 变量表：变量名 -> 局部变量名字符串
     std::map<std::string, std::string> variables;
