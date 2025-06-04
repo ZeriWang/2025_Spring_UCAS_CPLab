@@ -2,6 +2,7 @@
 .vscode
 build
 *.ll
+*.actual
 grammar/*
 !gramma/*.g4
 test_results/*
