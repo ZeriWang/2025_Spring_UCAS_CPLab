@@ -12,8 +12,8 @@ NC='\033[0m' # No Color
 
 # 全局变量
 COMPILER_PATH="build/compiler"
-TEST_DIR="test/testcases"
-RESULTS_DIR="test_results"
+TEST_DIR="test/samples_generateIR/test_cases"
+RESULTS_DIR="test/samples_generateIR/test_results"
 LLI_PATH=$(which lli) # 使用 which lli 获取路径
 TOTAL_TESTS=0
 PASSED_TESTS=0
@@ -61,6 +61,8 @@ compile_to_ir() {
     
     # 复制生成的IR文件到目标位置
     cp "$generated_ll_file" "$ir_file"
+    # 删除临时生成的IR文件
+    rm -f "$generated_ll_file"
     return 0
 }
 
@@ -76,7 +78,7 @@ run_ir() {
     fi
     
     # 检查是否需要运行时库
-    local runtime_lib="runtime.ll"
+    local runtime_lib="test/samples_generateIR/runtime_lib/runtime.ll"
     local final_ir_file="$ir_file"
     
     if grep -q "get_int\|get_float\|get_char" "$ir_file" 2>/dev/null; then
