@@ -1,15 +1,15 @@
 #include <stdio.h>
 
 void print_int(int value) {
-    printf("%d\n", value);
+    printf("%d", value);
 }
 
 void print_float(float value) {
-    printf("%f\n", value);
+    printf("%f", value);
 }
 
 void print_char(char value) {
-    printf("%c\n", value);
+    printf("%c", value);
 }
 
 int get_int() {

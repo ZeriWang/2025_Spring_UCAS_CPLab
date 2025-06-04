@@ -773,20 +773,36 @@ antlrcpp::Any IRGenerator::visitLogicalOrExpression(CactParser::LogicalOrExpress
     // 检查是否有逻辑或运算符
     if (ctx->logicalOrExpression() && ctx->logicalAndExpression()) {
         // 这是一个逻辑或操作：logicalOrExpression || logicalAndExpression
+        // 实现短路求值：如果左操作数为真，则不计算右操作数
+        
+        // 创建基本块
+        llvm::Function* currentFunc = builder->GetInsertBlock()->getParent();
+        llvm::BasicBlock* evalRightBB = llvm::BasicBlock::Create(*context, "or.eval_right", currentFunc);
+        llvm::BasicBlock* mergeBB = llvm::BasicBlock::Create(*context, "or.merge", currentFunc);
+        
+        // 计算左操作数
         auto leftResult = visit(ctx->logicalOrExpression());
-        auto rightResult = visit(ctx->logicalAndExpression());
-        
         llvm::Value* left = nullptr;
-        llvm::Value* right = nullptr;
-        
         try {
             left = std::any_cast<llvm::Value*>(leftResult);
         } catch (...) {
-            // 如果不是Value*，尝试作为常量处理
             addError("逻辑或表达式左操作数类型错误");
             left = llvm::ConstantInt::get(getCactType("int"), 0);
         }
         
+        // 记录左操作数计算后的基本块
+        llvm::BasicBlock* leftBB = builder->GetInsertBlock();
+        
+        // 将左操作数转换为布尔值
+        llvm::Value* leftBool = builder->CreateICmpNE(left, llvm::ConstantInt::get(left->getType(), 0));
+        
+        // 如果左操作数为真，直接跳到merge块；否则计算右操作数
+        builder->CreateCondBr(leftBool, mergeBB, evalRightBB);
+        
+        // 计算右操作数的块
+        builder->SetInsertPoint(evalRightBB);
+        auto rightResult = visit(ctx->logicalAndExpression());
+        llvm::Value* right = nullptr;
         try {
             right = std::any_cast<llvm::Value*>(rightResult);
         } catch (...) {
@@ -794,17 +810,21 @@ antlrcpp::Any IRGenerator::visitLogicalOrExpression(CactParser::LogicalOrExpress
             right = llvm::ConstantInt::get(getCactType("int"), 0);
         }
         
-        if (left && right) {
-            // 将操作数转换为布尔值（非零为真，零为假）
-            llvm::Value* leftBool = builder->CreateICmpNE(left, llvm::ConstantInt::get(left->getType(), 0));
-            llvm::Value* rightBool = builder->CreateICmpNE(right, llvm::ConstantInt::get(right->getType(), 0));
-            
-            // 执行逻辑或操作
-            llvm::Value* result = builder->CreateOr(leftBool, rightBool);
-            
-            // 将布尔结果扩展为int类型（0或1）
-            return builder->CreateZExt(result, getCactType("int"));
-        }
+        // 将右操作数转换为布尔值
+        llvm::Value* rightBool = builder->CreateICmpNE(right, llvm::ConstantInt::get(right->getType(), 0));
+        builder->CreateBr(mergeBB);
+        
+        // 记录右操作数计算后的基本块
+        llvm::BasicBlock* rightBB = builder->GetInsertBlock();
+        
+        // 合并块
+        builder->SetInsertPoint(mergeBB);
+        llvm::PHINode* phi = builder->CreatePHI(llvm::Type::getInt1Ty(*context), 2);
+        phi->addIncoming(llvm::ConstantInt::getTrue(*context), leftBB); // 左操作数为真的情况
+        phi->addIncoming(rightBool, rightBB); // 右操作数的结果
+        
+        // 将布尔结果扩展为int类型（0或1）
+        return builder->CreateZExt(phi, getCactType("int"));
     } else if (ctx->logicalAndExpression()) {
         // 只有一个逻辑与表达式，直接访问
         return visit(ctx->logicalAndExpression());
@@ -819,12 +839,16 @@ antlrcpp::Any IRGenerator::visitLogicalAndExpression(CactParser::LogicalAndExpre
     // 检查是否有逻辑与运算符
     if (ctx->logicalAndExpression() && ctx->equalityExpression()) {
         // 这是一个逻辑与操作：logicalAndExpression && equalityExpression
+        // 实现短路求值：如果左操作数为假，则不计算右操作数
+        
+        // 创建基本块
+        llvm::Function* currentFunc = builder->GetInsertBlock()->getParent();
+        llvm::BasicBlock* evalRightBB = llvm::BasicBlock::Create(*context, "and.eval_right", currentFunc);
+        llvm::BasicBlock* mergeBB = llvm::BasicBlock::Create(*context, "and.merge", currentFunc);
+        
+        // 计算左操作数
         auto leftResult = visit(ctx->logicalAndExpression());
-        auto rightResult = visit(ctx->equalityExpression());
-        
         llvm::Value* left = nullptr;
-        llvm::Value* right = nullptr;
-        
         try {
             left = std::any_cast<llvm::Value*>(leftResult);
         } catch (...) {
@@ -832,6 +856,19 @@ antlrcpp::Any IRGenerator::visitLogicalAndExpression(CactParser::LogicalAndExpre
             left = llvm::ConstantInt::get(getCactType("int"), 0);
         }
         
+        // 记录左操作数计算后的基本块
+        llvm::BasicBlock* leftBB = builder->GetInsertBlock();
+        
+        // 将左操作数转换为布尔值
+        llvm::Value* leftBool = builder->CreateICmpNE(left, llvm::ConstantInt::get(left->getType(), 0));
+        
+        // 如果左操作数为假，直接跳到merge块；否则计算右操作数
+        builder->CreateCondBr(leftBool, evalRightBB, mergeBB);
+        
+        // 计算右操作数的块
+        builder->SetInsertPoint(evalRightBB);
+        auto rightResult = visit(ctx->equalityExpression());
+        llvm::Value* right = nullptr;
         try {
             right = std::any_cast<llvm::Value*>(rightResult);
         } catch (...) {
@@ -839,17 +876,21 @@ antlrcpp::Any IRGenerator::visitLogicalAndExpression(CactParser::LogicalAndExpre
             right = llvm::ConstantInt::get(getCactType("int"), 0);
         }
         
-        if (left && right) {
-            // 将操作数转换为布尔值（非零为真，零为假）
-            llvm::Value* leftBool = builder->CreateICmpNE(left, llvm::ConstantInt::get(left->getType(), 0));
-            llvm::Value* rightBool = builder->CreateICmpNE(right, llvm::ConstantInt::get(right->getType(), 0));
-            
-            // 执行逻辑与操作
-            llvm::Value* result = builder->CreateAnd(leftBool, rightBool);
-            
-            // 将布尔结果扩展为int类型（0或1）
-            return builder->CreateZExt(result, getCactType("int"));
-        }
+        // 将右操作数转换为布尔值
+        llvm::Value* rightBool = builder->CreateICmpNE(right, llvm::ConstantInt::get(right->getType(), 0));
+        builder->CreateBr(mergeBB);
+        
+        // 记录右操作数计算后的基本块
+        llvm::BasicBlock* rightBB = builder->GetInsertBlock();
+        
+        // 合并块
+        builder->SetInsertPoint(mergeBB);
+        llvm::PHINode* phi = builder->CreatePHI(llvm::Type::getInt1Ty(*context), 2);
+        phi->addIncoming(llvm::ConstantInt::getFalse(*context), leftBB); // 左操作数为假的情况
+        phi->addIncoming(rightBool, rightBB); // 右操作数的结果
+        
+        // 将布尔结果扩展为int类型（0或1）
+        return builder->CreateZExt(phi, getCactType("int"));
     } else if (ctx->equalityExpression()) {
         // 只有一个相等表达式，直接访问
         return visit(ctx->equalityExpression());
@@ -1149,8 +1190,15 @@ antlrcpp::Any IRGenerator::visitUnaryExpression(CactParser::UnaryExpressionConte
         std::string funcName = ctx->Identifier()->getText();
         std::cout << "访问函数调用: " << funcName << std::endl;
         
-        // 特殊处理内置打印函数，使用printf实现
+        // 特殊处理内置打印函数，直接调用运行时库函数
         if (funcName == "print_int" || funcName == "print_float" || funcName == "print_char") {
+            // 查找运行时库函数
+            llvm::Function* printFunc = module->getFunction(funcName);
+            if (!printFunc) {
+                addError("运行时库函数 " + funcName + " 未找到");
+                return llvm::ConstantInt::get(getCactType("int"), 0);
+            }
+            
             // 收集参数
             std::vector<llvm::Value*> args;
             if (ctx->functionRealParameters() && !ctx->functionRealParameters()->expression().empty()) {
@@ -1168,70 +1216,21 @@ antlrcpp::Any IRGenerator::visitUnaryExpression(CactParser::UnaryExpressionConte
                         argValue = llvm::ConstantInt::get(getCactType("char"), 0);
                     }
                 }
-                
-                // 使用printf实现打印功能
-                llvm::Function* printfFunc = module->getFunction("printf");
-                if (printfFunc) {
-                    std::vector<llvm::Value*> printfArgs;
-                    
-                    if (funcName == "print_int") {
-                        // 获取格式字符串 "%d\n"
-                        auto formatStr = module->getGlobalVariable(".str.int");
-                        if (!formatStr) {
-                            // 如果还没有创建格式字符串，创建一个
-                            llvm::ArrayType* arrayType = llvm::ArrayType::get(llvm::Type::getInt8Ty(*context), 4);
-                            formatStr = new llvm::GlobalVariable(*module, arrayType, true, 
-                                llvm::GlobalValue::PrivateLinkage, 
-                                llvm::ConstantArray::get(arrayType, {
-                                    llvm::ConstantInt::get(llvm::Type::getInt8Ty(*context), '%'),
-                                    llvm::ConstantInt::get(llvm::Type::getInt8Ty(*context), 'd'),
-                                    llvm::ConstantInt::get(llvm::Type::getInt8Ty(*context), '\n'),
-                                    llvm::ConstantInt::get(llvm::Type::getInt8Ty(*context), 0)
-                                }), ".str.int");
-                        }
-                        printfArgs.push_back(builder->CreatePointerCast(formatStr, llvm::PointerType::get(llvm::Type::getInt8Ty(*context), 0)));
-                        printfArgs.push_back(argValue);
-                    } else if (funcName == "print_float") {
-                        auto formatStr = module->getGlobalVariable(".str.float");
-                        if (!formatStr) {
-                            llvm::ArrayType* arrayType = llvm::ArrayType::get(llvm::Type::getInt8Ty(*context), 4);
-                            formatStr = new llvm::GlobalVariable(*module, arrayType, true, 
-                                llvm::GlobalValue::PrivateLinkage, 
-                                llvm::ConstantArray::get(arrayType, {
-                                    llvm::ConstantInt::get(llvm::Type::getInt8Ty(*context), '%'),
-                                    llvm::ConstantInt::get(llvm::Type::getInt8Ty(*context), 'f'),
-                                    llvm::ConstantInt::get(llvm::Type::getInt8Ty(*context), '\n'),
-                                    llvm::ConstantInt::get(llvm::Type::getInt8Ty(*context), 0)
-                                }), ".str.float");
-                        }
-                        printfArgs.push_back(builder->CreatePointerCast(formatStr, llvm::PointerType::get(llvm::Type::getInt8Ty(*context), 0)));
-                        // 将float提升为double给printf
-                        llvm::Value* doubleVal = builder->CreateFPExt(argValue, llvm::Type::getDoubleTy(*context));
-                        printfArgs.push_back(doubleVal);
-                    } else { // print_char
-                        auto formatStr = module->getGlobalVariable(".str.char");
-                        if (!formatStr) {
-                            llvm::ArrayType* arrayType = llvm::ArrayType::get(llvm::Type::getInt8Ty(*context), 4);
-                            formatStr = new llvm::GlobalVariable(*module, arrayType, true, 
-                                llvm::GlobalValue::PrivateLinkage, 
-                                llvm::ConstantArray::get(arrayType, {
-                                    llvm::ConstantInt::get(llvm::Type::getInt8Ty(*context), '%'),
-                                    llvm::ConstantInt::get(llvm::Type::getInt8Ty(*context), 'c'),
-                                    llvm::ConstantInt::get(llvm::Type::getInt8Ty(*context), '\n'),
-                                    llvm::ConstantInt::get(llvm::Type::getInt8Ty(*context), 0)
-                                }), ".str.char");
-                        }
-                        printfArgs.push_back(builder->CreatePointerCast(formatStr, llvm::PointerType::get(llvm::Type::getInt8Ty(*context), 0)));
-                        printfArgs.push_back(argValue);
-                    }
-                    
-                    // 调用printf
-                    llvm::Value* result = builder->CreateCall(printfFunc, printfArgs);
-                    return result;
+                if (argValue) args.push_back(argValue);
+            } else {
+                // 如果没有参数，提供默认值
+                if (funcName == "print_int") {
+                    args.push_back(llvm::ConstantInt::get(getCactType("int"), 0));
+                } else if (funcName == "print_float") {
+                    args.push_back(llvm::ConstantFP::get(getCactType("float"), 0.0));
+                } else { // print_char
+                    args.push_back(llvm::ConstantInt::get(getCactType("char"), 0));
                 }
             }
-            // 如果没有参数或printf不可用，返回0
-            return llvm::ConstantInt::get(getCactType("int"), 0);
+            
+            // 直接调用运行时库函数
+            llvm::Value* result = builder->CreateCall(printFunc, args);
+            return result;
         }
         
         // 查找普通函数
@@ -1283,7 +1282,9 @@ antlrcpp::Any IRGenerator::visitUnaryExpression(CactParser::UnaryExpressionConte
         } else if (ctx->ExclamationMark()) {
             // 逻辑非
             llvm::Value* zero = llvm::ConstantInt::get(operand->getType(), 0);
-            return builder->CreateICmpEQ(operand, zero);
+            llvm::Value* boolResult = builder->CreateICmpEQ(operand, zero);
+            // 将布尔结果转换为整数类型，确保与其他整数类型兼容
+            return builder->CreateZExt(boolResult, getCactType("int"));
         }
     }
     
