@@ -81,7 +81,7 @@ run_ir() {
     local runtime_lib="test/samples_generateIR/runtime_lib/runtime.ll"
     local final_ir_file="$ir_file"
     
-    if grep -q "get_int\|get_float\|get_char" "$ir_file" 2>/dev/null; then
+    if grep -q "get_int\|get_float\|get_char\|print_int\|print_float\|print_char" "$ir_file" 2>/dev/null; then
         # 需要链接运行时库
         if [ -f "$runtime_lib" ]; then
             local linked_file="${ir_file%.ll}_linked.ll"

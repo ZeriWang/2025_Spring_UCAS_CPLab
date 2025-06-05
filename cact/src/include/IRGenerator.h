@@ -21,6 +21,23 @@
 #include "llvm/IR/Type.h"
 #include "llvm/IR/Constants.h"
 #include "llvm/IR/Verifier.h"
+#include "llvm/IR/PassManager.h"
+#include "llvm/Passes/PassBuilder.h"
+#include "llvm/Passes/StandardInstrumentations.h"
+#include "llvm/Analysis/AliasAnalysis.h"
+#include "llvm/Analysis/TargetLibraryInfo.h"
+#include "llvm/Transforms/Scalar.h"
+#include "llvm/Transforms/Utils.h"
+#include "llvm/Transforms/InstCombine/InstCombine.h"
+#include "llvm/Transforms/Scalar/GVN.h"
+#include "llvm/Transforms/Scalar/SCCP.h"
+#include "llvm/Transforms/Scalar/DeadStoreElimination.h"
+#include "llvm/Transforms/Scalar/SimplifyCFG.h"
+#include "llvm/Transforms/Utils/LoopSimplify.h"
+#include "llvm/Transforms/Utils/LCSSA.h"
+#include "llvm/Transforms/Scalar/LICM.h"
+#include "llvm/Transforms/IPO/GlobalOpt.h"
+#include "llvm/Target/TargetMachine.h"
 #endif
 
 // Forward declarations
@@ -39,6 +56,9 @@ public:
     // Output IR to string or file
     std::string getIRString() const;
     bool writeIRToFile(const std::string& filename) const;
+    
+    // Apply LLVM optimizations to the generated IR
+    void optimizeIR();
     
     // Check if there are any IR generation errors
     bool hasErrors() const { return !errors.empty(); }
@@ -74,6 +94,15 @@ private:
     std::unique_ptr<llvm::LLVMContext> context;
     std::unique_ptr<llvm::Module> module;
     std::unique_ptr<llvm::IRBuilder<>> builder;
+    
+    // Optimization passes
+    std::unique_ptr<llvm::FunctionPassManager> FPM;
+    std::unique_ptr<llvm::ModulePassManager> MPM;
+    std::unique_ptr<llvm::PassBuilder> PB;
+    std::unique_ptr<llvm::FunctionAnalysisManager> FAM;
+    std::unique_ptr<llvm::ModuleAnalysisManager> MAM;
+    std::unique_ptr<llvm::LoopAnalysisManager> LAM;
+    std::unique_ptr<llvm::CGSCCAnalysisManager> CGAM;
     
     // Type mapping
     std::map<std::string, llvm::Type*> typeMap;
@@ -141,6 +170,9 @@ private:
     
     // Initialize LLVM components
     void initializeLLVM(const std::string& moduleName);
+    
+    // Initialize optimization passes
+    void initializeOptimizationPasses();
     
     // 全局变量声明处理
     antlrcpp::Any visitGlobalVariableDeclaration(CactParser::VariableDeclarationContext *ctx);

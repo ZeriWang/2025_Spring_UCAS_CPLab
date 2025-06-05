@@ -8,7 +8,7 @@ IRGenerator::IRGenerator()
 #ifdef LLVM_AVAILABLE
     : context(nullptr), module(nullptr), builder(nullptr), currentFunction(nullptr), currentVariables(nullptr)
 #else
-    : currentVariables(nullptr)
+    : currentVariables(nullptr
 #endif
 {
     labelCounter = 0;
@@ -31,6 +31,10 @@ bool IRGenerator::generateIR(antlr4::tree::ParseTree* tree, const std::string& m
     try {
         initializeLLVM(moduleName);
         visit(tree);
+        
+        // 在生成完IR后立即进行优化
+        optimizeIR();
+        
         return !hasErrors();
     } catch (const std::exception& e) {
         addError(std::string("IR生成异常: ") + e.what());
@@ -124,14 +128,22 @@ void IRGenerator::exitScope() {
 #ifdef LLVM_AVAILABLE
 llvm::Value* IRGenerator::findVariable(const std::string& name) {
     // 在作用域栈中从上到下查找局部变量
+    // 使用临时向量来按正确顺序访问作用域（从最内层到最外层）
+    std::vector<std::map<std::string, llvm::Value*>> scopes;
     std::stack<std::map<std::string, llvm::Value*>> tempStack = variableScopes;
+    
+    // 将栈内容复制到向量中（顺序相反）
     while (!tempStack.empty()) {
-        auto& scope = tempStack.top();
-        auto it = scope.find(name);
-        if (it != scope.end()) {
+        scopes.push_back(tempStack.top());
+        tempStack.pop();
+    }
+    
+    // 从最内层作用域开始查找（向量的末尾）
+    for (int i = scopes.size() - 1; i >= 0; i--) {
+        auto it = scopes[i].find(name);
+        if (it != scopes[i].end()) {
             return it->second;
         }
-        tempStack.pop();
     }
     
     // 如果在局部作用域中没找到，查找全局变量
@@ -152,14 +164,22 @@ void IRGenerator::defineVariable(const std::string& name, llvm::Value* value) {
 // 非LLVM版本的findVariable实现
 std::string IRGenerator::findVariable(const std::string& name) {
     // 在作用域栈中从上到下查找局部变量
+    // 使用临时向量来按正确顺序访问作用域（从最内层到最外层）
+    std::vector<std::map<std::string, std::string>> scopes;
     std::stack<std::map<std::string, std::string>> tempStack = variableScopes;
+    
+    // 将栈内容复制到向量中（顺序相反）
     while (!tempStack.empty()) {
-        auto& scope = tempStack.top();
-        auto it = scope.find(name);
-        if (it != scope.end()) {
+        scopes.push_back(tempStack.top());
+        tempStack.pop();
+    }
+    
+    // 从最内层作用域开始查找（向量的末尾）
+    for (int i = scopes.size() - 1; i >= 0; i--) {
+        auto it = scopes[i].find(name);
+        if (it != scopes[i].end()) {
             return it->second;
         }
-        tempStack.pop();
     }
     
     // 如果没找到，返回空字符串
@@ -565,14 +585,25 @@ antlrcpp::Any IRGenerator::visitFunctionFormalParameter(CactParser::FunctionForm
 }
 
 antlrcpp::Any IRGenerator::visitBlock(CactParser::BlockContext *ctx) {
-    // 进入新的作用域
-    enterScope();
+    // 检查是否是函数的顶级块（其父节点是函数定义）
+    bool isFunctionTopLevelBlock = false;
+    if (ctx->parent && dynamic_cast<CactParser::FunctionDefinitionContext*>(ctx->parent)) {
+        isFunctionTopLevelBlock = true;
+    }
+    
+    // 只有非函数顶级块才创建新作用域
+    // 函数顶级块的作用域已经在visitFunctionDefinition中创建
+    if (!isFunctionTopLevelBlock) {
+        enterScope();
+    }
     
     // 处理块中的所有项目
     antlrcpp::Any result = visitChildren(ctx);
     
-    // 退出作用域
-    exitScope();
+    // 只有创建了作用域才退出作用域
+    if (!isFunctionTopLevelBlock) {
+        exitScope();
+    }
     
     return result;
 }
@@ -1721,6 +1752,9 @@ void IRGenerator::initializeLLVM(const std::string& moduleName) {
         *module, formatStrChar->getType(), true, llvm::GlobalValue::PrivateLinkage,
         formatStrChar, ".str.char");
     formatGlobalChar->setAlignment(llvm::MaybeAlign(1));
+    
+    // 初始化优化passes
+    initializeOptimizationPasses();
 }
 
 llvm::Type* IRGenerator::getCactType(const std::string& typeName) {
@@ -1875,24 +1909,6 @@ antlrcpp::Any IRGenerator::visitVariableDeclaration(CactParser::VariableDeclarat
                     llvm::Value* arrayPtr = builder->CreateBitCast(alloca, llvm::PointerType::get(llvm::Type::getInt8Ty(*context), 0));
                     builder->CreateCall(memsetFunc, {arrayPtr, val, size});
                 }
-            } else {
-                // 没有初始化值，清零数组
-                llvm::Value* size = llvm::ConstantInt::get(llvm::Type::getInt64Ty(*context), 
-                    arrayType->getPrimitiveSizeInBits() / 8);
-                llvm::Value* val = llvm::ConstantInt::get(llvm::Type::getInt8Ty(*context), 0);
-                
-                std::vector<llvm::Type*> memsetTypes = {
-                    llvm::PointerType::get(llvm::Type::getInt8Ty(*context), 0),
-                    llvm::Type::getInt32Ty(*context),
-                    llvm::Type::getInt64Ty(*context)
-                };
-                llvm::FunctionType* memsetFuncType = llvm::FunctionType::get(
-                    llvm::Type::getVoidTy(*context), memsetTypes, false);
-                llvm::Function* memsetFunc = llvm::Function::Create(
-                    memsetFuncType, llvm::Function::ExternalLinkage, "llvm.memset.p0i8.i64", module.get());
-                
-                llvm::Value* arrayPtr = builder->CreateBitCast(alloca, llvm::PointerType::get(llvm::Type::getInt8Ty(*context), 0));
-                builder->CreateCall(memsetFunc, {arrayPtr, val, size});
             }
         } else {
             // 处理标量变量
@@ -2052,4 +2068,90 @@ antlrcpp::Any IRGenerator::visitConstantDeclaration(CactParser::ConstantDeclarat
     }
 #endif
     return nullptr;
-} 
+}
+
+void IRGenerator::initializeOptimizationPasses() {
+    // 创建Pass管理器
+    PB = std::make_unique<llvm::PassBuilder>();
+    
+    // 创建分析管理器
+    FAM = std::make_unique<llvm::FunctionAnalysisManager>();
+    MAM = std::make_unique<llvm::ModuleAnalysisManager>();
+    LAM = std::make_unique<llvm::LoopAnalysisManager>();
+    CGAM = std::make_unique<llvm::CGSCCAnalysisManager>();
+    
+    // 注册所有分析passes
+    PB->registerModuleAnalyses(*MAM);
+    PB->registerFunctionAnalyses(*FAM);
+    PB->registerLoopAnalyses(*LAM);
+    PB->registerCGSCCAnalyses(*CGAM);
+    
+    // 交叉注册代理
+    PB->crossRegisterProxies(*LAM, *FAM, *CGAM, *MAM);
+    
+    // 创建Function Pass Manager
+    FPM = std::make_unique<llvm::FunctionPassManager>();
+    
+    // 添加关键的优化passes，特别针对循环和重复计算的优化
+    
+    // 1. 基础优化
+    FPM->addPass(llvm::InstCombinePass());  // 指令合并
+    FPM->addPass(llvm::SimplifyCFGPass());  // 控制流简化
+    
+    // 2. 循环相关优化 - 使用标准的O2级别pipeline
+    // 先创建循环分析所需的prerequisites
+    FPM->addPass(llvm::LoopSimplifyPass());  // 循环简化(LICM的前置条件)
+    FPM->addPass(llvm::LCSSAPass());         // 循环闭合SSA形式
+    
+    // 3. 添加冗余消除优化
+    FPM->addPass(llvm::GVNPass());          // 全局值编号(消除冗余计算)
+    FPM->addPass(llvm::SCCPPass());         // 稀疏条件常数传播
+    FPM->addPass(llvm::DSEPass());          // 死存储消除
+    
+    // 4. 再次进行指令合并和控制流简化
+    FPM->addPass(llvm::InstCombinePass());
+    FPM->addPass(llvm::SimplifyCFGPass());
+    
+    // 创建Module Pass Manager
+    MPM = std::make_unique<llvm::ModulePassManager>();
+    
+    // 添加模块级优化
+    MPM->addPass(llvm::GlobalOptPass());    // 全局优化
+}
+
+void IRGenerator::optimizeIR() {
+    if (!module || !FPM || !MPM) {
+        std::cout << "警告: 无法执行优化，相关组件未初始化" << std::endl;
+        return;
+    }
+    
+    std::cout << "开始LLVM IR优化..." << std::endl;
+    
+    // 首先验证模块
+    std::string verifyError;
+    llvm::raw_string_ostream rso(verifyError);
+    if (llvm::verifyModule(*module, &rso)) {
+        std::cout << "警告: 模块验证失败，跳过优化: " << verifyError << std::endl;
+        return;
+    }
+    
+    try {
+        // 对每个函数运行Function-level优化
+        for (auto &F : *module) {
+            if (!F.isDeclaration()) {
+                std::cout << "优化函数: " << F.getName().str() << std::endl;
+                FPM->run(F, *FAM);
+            }
+        }
+        
+        // 运行模块级优化
+        std::cout << "运行模块级优化..." << std::endl;
+        MPM->run(*module, *MAM);
+        
+        std::cout << "LLVM IR优化完成" << std::endl;
+        
+    } catch (const std::exception& e) {
+        std::cout << "优化过程中发生异常: " << e.what() << std::endl;
+        addError("优化失败: " + std::string(e.what()));
+    }
+}

@@ -19,8 +19,11 @@ if(LLVM_FOUND)
     add_definitions(${LLVM_DEFINITIONS_LIST})
     add_definitions(-DLLVM_AVAILABLE)
     
-    # 获取LLVM库
-    llvm_map_components_to_libnames(llvm_libs support core irreader)
+    # 获取LLVM库 - 添加更多组件以支持优化passes
+    llvm_map_components_to_libnames(llvm_libs 
+        support core irreader 
+        transformutils scalaropts instcombine 
+        vectorize ipo passes analysis target)
 else()
     message(STATUS "LLVM not found, using mock IR generator")
 endif()
