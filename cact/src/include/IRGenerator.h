@@ -82,10 +82,10 @@ private:
     llvm::Function* currentFunction;
     
     // 作用域栈：每个作用域维护一个变量表
-    std::stack<std::map<std::string, llvm::AllocaInst*>> variableScopes;
+    std::stack<std::map<std::string, llvm::Value*>> variableScopes;
     
     // 当前作用域的变量表的引用（指向栈顶）
-    std::map<std::string, llvm::AllocaInst*>* currentVariables;
+    std::map<std::string, llvm::Value*>* currentVariables;
     
     // 全局变量表：变量名 -> GlobalVariable*
     std::map<std::string, llvm::GlobalVariable*> globalVariables;
@@ -125,7 +125,7 @@ private:
     void exitScope();
 #ifdef LLVM_AVAILABLE
     llvm::Value* findVariable(const std::string& name);
-    void defineVariable(const std::string& name, llvm::AllocaInst* alloca);
+    void defineVariable(const std::string& name, llvm::Value* value);
 #else
     std::string findVariable(const std::string& name);
     void defineVariable(const std::string& name, const std::string& localVar);

@@ -101,7 +101,7 @@ void IRGenerator::addError(const std::string& message) {
 void IRGenerator::enterScope() {
 #ifdef LLVM_AVAILABLE
     // 创建新的作用域
-    variableScopes.push(std::map<std::string, llvm::AllocaInst*>());
+    variableScopes.push(std::map<std::string, llvm::Value*>());
     currentVariables = &variableScopes.top();
 #else
     // 创建新的作用域
@@ -124,7 +124,7 @@ void IRGenerator::exitScope() {
 #ifdef LLVM_AVAILABLE
 llvm::Value* IRGenerator::findVariable(const std::string& name) {
     // 在作用域栈中从上到下查找局部变量
-    std::stack<std::map<std::string, llvm::AllocaInst*>> tempStack = variableScopes;
+    std::stack<std::map<std::string, llvm::Value*>> tempStack = variableScopes;
     while (!tempStack.empty()) {
         auto& scope = tempStack.top();
         auto it = scope.find(name);
@@ -143,9 +143,9 @@ llvm::Value* IRGenerator::findVariable(const std::string& name) {
     return nullptr;
 }
 
-void IRGenerator::defineVariable(const std::string& name, llvm::AllocaInst* alloca) {
+void IRGenerator::defineVariable(const std::string& name, llvm::Value* value) {
     if (currentVariables) {
-        (*currentVariables)[name] = alloca;
+        (*currentVariables)[name] = value;
     }
 }
 #else
@@ -438,7 +438,16 @@ antlrcpp::Any IRGenerator::visitFunctionDefinition(CactParser::FunctionDefinitio
         for (auto param : params) {
             std::string paramType = param->basicType()->getText();
             std::string paramName = param->Identifier()->getText();
-            paramTypes.push_back(getCactType(paramType));
+            
+            // 检查是否是数组参数
+            if (!param->LeftBracket().empty()) {
+                // 数组参数使用指针类型
+                llvm::Type* elementType = getCactType(paramType);
+                paramTypes.push_back(llvm::PointerType::get(elementType, 0));
+            } else {
+                // 普通参数使用基本类型
+                paramTypes.push_back(getCactType(paramType));
+            }
             paramNames.push_back(paramName);
         }
     }
@@ -461,10 +470,17 @@ antlrcpp::Any IRGenerator::visitFunctionDefinition(CactParser::FunctionDefinitio
         llvm::Argument* arg = &(*argIter);
         arg->setName(paramNames[i]);
         
-        // 为参数创建alloca
-        llvm::AllocaInst* paramAlloca = builder->CreateAlloca(arg->getType(), nullptr, paramNames[i]);
-        builder->CreateStore(arg, paramAlloca);
-        defineVariable(paramNames[i], paramAlloca);
+        if (arg->getType()->isPointerTy()) {
+            // 对于数组参数（指针类型），直接使用参数本身
+            std::cout << "定义数组参数: " << paramNames[i] << " (指针类型)" << std::endl;
+            defineVariable(paramNames[i], arg);
+        } else {
+            // 对于基本类型参数，创建alloca并存储参数值
+            std::cout << "定义基本类型参数: " << paramNames[i] << std::endl;
+            llvm::AllocaInst* paramAlloca = builder->CreateAlloca(arg->getType(), nullptr, paramNames[i]);
+            builder->CreateStore(arg, paramAlloca);
+            defineVariable(paramNames[i], paramAlloca);
+        }
     }
     
     // 处理函数体
@@ -754,6 +770,12 @@ antlrcpp::Any IRGenerator::visitStatement(CactParser::StatementContext *ctx) {
                     arrayType = allocaInst->getAllocatedType();
                 } else if (auto globalVar = llvm::dyn_cast<llvm::GlobalVariable>(arrayPtr)) {
                     arrayType = globalVar->getValueType();
+                } else if (auto argument = llvm::dyn_cast<llvm::Argument>(arrayPtr)) {
+                    // 对于函数参数，如果是指针类型，我们需要从函数参数推断数组类型
+                    // 这里假设是二维数组，类型为 [1024 x i32] (忽略第一维度)
+                    if (argument->getType()->isPointerTy()) {
+                        arrayType = llvm::ArrayType::get(getCactType("int"), 1024);
+                    }
                 }
             }
             
@@ -761,9 +783,13 @@ antlrcpp::Any IRGenerator::visitStatement(CactParser::StatementContext *ctx) {
                 // 构建GEP指令的索引列表
                 std::vector<llvm::Value*> gepIndices;
                 
-                // 第一个索引总是0（用于访问数组本身）
-                llvm::Value* zero = llvm::ConstantInt::get(getCactType("int"), 0);
-                gepIndices.push_back(zero);
+                // 对于函数参数（指针类型），不需要第一个0索引
+                // 对于局部数组或全局数组，需要第一个0索引
+                if (!llvm::isa<llvm::Argument>(arrayPtr)) {
+                    // 局部数组或全局数组：第一个索引总是0（用于访问数组本身）
+                    llvm::Value* zero = llvm::ConstantInt::get(getCactType("int"), 0);
+                    gepIndices.push_back(zero);
+                }
                 
                 // 添加用户提供的索引
                 for (auto* index : indices) {
@@ -1128,6 +1154,7 @@ antlrcpp::Any IRGenerator::visitLeftValue(CactParser::LeftValueContext *ctx) {
         
         // 查找数组（局部优先，然后全局）
         llvm::Value* arrayPtr = findVariable(varName);
+        std::cout << "查找数组变量: " << varName << ", 找到: " << (arrayPtr ? "是" : "否") << std::endl;
         llvm::Type* arrayType = nullptr;
         
         if (arrayPtr) {
@@ -1135,6 +1162,12 @@ antlrcpp::Any IRGenerator::visitLeftValue(CactParser::LeftValueContext *ctx) {
                 arrayType = allocaInst->getAllocatedType();
             } else if (auto globalVar = llvm::dyn_cast<llvm::GlobalVariable>(arrayPtr)) {
                 arrayType = globalVar->getValueType();
+            } else if (auto argument = llvm::dyn_cast<llvm::Argument>(arrayPtr)) {
+                // 对于函数参数，如果是指针类型，我们需要从函数参数推断数组类型
+                // 这里假设是二维数组，类型为 [1024 x i32] (忽略第一维度)
+                if (argument->getType()->isPointerTy()) {
+                    arrayType = llvm::ArrayType::get(getCactType("int"), 1024);
+                }
             }
         }
         
@@ -1142,9 +1175,13 @@ antlrcpp::Any IRGenerator::visitLeftValue(CactParser::LeftValueContext *ctx) {
             // 构建GEP指令的索引列表
             std::vector<llvm::Value*> gepIndices;
             
-            // 第一个索引总是0（用于访问数组本身）
-            llvm::Value* zero = llvm::ConstantInt::get(getCactType("int"), 0);
-            gepIndices.push_back(zero);
+            // 对于函数参数（指针类型），不需要第一个0索引
+            // 对于局部数组或全局数组，需要第一个0索引
+            if (!llvm::isa<llvm::Argument>(arrayPtr)) {
+                // 局部数组或全局数组：第一个索引总是0（用于访问数组本身）
+                llvm::Value* zero = llvm::ConstantInt::get(getCactType("int"), 0);
+                gepIndices.push_back(zero);
+            }
             
             // 添加用户提供的索引
             for (auto* index : indices) {
@@ -1168,11 +1205,29 @@ antlrcpp::Any IRGenerator::visitLeftValue(CactParser::LeftValueContext *ctx) {
         addError("数组访问失败: " + varName);
         return llvm::ConstantInt::get(getCactType("int"), 0);
     } else {
-        // 普通变量
+        // 普通变量或数组基地址
         llvm::Value* varPtr = findVariable(varName);
         if (varPtr) {
-            llvm::Value* result = builder->CreateLoad(getCactType("int"), varPtr);
-            return result;
+            // 检查是否是全局数组变量
+            if (auto globalVar = llvm::dyn_cast<llvm::GlobalVariable>(varPtr)) {
+                // 如果是全局数组，返回数组的基地址（用于函数参数传递）
+                if (globalVar->getValueType()->isArrayTy()) {
+                    // 对于全局数组，需要使用GEP获取第一个元素的地址
+                    std::vector<llvm::Value*> gepIndices;
+                    gepIndices.push_back(llvm::ConstantInt::get(getCactType("int"), 0));
+                    gepIndices.push_back(llvm::ConstantInt::get(getCactType("int"), 0));
+                    llvm::Value* arrayBasePtr = builder->CreateGEP(globalVar->getValueType(), globalVar, gepIndices);
+                    return arrayBasePtr;
+                } else {
+                    // 普通全局变量，加载值
+                    llvm::Value* result = builder->CreateLoad(getCactType("int"), varPtr);
+                    return result;
+                }
+            } else {
+                // 局部变量或函数参数，加载值
+                llvm::Value* result = builder->CreateLoad(getCactType("int"), varPtr);
+                return result;
+            }
         }
         else {
             addError("未找到变量: " + varName);
