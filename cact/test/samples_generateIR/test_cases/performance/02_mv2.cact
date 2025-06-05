@@ -72,5 +72,6 @@ int main(){
         i = i + 1;
     }
     print_int(res);
+    print_char('\n');
     return 0;
 }

@@ -118,7 +118,7 @@ int main()
 {
   loopCount = get_int();
   int result = func(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1);
-  putint(result);
+  print_int(result);
   print_char('\n');
   return 0;
 }

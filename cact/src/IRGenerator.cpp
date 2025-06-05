@@ -466,14 +466,56 @@ antlrcpp::Any IRGenerator::visitFunctionDefinition(CactParser::FunctionDefinitio
     
     // 为函数参数创建alloca并存储参数值
     auto argIter = currentFunction->arg_begin();
+    auto params = ctx->functionFormalParameters() ? ctx->functionFormalParameters()->functionFormalParameter() : std::vector<CactParser::FunctionFormalParameterContext*>();
+    
     for (size_t i = 0; i < paramNames.size(); ++i, ++argIter) {
         llvm::Argument* arg = &(*argIter);
         arg->setName(paramNames[i]);
         
         if (arg->getType()->isPointerTy()) {
-            // 对于数组参数（指针类型），直接使用参数本身
+            // 对于数组参数（指针类型），直接使用参数本身，并保存数组类型信息
             std::cout << "定义数组参数: " << paramNames[i] << " (指针类型)" << std::endl;
             defineVariable(paramNames[i], arg);
+            
+            // 从函数参数上下文中获取数组维度信息
+            if (i < params.size()) {
+                auto param = params[i];
+                if (!param->LeftBracket().empty()) {
+                    // 解析数组维度
+                    std::vector<int> dimensions;
+                    auto intConstants = param->IntegerConstant();
+                    int bracketPairCount = param->LeftBracket().size();
+                    bool firstDimImplicit = intConstants.size() < bracketPairCount;
+                    
+                    for (int j = 0; j < bracketPairCount; j++) {
+                        int dimension = -1;
+                        if (j == 0 && firstDimImplicit) {
+                            // 第一个维度是隐式的（如 int a[][10]）
+                            dimension = -1;
+                        } else {
+                            // 计算在IntegerConstant列表中的索引
+                            int constantIndex = firstDimImplicit ? j - 1 : j;
+                            if (constantIndex >= 0 && constantIndex < intConstants.size()) {
+                                try {
+                                    dimension = std::stoi(intConstants[constantIndex]->getText());
+                                } catch (...) {
+                                    dimension = 1024; // 默认值
+                                }
+                            }
+                        }
+                        dimensions.push_back(dimension);
+                    }
+                    
+                    // 保存参数的数组类型信息
+                    functionParameterArrayTypes[paramNames[i]] = dimensions;
+                    std::cout << "保存数组参数 " << paramNames[i] << " 的维度信息: ";
+                    for (size_t k = 0; k < dimensions.size(); k++) {
+                        std::cout << dimensions[k];
+                        if (k < dimensions.size() - 1) std::cout << "x";
+                    }
+                    std::cout << std::endl;
+                }
+            }
         } else {
             // 对于基本类型参数，创建alloca并存储参数值
             std::cout << "定义基本类型参数: " << paramNames[i] << std::endl;
@@ -771,10 +813,26 @@ antlrcpp::Any IRGenerator::visitStatement(CactParser::StatementContext *ctx) {
                 } else if (auto globalVar = llvm::dyn_cast<llvm::GlobalVariable>(arrayPtr)) {
                     arrayType = globalVar->getValueType();
                 } else if (auto argument = llvm::dyn_cast<llvm::Argument>(arrayPtr)) {
-                    // 对于函数参数，如果是指针类型，我们需要从函数参数推断数组类型
-                    // 这里假设是二维数组，类型为 [1024 x i32] (忽略第一维度)
+                    // 对于函数参数，如果是指针类型，从保存的维度信息推断数组类型
                     if (argument->getType()->isPointerTy()) {
-                        arrayType = llvm::ArrayType::get(getCactType("int"), 1024);
+                        auto dimIt = functionParameterArrayTypes.find(varName);
+                        if (dimIt != functionParameterArrayTypes.end()) {
+                            std::vector<int> dimensions = dimIt->second;
+                            
+                            // 构建数组类型，从最内层开始
+                            llvm::Type* elementType = getCactType("int");
+                            arrayType = elementType;
+                            
+                            // 从最后一个维度开始构建（跳过第一个隐式维度）
+                            for (int i = dimensions.size() - 1; i >= 1; i--) {
+                                if (dimensions[i] > 0) {
+                                    arrayType = llvm::ArrayType::get(arrayType, dimensions[i]);
+                                }
+                            }
+                        } else {
+                            // 如果没有找到维度信息，使用默认值
+                            arrayType = llvm::ArrayType::get(getCactType("int"), 1024);
+                        }
                     }
                 }
             }
@@ -1163,10 +1221,35 @@ antlrcpp::Any IRGenerator::visitLeftValue(CactParser::LeftValueContext *ctx) {
             } else if (auto globalVar = llvm::dyn_cast<llvm::GlobalVariable>(arrayPtr)) {
                 arrayType = globalVar->getValueType();
             } else if (auto argument = llvm::dyn_cast<llvm::Argument>(arrayPtr)) {
-                // 对于函数参数，如果是指针类型，我们需要从函数参数推断数组类型
-                // 这里假设是二维数组，类型为 [1024 x i32] (忽略第一维度)
+                // 对于函数参数，如果是指针类型，从保存的维度信息推断数组类型
                 if (argument->getType()->isPointerTy()) {
-                    arrayType = llvm::ArrayType::get(getCactType("int"), 1024);
+                    auto dimIt = functionParameterArrayTypes.find(varName);
+                    if (dimIt != functionParameterArrayTypes.end()) {
+                        std::vector<int> dimensions = dimIt->second;
+                        std::cout << "找到函数参数 " << varName << " 的维度信息: ";
+                        for (size_t k = 0; k < dimensions.size(); k++) {
+                            std::cout << dimensions[k];
+                            if (k < dimensions.size() - 1) std::cout << "x";
+                        }
+                        std::cout << std::endl;
+                        
+                        // 构建数组类型，从最内层开始
+                        llvm::Type* elementType = getCactType("int");
+                        arrayType = elementType;
+                        
+                        // 从最后一个维度开始构建（跳过第一个隐式维度）
+                        for (int i = dimensions.size() - 1; i >= 1; i--) {
+                            if (dimensions[i] > 0) {
+                                arrayType = llvm::ArrayType::get(arrayType, dimensions[i]);
+                            }
+                        }
+                        
+                        std::cout << "构建的数组类型: " << varName << std::endl;
+                    } else {
+                        // 如果没有找到维度信息，使用默认值
+                        std::cout << "警告: 未找到函数参数 " << varName << " 的维度信息，使用默认值" << std::endl;
+                        arrayType = llvm::ArrayType::get(getCactType("int"), 1024);
+                    }
                 }
             }
         }

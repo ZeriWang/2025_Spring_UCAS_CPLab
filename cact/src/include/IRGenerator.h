@@ -90,6 +90,9 @@ private:
     // 全局变量表：变量名 -> GlobalVariable*
     std::map<std::string, llvm::GlobalVariable*> globalVariables;
     
+    // 函数参数数组类型信息：参数名 -> 维度列表
+    std::map<std::string, std::vector<int>> functionParameterArrayTypes;
+    
     // 循环控制块跟踪（用于break/continue语句）
     std::stack<std::pair<llvm::BasicBlock*, llvm::BasicBlock*>> loopStack; // (continue_target, break_target)
 #else
