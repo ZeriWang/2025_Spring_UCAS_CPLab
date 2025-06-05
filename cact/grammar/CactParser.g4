@@ -71,7 +71,7 @@ addExpression: multiplicativeExpression | addExpression (Plus | Minus) multiplic
 //  RelExp → AddExp | RelExp ('<' | '>' | '<=' | '>=') AddExp
 relationalExpression: addExpression | relationalExpression (Less | Greater | LessEqual | GreaterEqual) addExpression;
 //  EqExp → RelExp | EqExp ('==' | '!=') RelExp
-equalityExpression: relationalExpression | equalityExpression (LogicalEqual | NotEqual) relationalExpression;
+equalityExpression: relationalExpression | equalityExpression (LogicalEqual | NotEqual) relationalExpression | LeftParenthesis equalityExpression (LogicalEqual | NotEqual) relationalExpression  RightParenthesis;
 //  LAndExp → EqExp | LAndExp '&&' EqExp
 logicalAndExpression: equalityExpression | logicalAndExpression LogicalAnd equalityExpression;
 //  LOrExp → LAndExp | LOrExp '||' LAndExp
