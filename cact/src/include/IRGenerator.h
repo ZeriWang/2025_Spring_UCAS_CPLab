@@ -81,8 +81,11 @@ private:
     // Current function being processed
     llvm::Function* currentFunction;
     
-    // 变量表：变量名 -> AllocaInst*（局部变量）
-    std::map<std::string, llvm::AllocaInst*> variables;
+    // 作用域栈：每个作用域维护一个变量表
+    std::stack<std::map<std::string, llvm::AllocaInst*>> variableScopes;
+    
+    // 当前作用域的变量表的引用（指向栈顶）
+    std::map<std::string, llvm::AllocaInst*>* currentVariables;
     
     // 全局变量表：变量名 -> GlobalVariable*
     std::map<std::string, llvm::GlobalVariable*> globalVariables;
@@ -90,8 +93,11 @@ private:
     // 循环控制块跟踪（用于break/continue语句）
     std::stack<std::pair<llvm::BasicBlock*, llvm::BasicBlock*>> loopStack; // (continue_target, break_target)
 #else
-    // 变量表：变量名 -> 局部变量名字符串
-    std::map<std::string, std::string> variables;
+    // 作用域栈：每个作用域维护一个变量表
+    std::stack<std::map<std::string, std::string>> variableScopes;
+    
+    // 当前作用域的变量表的引用（指向栈顶）
+    std::map<std::string, std::string>* currentVariables;
 #endif
     
     std::vector<std::string> errors;
@@ -113,6 +119,17 @@ private:
     int localVarCounter;
     
     void addError(const std::string& message);
+    
+    // 作用域管理方法
+    void enterScope();
+    void exitScope();
+#ifdef LLVM_AVAILABLE
+    llvm::Value* findVariable(const std::string& name);
+    void defineVariable(const std::string& name, llvm::AllocaInst* alloca);
+#else
+    std::string findVariable(const std::string& name);
+    void defineVariable(const std::string& name, const std::string& localVar);
+#endif
     
 #ifdef LLVM_AVAILABLE
     // Helper methods for LLVM operations

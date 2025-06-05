@@ -6,7 +6,9 @@
 
 IRGenerator::IRGenerator() 
 #ifdef LLVM_AVAILABLE
-    : context(nullptr), module(nullptr), builder(nullptr), currentFunction(nullptr)
+    : context(nullptr), module(nullptr), builder(nullptr), currentFunction(nullptr), currentVariables(nullptr)
+#else
+    : currentVariables(nullptr)
 #endif
 {
     labelCounter = 0;
@@ -94,6 +96,84 @@ void IRGenerator::printErrors() const {
 void IRGenerator::addError(const std::string& message) {
     errors.push_back(message);
 }
+
+// 作用域管理方法实现
+void IRGenerator::enterScope() {
+#ifdef LLVM_AVAILABLE
+    // 创建新的作用域
+    variableScopes.push(std::map<std::string, llvm::AllocaInst*>());
+    currentVariables = &variableScopes.top();
+#else
+    // 创建新的作用域
+    variableScopes.push(std::map<std::string, std::string>());
+    currentVariables = &variableScopes.top();
+#endif
+}
+
+void IRGenerator::exitScope() {
+    if (!variableScopes.empty()) {
+        variableScopes.pop();
+        if (!variableScopes.empty()) {
+            currentVariables = &variableScopes.top();
+        } else {
+            currentVariables = nullptr;
+        }
+    }
+}
+
+#ifdef LLVM_AVAILABLE
+llvm::Value* IRGenerator::findVariable(const std::string& name) {
+    // 在作用域栈中从上到下查找局部变量
+    std::stack<std::map<std::string, llvm::AllocaInst*>> tempStack = variableScopes;
+    while (!tempStack.empty()) {
+        auto& scope = tempStack.top();
+        auto it = scope.find(name);
+        if (it != scope.end()) {
+            return it->second;
+        }
+        tempStack.pop();
+    }
+    
+    // 如果在局部作用域中没找到，查找全局变量
+    auto globalIt = globalVariables.find(name);
+    if (globalIt != globalVariables.end()) {
+        return globalIt->second;
+    }
+    
+    return nullptr;
+}
+
+void IRGenerator::defineVariable(const std::string& name, llvm::AllocaInst* alloca) {
+    if (currentVariables) {
+        (*currentVariables)[name] = alloca;
+    }
+}
+#else
+// 非LLVM版本的findVariable实现
+std::string IRGenerator::findVariable(const std::string& name) {
+    // 在作用域栈中从上到下查找局部变量
+    std::stack<std::map<std::string, std::string>> tempStack = variableScopes;
+    while (!tempStack.empty()) {
+        auto& scope = tempStack.top();
+        auto it = scope.find(name);
+        if (it != scope.end()) {
+            return it->second;
+        }
+        tempStack.pop();
+    }
+    
+    // 如果没找到，返回空字符串
+    return "";
+}
+
+void IRGenerator::defineVariable(const std::string& name, const std::string& localVar) {
+    if (currentVariables) {
+        (*currentVariables)[name] = localVar;
+    }
+}
+#endif
+
+
 
 // Visit方法实现
 antlrcpp::Any IRGenerator::visitCompilationUnit(CactParser::CompilationUnitContext *ctx) {
@@ -372,8 +452,8 @@ antlrcpp::Any IRGenerator::visitFunctionDefinition(CactParser::FunctionDefinitio
     llvm::BasicBlock* entryBlock = llvm::BasicBlock::Create(*context, "entry", currentFunction);
     builder->SetInsertPoint(entryBlock);
     
-    // 清空变量表
-    variables.clear();
+    // 进入函数作用域
+    enterScope();
     
     // 为函数参数创建alloca并存储参数值
     auto argIter = currentFunction->arg_begin();
@@ -384,11 +464,14 @@ antlrcpp::Any IRGenerator::visitFunctionDefinition(CactParser::FunctionDefinitio
         // 为参数创建alloca
         llvm::AllocaInst* paramAlloca = builder->CreateAlloca(arg->getType(), nullptr, paramNames[i]);
         builder->CreateStore(arg, paramAlloca);
-        variables[paramNames[i]] = paramAlloca;
+        defineVariable(paramNames[i], paramAlloca);
     }
     
     // 处理函数体
     visit(ctx->block());
+    
+    // 退出函数作用域
+    exitScope();
     
     // 检查当前基本块是否需要terminator
     if (!builder->GetInsertBlock()->getTerminator()) {
@@ -424,7 +507,16 @@ antlrcpp::Any IRGenerator::visitFunctionFormalParameter(CactParser::FunctionForm
 }
 
 antlrcpp::Any IRGenerator::visitBlock(CactParser::BlockContext *ctx) {
-    return visitChildren(ctx);
+    // 进入新的作用域
+    enterScope();
+    
+    // 处理块中的所有项目
+    antlrcpp::Any result = visitChildren(ctx);
+    
+    // 退出作用域
+    exitScope();
+    
+    return result;
 }
 
 antlrcpp::Any IRGenerator::visitDeclaration(CactParser::DeclarationContext *ctx) {
@@ -654,17 +746,13 @@ antlrcpp::Any IRGenerator::visitStatement(CactParser::StatementContext *ctx) {
             }
             
             // 查找数组（局部优先，然后全局）
-            llvm::Value* arrayPtr = nullptr;
+            llvm::Value* arrayPtr = findVariable(varName);
             llvm::Type* arrayType = nullptr;
             
-            if (variables.find(varName) != variables.end()) {
-                arrayPtr = variables[varName]; // 局部数组
+            if (arrayPtr) {
                 if (auto allocaInst = llvm::dyn_cast<llvm::AllocaInst>(arrayPtr)) {
                     arrayType = allocaInst->getAllocatedType();
-                }
-            } else if (globalVariables.find(varName) != globalVariables.end()) {
-                arrayPtr = globalVariables[varName]; // 全局数组
-                if (auto globalVar = llvm::dyn_cast<llvm::GlobalVariable>(arrayPtr)) {
+                } else if (auto globalVar = llvm::dyn_cast<llvm::GlobalVariable>(arrayPtr)) {
                     arrayType = globalVar->getValueType();
                 }
             }
@@ -687,11 +775,7 @@ antlrcpp::Any IRGenerator::visitStatement(CactParser::StatementContext *ctx) {
             }
         } else {
             // 简单变量赋值
-            if (variables.find(varName) != variables.end()) {
-                targetPtr = variables[varName];
-            } else if (globalVariables.find(varName) != globalVariables.end()) {
-                targetPtr = globalVariables[varName];
-            }
+            targetPtr = findVariable(varName);
         }
         
         if (!targetPtr) { 
@@ -1043,17 +1127,13 @@ antlrcpp::Any IRGenerator::visitLeftValue(CactParser::LeftValueContext *ctx) {
         }
         
         // 查找数组（局部优先，然后全局）
-        llvm::Value* arrayPtr = nullptr;
+        llvm::Value* arrayPtr = findVariable(varName);
         llvm::Type* arrayType = nullptr;
         
-        if (variables.find(varName) != variables.end()) {
-            arrayPtr = variables[varName]; // 局部数组
+        if (arrayPtr) {
             if (auto allocaInst = llvm::dyn_cast<llvm::AllocaInst>(arrayPtr)) {
                 arrayType = allocaInst->getAllocatedType();
-            }
-        } else if (globalVariables.find(varName) != globalVariables.end()) {
-            arrayPtr = globalVariables[varName]; // 全局数组
-            if (auto globalVar = llvm::dyn_cast<llvm::GlobalVariable>(arrayPtr)) {
+            } else if (auto globalVar = llvm::dyn_cast<llvm::GlobalVariable>(arrayPtr)) {
                 arrayType = globalVar->getValueType();
             }
         }
@@ -1089,16 +1169,9 @@ antlrcpp::Any IRGenerator::visitLeftValue(CactParser::LeftValueContext *ctx) {
         return llvm::ConstantInt::get(getCactType("int"), 0);
     } else {
         // 普通变量
-        // 先查找局部变量
-        if (variables.find(varName) != variables.end()) {
-            llvm::AllocaInst* alloca = variables[varName];
-            llvm::Value* result = builder->CreateLoad(getCactType("int"), alloca);
-            return result;
-        }
-        // 再查找全局变量
-        else if (globalVariables.find(varName) != globalVariables.end()) {
-            llvm::GlobalVariable* globalVar = globalVariables[varName];
-            llvm::Value* result = builder->CreateLoad(getCactType("int"), globalVar);
+        llvm::Value* varPtr = findVariable(varName);
+        if (varPtr) {
+            llvm::Value* result = builder->CreateLoad(getCactType("int"), varPtr);
             return result;
         }
         else {
@@ -1397,10 +1470,13 @@ void IRGenerator::emitPrintIntCall(const std::vector<std::string>& args) {
         std::string argValue = args[0];
         
         // 检查参数是否是变量名（需要load）
-        if (variables.find(argValue) != variables.end()) {
+        llvm::Value* varValue = findVariable(argValue);
+        if (varValue) {
             // 这是一个变量，需要先load
             std::string loadReg = getNextRegister();
-            emitLoad(variables[argValue]->getName().str(), loadReg);
+            if (auto allocaInst = llvm::cast<llvm::AllocaInst>(varValue)) {
+                emitLoad(allocaInst->getName().str(), loadReg);
+            }
             std::string callReg = getNextRegister();
             irOutput << "  " << callReg << " = call i32 (ptr, ...) @printf(ptr noundef @.str.int, i32 noundef " << loadReg << ")\n";
         } else {
@@ -1563,7 +1639,7 @@ antlrcpp::Any IRGenerator::visitVariableDeclaration(CactParser::VariableDeclarat
             }
             
             llvm::AllocaInst* alloca = builder->CreateAlloca(arrayType, nullptr, varName);
-            variables[varName] = alloca;
+            defineVariable(varName, alloca);
             
             // 初始化数组
             if (varDef->constantInitializationValue()) {
@@ -1683,7 +1759,7 @@ antlrcpp::Any IRGenerator::visitVariableDeclaration(CactParser::VariableDeclarat
         } else {
             // 处理标量变量
             llvm::AllocaInst* alloca = builder->CreateAlloca(elementType, nullptr, varName);
-            variables[varName] = alloca;
+            defineVariable(varName, alloca);
             // 初始化
             if (varDef->constantInitializationValue()) {
                 auto initResult = visit(varDef->constantInitializationValue());
@@ -1710,7 +1786,9 @@ antlrcpp::Any IRGenerator::visitVariableDeclaration(CactParser::VariableDeclarat
         std::cout << "声明变量: " << varName << std::endl;
         std::string localVar = getNextLocalVar();
         irOutput << "  " << localVar << " = alloca i32, align 4\n";
-        variables[varName] = localVar;
+        if (currentVariables) {
+            (*currentVariables)[varName] = localVar;
+        }
         
         if (varDef->constantInitializationValue()) {
             auto initResult = visit(varDef->constantInitializationValue());
@@ -1792,7 +1870,7 @@ antlrcpp::Any IRGenerator::visitConstantDeclaration(CactParser::ConstantDeclarat
         
         // 对于常量，我们仍然创建一个alloca，但标记为const（在变量表中区分）
         llvm::AllocaInst* alloca = builder->CreateAlloca(llvmType, nullptr, constName);
-        variables[constName] = alloca;
+        defineVariable(constName, alloca);
         
         // 初始化常量值
         if (constDef->constantInitializationValue()) {
@@ -1818,7 +1896,9 @@ antlrcpp::Any IRGenerator::visitConstantDeclaration(CactParser::ConstantDeclarat
         std::cout << "声明常量: " << constName << std::endl;
         std::string localVar = getNextLocalVar();
         irOutput << "  " << localVar << " = alloca i32, align 4\n";
-        variables[constName] = localVar;
+        if (currentVariables) {
+            (*currentVariables)[constName] = localVar;
+        }
         
         if (constDef->constantInitializationValue()) {
             auto initResult = visit(constDef->constantInitializationValue());

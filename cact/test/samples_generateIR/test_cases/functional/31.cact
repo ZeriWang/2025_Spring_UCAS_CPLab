@@ -22,5 +22,6 @@ int main() {
     }
     print_int(k);
   }
+  print_char('\n');
   return k;
 }
