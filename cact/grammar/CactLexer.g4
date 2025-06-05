@@ -63,10 +63,21 @@ IntegerConstant: ('0' | [1-9][0-9]* | '0'[0-7]+ | '0'[xX][0-9a-fA-F]+);
 CharacterConstant: '\'' ( EscapeSequence | ~['\\] ) '\'';
 fragment EscapeSequence: '\\' ['"?\\abfnrtv0];
 // FloatConst
-FloatConstant: ([-]?       '.'[0-9]+                  |
-                [-]?[0-9]+ '.'[0-9]*                  |
-                [-]?       '.'[0-9]+  [eE][+-]?[0-9]+ |
-                [-]?[0-9]+('.'[0-9]*)?[eE][+-]?[0-9]+  )[fF]?;
+fragment FloatConstantSuffix: [fFlL];
+fragment Digit: [0-9];
+fragment DigitSequence: Digit+;
+fragment HexDigit: [0-9a-fA-F];
+fragment HexDigitSequence: HexDigit+;
+fragment FractionalConstant: DigitSequence? '.' DigitSequence | DigitSequence '.' ;
+fragment HexFractionalConstant: HexDigitSequence? '.' HexDigitSequence | HexDigitSequence '.' ;
+fragment ExponentPart: [eE] [+-]? DigitSequence;
+fragment BinaryExponentPart: [pP] [+-]? DigitSequence;
+
+// Float constants - order matters! Put more specific rules first
+FloatConstant: ('0'[xX] HexFractionalConstant BinaryExponentPart FloatConstantSuffix?)
+             | ('0'[xX] HexDigitSequence BinaryExponentPart FloatConstantSuffix?)
+             | (FractionalConstant ExponentPart? FloatConstantSuffix?)
+             | (DigitSequence ExponentPart FloatConstantSuffix?);
 
 // Comments and white spaces
 LineComment: '//' ~[\r\n]* -> skip;

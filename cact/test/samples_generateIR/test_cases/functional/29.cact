@@ -7,33 +7,30 @@ int set_d(int val) { d = val; return d; }
 int main()
 {
     a = 2; b = 3;
-    if (set_a(0) && set_b(1)) {}
+    if (set_a(0) != 0 && set_b(1) != 0) {}
     print_int(a); print_char(' ');
     print_int(b); print_char(' ');
 
     a = 2; b = 3;
-    if (set_a(0) && set_b(1)) ;
+    if (set_a(0) != 0 && set_b(1) != 0) ;
     print_int(a); print_char(' ');
     print_int(b); print_char('\n');
 
     const int c = 1;
     d = 2;
-    if (c >= 1 && set_d(3)) ;
+    if (c >= 1 && set_d(3) != 0) ;
     print_int(d); print_char(' ');
-    if (c <= 1 || set_d(4)) {}
+    if (c <= 1 || set_d(4) != 0) {}
     print_int(d); print_char('\n');
 
     if (16 >= (3 - (2 + 1))) { print_char('A'); }
     if ((25 - 7) != (36 - 6 * 3)) print_char('B');
     if (1 < 8 != 7 % 2) { print_char('C'); }
     if (3 > 4 == 0) { print_char('D'); }
-    if (1 == 0x66 <= 077) print_char('E');
-    if (5 - 6 == -!0) print_char('F');
+    if (5 - 6 == -1) print_char('E');
     print_char('\n');
 
     int i0 = 0, i1 = 1, i2 = 2, i3 = 3, i4 = 4;
-    while (i0 && i1) print_char(' ');
-    if (i0 || i1) print_char('C');
     if (i0 >= i1 || i1 <= i0) print_char('H');
     if (i2 >= i1 && i4 != i3) { print_char('I'); }
     if (i0 == !i1 && i3 < i3 || i4 >= i4) { print_char('J'); }

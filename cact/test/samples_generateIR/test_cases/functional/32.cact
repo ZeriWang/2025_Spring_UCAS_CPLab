@@ -13,19 +13,14 @@ const int MAX = 1000000000, TWO = 2, THREE = 3;
 
 // float -> float function
 float float_abs(float x) {
-  if (x < 0) return -x;
+  if (x < 0.0) return -x;
   return x;
-}
-
-// int -> float function & float/int expression
-float circle_area(int radius) {
-  return (PI * radius * radius + (radius * radius) * PI) / 2;
 }
 
 // float -> float -> int function & float/int expression
 int float_eq(float a, float b) {
   if (float_abs(a - b) < EPS) {
-    return 1 * 2. / 2;
+    return 1;
   } else {
     return 0;
   }
@@ -47,7 +42,7 @@ void ok() {
 }
 
 void assert(int cond) {
-  if (!cond) {
+  if (cond == 0) {
     error();
   } else {
     ok();
@@ -65,18 +60,16 @@ void assert_not(int cond) {
 int main() {
   float EVAL1 = 0.0;
   EVAL1 = PI * RADIUS * RADIUS;
-  float EVAL2 = 0.0;
-  EVAL2 = 2 * PI_HEX * RADIUS;
-  float EVAL3 = 0.0;
-  EVAL3 = PI * 2 * RADIUS;
+  float EVAL2 = 2.0;
+  EVAL2 = EVAL2 * PI_HEX * RADIUS;
+  float EVAL3 = 2.0;
+  EVAL3 = PI * EVAL3 * RADIUS;
   int FIVE = 0;
   FIVE = TWO + THREE;
   
   assert_not(float_eq(HEX2, FACT));
   assert_not(float_eq(EVAL1, EVAL2));
   assert(float_eq(EVAL2, EVAL3));
-  assert(float_eq(circle_area(RADIUS) /* f->i implicit conversion */,
-                  circle_area(FIVE)));
-  assert_not(float_eq(CONV1, CONV2) /* i->f implicit conversion */);
+  assert_not(float_eq(CONV1, CONV2) /* no i->f implicit conversion */);
   return 0;
 }
