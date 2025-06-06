@@ -132,16 +132,30 @@ llvm::Value* IRGenerator::findVariable(const std::string& name) {
     std::vector<std::map<std::string, llvm::Value*>> scopes;
     std::stack<std::map<std::string, llvm::Value*>> tempStack = variableScopes;
     
+    std::cout << "查找变量 " << name << "，当前作用域栈大小: " << variableScopes.size() << std::endl;
+    
     // 将栈内容复制到向量中（顺序相反）
     while (!tempStack.empty()) {
         scopes.push_back(tempStack.top());
         tempStack.pop();
     }
     
-    // 从最内层作用域开始查找（向量的末尾）
-    for (int i = scopes.size() - 1; i >= 0; i--) {
+    std::cout << "复制后向量大小: " << scopes.size() << std::endl;
+    
+    // 打印每个作用域的内容
+    for (size_t i = 0; i < scopes.size(); i++) {
+        std::cout << "作用域 " << i << " (层级 " << (scopes.size() - i) << ") 包含变量: ";
+        for (const auto& pair : scopes[i]) {
+            std::cout << pair.first << "->" << pair.second->getName().str() << " ";
+        }
+        std::cout << std::endl;
+    }
+    
+    // 从最内层作用域开始查找（向量的开头，索引0是最内层）
+    for (int i = 0; i < scopes.size(); i++) {
         auto it = scopes[i].find(name);
         if (it != scopes[i].end()) {
+            std::cout << "查找变量 " << name << " 在作用域层级 " << (scopes.size() - i) << " (索引 " << i << ") 找到: " << it->second->getName().str() << std::endl;
             return it->second;
         }
     }
@@ -149,15 +163,18 @@ llvm::Value* IRGenerator::findVariable(const std::string& name) {
     // 如果在局部作用域中没找到，查找全局变量
     auto globalIt = globalVariables.find(name);
     if (globalIt != globalVariables.end()) {
+        std::cout << "查找变量 " << name << " 在全局作用域找到: " << globalIt->second->getName().str() << std::endl;
         return globalIt->second;
     }
     
+    std::cout << "查找变量 " << name << " 未找到" << std::endl;
     return nullptr;
 }
 
 void IRGenerator::defineVariable(const std::string& name, llvm::Value* value) {
     if (currentVariables) {
         (*currentVariables)[name] = value;
+        std::cout << "定义变量: " << name << " -> " << value->getName().str() << " (在作用域层级 " << variableScopes.size() << ")" << std::endl;
     }
 }
 #else
@@ -1320,8 +1337,10 @@ antlrcpp::Any IRGenerator::visitLeftValue(CactParser::LeftValueContext *ctx) {
         return llvm::ConstantInt::get(getCactType("int"), 0);
     } else {
         // 普通变量或数组基地址
+        std::cout << "查找普通变量: " << varName << std::endl;
         llvm::Value* varPtr = findVariable(varName);
         if (varPtr) {
+            std::cout << "找到变量 " << varName << " -> " << varPtr->getName().str() << std::endl;
             // 检查是否是全局数组变量
             if (auto globalVar = llvm::dyn_cast<llvm::GlobalVariable>(varPtr)) {
                 // 如果是全局数组，返回数组的基地址（用于函数参数传递）
