@@ -574,7 +574,19 @@ antlrcpp::Any IRGenerator::visitFunctionDefinition(CactParser::FunctionDefinitio
         if (retType->isVoidTy()) {
             builder->CreateRetVoid();
         } else {
-            builder->CreateRet(llvm::ConstantInt::get(retType, 0));
+            // 根据返回类型创建相应的默认返回值
+            llvm::Value* defaultValue = nullptr;
+            if (retType->isIntegerTy()) {
+                defaultValue = llvm::ConstantInt::get(retType, 0);
+            } else if (retType->isFloatTy()) {
+                defaultValue = llvm::ConstantFP::get(retType, 0.0);
+            } else if (retType->isDoubleTy()) {
+                defaultValue = llvm::ConstantFP::get(retType, 0.0);
+            } else {
+                // 对于其他类型，使用null常量
+                defaultValue = llvm::Constant::getNullValue(retType);
+            }
+            builder->CreateRet(defaultValue);
         }
     }
     
@@ -1143,12 +1155,28 @@ antlrcpp::Any IRGenerator::visitEqualityExpression(CactParser::EqualityExpressio
         
         if (left && right) {
             llvm::Value* result = nullptr;
-            if (ctx->LogicalEqual()) {
-                // == 运算符
-                result = builder->CreateICmpEQ(left, right);
-            } else if (ctx->NotEqual()) {
-                // != 运算符
-                result = builder->CreateICmpNE(left, right);
+            
+            // 检查操作数类型，决定使用整数比较还是浮点比较
+            bool isFloatComparison = left->getType()->isFloatingPointTy() || right->getType()->isFloatingPointTy();
+            
+            if (isFloatComparison) {
+                // 浮点数比较
+                if (ctx->LogicalEqual()) {
+                    // == 运算符
+                    result = builder->CreateFCmpOEQ(left, right);
+                } else if (ctx->NotEqual()) {
+                    // != 运算符
+                    result = builder->CreateFCmpONE(left, right);
+                }
+            } else {
+                // 整数比较
+                if (ctx->LogicalEqual()) {
+                    // == 运算符
+                    result = builder->CreateICmpEQ(left, right);
+                } else if (ctx->NotEqual()) {
+                    // != 运算符
+                    result = builder->CreateICmpNE(left, right);
+                }
             }
             
             if (result) {
@@ -1204,14 +1232,32 @@ antlrcpp::Any IRGenerator::visitRelationalExpression(CactParser::RelationalExpre
         
         if (left && right) {
             llvm::Value* result = nullptr;
-            if (ctx->Less()) {
-                result = builder->CreateICmpSLT(left, right);
-            } else if (ctx->Greater()) {
-                result = builder->CreateICmpSGT(left, right);
-            } else if (ctx->LessEqual()) {
-                result = builder->CreateICmpSLE(left, right);
-            } else if (ctx->GreaterEqual()) {
-                result = builder->CreateICmpSGE(left, right);
+            
+            // 检查操作数类型，决定使用整数比较还是浮点比较
+            bool isFloatComparison = left->getType()->isFloatingPointTy() || right->getType()->isFloatingPointTy();
+            
+            if (isFloatComparison) {
+                // 浮点数比较
+                if (ctx->Less()) {
+                    result = builder->CreateFCmpOLT(left, right);
+                } else if (ctx->Greater()) {
+                    result = builder->CreateFCmpOGT(left, right);
+                } else if (ctx->LessEqual()) {
+                    result = builder->CreateFCmpOLE(left, right);
+                } else if (ctx->GreaterEqual()) {
+                    result = builder->CreateFCmpOGE(left, right);
+                }
+            } else {
+                // 整数比较
+                if (ctx->Less()) {
+                    result = builder->CreateICmpSLT(left, right);
+                } else if (ctx->Greater()) {
+                    result = builder->CreateICmpSGT(left, right);
+                } else if (ctx->LessEqual()) {
+                    result = builder->CreateICmpSLE(left, right);
+                } else if (ctx->GreaterEqual()) {
+                    result = builder->CreateICmpSGE(left, right);
+                }
             }
             
             if (result) {
@@ -1353,12 +1399,25 @@ antlrcpp::Any IRGenerator::visitLeftValue(CactParser::LeftValueContext *ctx) {
                     return arrayBasePtr;
                 } else {
                     // 普通全局变量，加载值
-                    llvm::Value* result = builder->CreateLoad(getCactType("int"), varPtr);
+                    // 确定变量的实际类型
+                    llvm::Type* varType = globalVar->getValueType();
+                    llvm::Value* result = builder->CreateLoad(varType, varPtr);
                     return result;
                 }
             } else {
                 // 局部变量或函数参数，加载值
-                llvm::Value* result = builder->CreateLoad(getCactType("int"), varPtr);
+                // 确定变量的实际类型
+                llvm::Type* varType = nullptr;
+                if (auto allocaInst = llvm::dyn_cast<llvm::AllocaInst>(varPtr)) {
+                    varType = allocaInst->getAllocatedType();
+                } else if (auto argument = llvm::dyn_cast<llvm::Argument>(varPtr)) {
+                    // 对于函数参数，直接返回参数值（已经是正确类型）
+                    return varPtr;
+                } else {
+                    // 其他情况，默认为int类型
+                    varType = getCactType("int");
+                }
+                llvm::Value* result = builder->CreateLoad(varType, varPtr);
                 return result;
             }
         }
@@ -1394,10 +1453,23 @@ antlrcpp::Any IRGenerator::visitAddExpression(CactParser::AddExpressionContext *
         }
         
         if (left && right) {
-            if (ctx->Plus()) {
-                return builder->CreateAdd(left, right);
-            } else if (ctx->Minus()) {
-                return builder->CreateSub(left, right);
+            // 检查操作数类型，决定使用整数运算还是浮点运算
+            bool isFloatOperation = left->getType()->isFloatingPointTy() || right->getType()->isFloatingPointTy();
+            
+            if (isFloatOperation) {
+                // 浮点数运算
+                if (ctx->Plus()) {
+                    return builder->CreateFAdd(left, right);
+                } else if (ctx->Minus()) {
+                    return builder->CreateFSub(left, right);
+                }
+            } else {
+                // 整数运算
+                if (ctx->Plus()) {
+                    return builder->CreateAdd(left, right);
+                } else if (ctx->Minus()) {
+                    return builder->CreateSub(left, right);
+                }
             }
         }
     } else if (ctx->multiplicativeExpression()) {
@@ -1431,12 +1503,29 @@ antlrcpp::Any IRGenerator::visitMultiplicativeExpression(CactParser::Multiplicat
         }
         
         if (left && right) {
-            if (ctx->Asterisk()) {
-                return builder->CreateMul(left, right);
-            } else if (ctx->Slash()) {
-                return builder->CreateSDiv(left, right);
-            } else if (ctx->Percent()) {
-                return builder->CreateSRem(left, right);
+            // 检查操作数类型，决定使用整数运算还是浮点运算
+            bool isFloatOperation = left->getType()->isFloatingPointTy() || right->getType()->isFloatingPointTy();
+            
+            if (isFloatOperation) {
+                // 浮点数运算
+                if (ctx->Asterisk()) {
+                    return builder->CreateFMul(left, right);
+                } else if (ctx->Slash()) {
+                    return builder->CreateFDiv(left, right);
+                } else if (ctx->Percent()) {
+                    // 浮点数不支持取余运算
+                    addError("Modulo operator '%' cannot be applied to floating-point operands");
+                    return llvm::ConstantFP::get(getCactType("float"), 0.0);
+                }
+            } else {
+                // 整数运算
+                if (ctx->Asterisk()) {
+                    return builder->CreateMul(left, right);
+                } else if (ctx->Slash()) {
+                    return builder->CreateSDiv(left, right);
+                } else if (ctx->Percent()) {
+                    return builder->CreateSRem(left, right);
+                }
             }
         }
     } else if (ctx->unaryExpression()) {
@@ -1539,7 +1628,12 @@ antlrcpp::Any IRGenerator::visitUnaryExpression(CactParser::UnaryExpressionConte
         if (ctx->Plus()) {
             return operand; // +a = a
         } else if (ctx->Minus()) {
-            return builder->CreateNeg(operand); // -a
+            // 检查操作数类型，决定使用整数取反还是浮点取反
+            if (operand->getType()->isFloatingPointTy()) {
+                return builder->CreateFNeg(operand); // 浮点数取反
+            } else {
+                return builder->CreateNeg(operand); // 整数取反
+            }
         } else if (ctx->ExclamationMark()) {
             // 逻辑非
             llvm::Value* zero = llvm::ConstantInt::get(operand->getType(), 0);
