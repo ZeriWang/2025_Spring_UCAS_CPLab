@@ -10,8 +10,8 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 CACT_DIR="$SCRIPT_DIR"
 COMPILER="$CACT_DIR/build/compiler"
 TEST_DIR="$CACT_DIR/test/samples_generateIR/functional"
-OUTPUT_DIR="$(dirname "$CACT_DIR")/out"  # 修正：输出目录在项目根目录下
-RUNTIME_LIB="$CACT_DIR/libcact/lib.c"
+OUTPUT_DIR="$(dirname "$CACT_DIR")/cact/out"  # 修正：输出目录在项目根目录下
+RUNTIME_LIB="$CACT_DIR/libcact/libcact.a"  # 修正：运行时库路径
 
 # RISC-V交叉编译器和模拟器配置
 RISCV_GCC="riscv64-unknown-elf-gcc"

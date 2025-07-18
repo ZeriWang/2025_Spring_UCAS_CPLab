@@ -1123,7 +1123,7 @@ void SemanticAnalysis::exitUnary(CACTParser::UnaryContext *ctx)
         VarInfo *child_info = sym_table.lookup(child_name);
         auto tmp_offset_str = sym_table.get_fp_offset(tmp_info);
         auto child_offset_str = sym_table.get_fp_offset(child_info);
-        ir.addIMC("t2", OP::LOAD, child_offset_str, VOID, CLASS_BOOLEAN);
+        ir.addIMC("t2", OP::LOAD, child_offset_str, VOID, child_info->cls);
         ir.addIMC("t2", OP::NOT, "t2", VOID, CLASS_BOOLEAN);
         ir.addIMC("t2", OP::STORE, tmp_offset_str, VOID, CLASS_BOOLEAN);
     }
@@ -1449,9 +1449,7 @@ void SemanticAnalysis::exitLOrExp(CACTParser::LOrExpContext *ctx)
         VarInfo *op1_info = sym_table.lookup(op1);
         VarInfo *op2_info = sym_table.lookup(op2);
 
-        if (op1_info->cls != op2_info->cls) {
-            throw std::runtime_error("line " + std::to_string(ctx->getStart()->getLine()) + ": error: wrong type to ||\n");
-        }
+        // 检查操作数是否为数组（数组不能用于逻辑操作）
         if (op1_info->type == TYPE_ARRAY || op1_info->type == TYPE_CONST_ARRAY ||
             op2_info->type == TYPE_ARRAY || op2_info->type == TYPE_CONST_ARRAY) {
             throw std::runtime_error("line " + std::to_string(ctx->getStart()->getLine()) + ": error: invalid operands to ||\n");
