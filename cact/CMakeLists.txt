@@ -1,47 +1,36 @@
-cmake_minimum_required(VERSION 3.10)
+cmake_minimum_required(VERSION 3.15)
 
-project(Compiler LANGUAGES C CXX)
+project(Compiler LANGUAGES CXX)
 
+# Set C++ standard
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(THREADS_PREFER_PTHREAD_FLAG ON)
 
-# 尝试查找LLVM
-find_package(LLVM QUIET)
-
-if(LLVM_FOUND)
-    message(STATUS "Found LLVM ${LLVM_PACKAGE_VERSION}")
-    message(STATUS "Using LLVMConfig.cmake in: ${LLVM_DIR}")
-    
-    # 添加LLVM头文件路径
-    include_directories(${LLVM_INCLUDE_DIRS})
-    separate_arguments(LLVM_DEFINITIONS_LIST UNIX_COMMAND "${LLVM_DEFINITIONS}")
-    add_definitions(${LLVM_DEFINITIONS_LIST})
-    add_definitions(-DLLVM_AVAILABLE)
-    
-    # 获取LLVM库 - 添加更多组件以支持优化passes
-    llvm_map_components_to_libnames(llvm_libs 
-        support core irreader 
-        transformutils scalaropts instcombine 
-        vectorize ipo passes analysis target)
-else()
-    message(STATUS "LLVM not found, using mock IR generator")
+# For macOS, ensure we use the system compiler
+if(APPLE)
+    set(CMAKE_CXX_COMPILER clang++)
 endif()
 
-include_directories(deps/antlr4-runtime/)
+include_directories(deps/antlr4-runtime)
 include_directories(grammar)
 include_directories(src)
 
-FILE(GLOB_RECURSE SOURCE_FILES "src/*.cpp" "grammar/*.cpp")
-FILE(GLOB_RECURSE ANTLR_LIB_FILES "deps/antlr4-runtime/*.cpp")
+# Comment out link_directories and link_libraries since we're using source files
+# link_directories("dependencies/antlr4-runtime/lib")
+# link_libraries(antlr4-runtime)
 
-add_definitions(-w -g)
-add_library(antlr STATIC ${ANTLR_LIB_FILES})
-add_executable(compiler ${SOURCE_FILES})
-find_package(Threads REQUIRED)
+FILE(GLOB_RECURSE SOURCE_FILES 
+    "src/*.cpp" 
+    "grammar/*.cpp" 
+    "deps/antlr4-runtime/*.cpp"
+)
 
-if(LLVM_FOUND)
-    target_link_libraries(compiler antlr Threads::Threads ${llvm_libs})
+# Add debug symbols and suppress warnings for macOS
+add_definitions(-g)
+if(APPLE)
+    add_definitions(-Wno-everything)
 else()
-    target_link_libraries(compiler antlr Threads::Threads)
+    add_definitions(-w)
 endif()
+
+add_executable(compiler ${SOURCE_FILES})

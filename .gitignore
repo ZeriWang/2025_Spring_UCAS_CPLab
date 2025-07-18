@@ -1,0 +1,7 @@
+.DS_Store
+.vscode
+cact/build
+cact/*.ll
+cact/*.actual
+cact/grammar/*
+!cact/grammar/*.g4
