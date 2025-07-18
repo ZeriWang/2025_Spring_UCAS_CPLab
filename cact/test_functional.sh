@@ -11,7 +11,7 @@ CACT_DIR="$SCRIPT_DIR"
 COMPILER="$CACT_DIR/build/compiler"
 TEST_DIR="$CACT_DIR/test/samples_generateIR/functional"
 OUTPUT_DIR="$(dirname "$CACT_DIR")/out"  # 修正：输出目录在项目根目录下
-RUNTIME_LIB="$CACT_DIR/libcact/libcact.a"
+RUNTIME_LIB="$CACT_DIR/libcact/lib.c"
 
 # RISC-V交叉编译器和模拟器配置
 RISCV_GCC="riscv64-unknown-elf-gcc"

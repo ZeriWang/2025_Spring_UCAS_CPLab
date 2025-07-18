@@ -411,6 +411,12 @@ void SemanticAnalysis::enterDefVal(CACTParser::DefValContext *ctx)
     else
         throw std::runtime_error("line " + std::to_string(ctx->getStart()->getLine()) + ": error: unknown type name '" + class_str + "'\n");
     sym_table.addSymbol(var_name, var_cls, TYPE_VAR, 0, ctx->getStart()->getLine());
+    
+    // 为未初始化的全局变量生成IR代码
+    VarInfo *var_info = sym_table.lookup(var_name);
+    if (var_info->global) {
+        ir.addIMC(var_name, OP::GLOBAL_ASSIGN, "0", "uninited", var_cls);
+    }
 }
 void SemanticAnalysis::exitDefVal(CACTParser::DefValContext *ctx) {}
 

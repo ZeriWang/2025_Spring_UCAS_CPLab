@@ -4,6 +4,22 @@
 	.attribute unaligned_access, 0
 	.attribute stack_align, 16
 	
+	.globl   a
+	.bss
+	.align   2
+	.type    a, @object
+	.size    a, 4
+a:
+	.zero    4
+	
+	.globl   b
+	.bss
+	.align   2
+	.type    b, @object
+	.size    b, 4
+b:
+	.zero    4
+	
 	.text
 	.align   1
 	.globl   main
