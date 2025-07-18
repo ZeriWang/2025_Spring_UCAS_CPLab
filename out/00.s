@@ -17,6 +17,11 @@ main:
 	li    t2, 3
 	sw    t2, -20(s0)
 	lw    a0, -20(s0)
+	sw    a0, -24(s0)
+	lw    a0, -24(s0)
+	call  print_int
+	nop
+	lw    a0, -20(s0)
 	j     func_end0
 func_end0:
 	ld    ra, 24(sp)

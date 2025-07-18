@@ -22,11 +22,11 @@ arr:
 	.globl   main
 	.type    main, @function
 main:
-#frame size: 48
-	addi  sp, sp, -48
-	sd    ra, 40(sp)
-	sd    s0, 32(sp)
-	addi  s0, sp, 48
+#frame size: 64
+	addi  sp, sp, -64
+	sd    ra, 56(sp)
+	sd    s0, 48(sp)
+	addi  s0, sp, 64
 	li    t2, 0
 	sw    t2, -20(s0)
 	li    t2, 0
@@ -65,10 +65,15 @@ label1:
 	j     label1
 label2:
 	lw    a0, -24(s0)
+	sw    a0, -52(s0)
+	lw    a0, -52(s0)
+	call  print_int
+	nop
+	lw    a0, -24(s0)
 	j     func_end0
 func_end0:
-	ld    ra, 40(sp)
-	ld    s0, 32(sp)
-	addi  sp, sp, 48
+	ld    ra, 56(sp)
+	ld    s0, 48(sp)
+	addi  sp, sp, 64
 	jr    ra
 	.size    main,  .-main

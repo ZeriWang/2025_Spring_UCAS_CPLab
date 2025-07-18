@@ -108,6 +108,11 @@ main:
 	nop
 	sw    a0, -20(s0)
 	lw    a0, -20(s0)
+	sw    a0, -24(s0)
+	lw    a0, -24(s0)
+	call  print_int
+	nop
+	lw    a0, -20(s0)
 	j     func_end1
 func_end1:
 	ld    ra, 24(sp)

@@ -9,14 +9,14 @@
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 CACT_DIR="$SCRIPT_DIR"
 COMPILER="$CACT_DIR/build/compiler"
-TEST_DIR="$CACT_DIR/test/samples_generateIR/test_cases/functional"
+TEST_DIR="$CACT_DIR/test/samples_generateIR/functional"
 OUTPUT_DIR="$(dirname "$CACT_DIR")/out"  # 修正：输出目录在项目根目录下
 RUNTIME_LIB="$CACT_DIR/libcact/libcact.a"
 
 # RISC-V交叉编译器和模拟器配置
 RISCV_GCC="riscv64-unknown-elf-gcc"
 SPIKE="/opt/homebrew/bin/spike"
-PK="/opt/homebrew/riscv64-unknown-elf/bin/pk"
+PK="pk"  # pk 是 spike 的内置功能
 
 # 颜色定义
 RED='\033[0;31m'
@@ -57,13 +57,6 @@ if ! command -v "$SPIKE" &> /dev/null; then
     SPIKE=""
 fi
 
-# 检查pk (proxy kernel)
-if [ ! -f "$PK" ]; then
-    echo -e "${YELLOW}警告: RISC-V proxy kernel不存在: $PK${NC}"
-    echo "将尝试查找系统中的pk"
-    PK=$(which pk 2>/dev/null || echo "")
-fi
-
 # 创建输出目录
 mkdir -p "$OUTPUT_DIR"
 
@@ -91,7 +84,6 @@ run_test() {
     local input_file="${test_file%.cact}.in"
     local asm_output="$OUTPUT_DIR/${test_name}.s"
     local exe_output="$OUTPUT_DIR/${test_name}"
-    local actual_output="$OUTPUT_DIR/${test_name}.actual"
     
     echo -n "测试 $test_name ... "
     
@@ -130,47 +122,30 @@ run_test() {
         fi
         
         # 第三步：使用Spike模拟器运行可执行文件
-        # 由于缺少pk (proxy kernel)，暂时跳过运行测试
-        echo -e "${GREEN}LINK_OK${NC} (RISC-V链接成功，跳过运行测试)"
-        ((PASSED_TESTS++))
-        
-        # 注释掉的运行测试代码，等有pk时可以启用
-        # if [ -n "$SPIKE" ]; then
-        #     local run_success=false
-        #     if [ -n "$PK" ]; then
-        #         if [ -f "$input_file" ]; then
-        #             if timeout 10s "$SPIKE" "$PK" "$exe_output" < "$input_file" > "$actual_output" 2>&1; then
-        #                 run_success=true
-        #             fi
-        #         else
-        #             if timeout 10s "$SPIKE" "$PK" "$exe_output" > "$actual_output" 2>&1; then
-        #                 run_success=true
-        #             fi
-        #         fi
-        #     fi
-        #     
-        #     if [ "$run_success" = false ]; then
-        #         echo -e "${RED}RUNTIME_FAIL${NC} (Spike运行失败)"
-        #         ((FAILED_TESTS++))
-        #         return
-        #     fi
-        #     
-        #     # 第四步：比较输出
-        #     if diff -q "$expected_output_file" "$actual_output" > /dev/null 2>&1; then
-        #         echo -e "${GREEN}PASS${NC}"
-        #         ((PASSED_TESTS++))
-        #     else
-        #         echo -e "${RED}OUTPUT_DIFF${NC}"
-        #         ((FAILED_TESTS++))
-        #         echo "    预期输出:"
-        #         cat "$expected_output_file" | head -3 | sed 's/^/      /'
-        #         echo "    实际输出:"
-        #         cat "$actual_output" | head -3 | sed 's/^/      /'
-        #     fi
-        # else
-        #     echo -e "${GREEN}LINK_OK${NC} (RISC-V链接成功，无Spike模拟器)"
-        #     ((PASSED_TESTS++))
-        # fi
+        if [ -n "$SPIKE" ]; then
+            local spike_output
+            if [ -f "$input_file" ]; then
+                spike_output=$("$SPIKE" "$PK" "$exe_output" < "$input_file" 2>&1 | grep -v "^bbl loader")
+            else
+                spike_output=$("$SPIKE" "$PK" "$exe_output" 2>&1 | grep -v "^bbl loader")
+            fi
+            
+            # 直接比较输出，无需判断spike的返回值
+            if diff -q "$expected_output_file" <(echo "$spike_output") > /dev/null 2>&1; then
+                echo -e "${GREEN}PASS${NC}"
+                ((PASSED_TESTS++))
+            else
+                echo -e "${RED}OUTPUT_DIFF${NC}"
+                ((FAILED_TESTS++))
+                echo "    预期输出:"
+                cat "$expected_output_file" | head -3 | sed 's/^/      /'
+                echo "    实际输出:"
+                echo "$spike_output" | head -3 | sed 's/^/      /'
+            fi
+        else
+            echo -e "${GREEN}LINK_OK${NC} (RISC-V链接成功，无Spike模拟器)"
+            ((PASSED_TESTS++))
+        fi
     else
         # 没有RISC-V编译器或运行时库，只测试编译
         echo -e "${GREEN}COMPILE_OK${NC} (仅编译测试)"

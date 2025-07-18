@@ -67,6 +67,11 @@ label2:
 	rem   t2, t0, t1
 	sw    t2, -68(s0)
 	lw    a0, -68(s0)
+	sw    a0, -72(s0)
+	lw    a0, -72(s0)
+	call  print_int
+	nop
+	lw    a0, -68(s0)
 	j     func_end0
 func_end0:
 	ld    ra, 72(sp)

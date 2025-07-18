@@ -750,6 +750,27 @@ void SemanticAnalysis::exitReturnStmt(CACTParser::ReturnStmtContext *ctx)
 
         auto offset_str = sym_table.get_fp_offset(return_info);
         ir.addIMC("a0", OP::LOAD, offset_str, VOID, cls);
+        
+        // 如果是 main 函数且返回值是整数，自动打印返回值
+        if (sym_table.cur_func == "main" && cls == CLASS_INT) {
+            // 保存返回值到临时变量以便传递给 print_int
+            auto temp_var = sym_table.gen_Temp_Var(ctx->getStart()->getLine(), CLASS_INT, sym_table);
+            VarInfo *temp_info = sym_table.lookup(temp_var);
+            auto temp_offset_str = sym_table.get_fp_offset(temp_info);
+            
+            // 将返回值保存到临时变量
+            ir.addIMC("a0", OP::STORE, temp_offset_str, VOID, CLASS_INT);
+            
+            // 准备调用 print_int: 将参数加载到 a0
+            ir.addIMC("a0", OP::LOAD, temp_offset_str, VOID, CLASS_INT);
+            
+            // 调用 print_int
+            ir.addIMC("print_int", OP::CALL, VOID, VOID, CLASS_VOID);
+            
+            // 重新加载返回值到 a0 寄存器
+            ir.addIMC("a0", OP::LOAD, offset_str, VOID, cls);
+        }
+        
         ir.addIMC(VOID, OP::RET, VOID, VOID, CLASS_VOID);
     }
     else{

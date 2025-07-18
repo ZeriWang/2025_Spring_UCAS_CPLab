@@ -9,11 +9,11 @@
 	.globl   main
 	.type    main, @function
 main:
-#frame size: 96
-	addi  sp, sp, -96
-	sd    ra, 88(sp)
-	sd    s0, 80(sp)
-	addi  s0, sp, 96
+#frame size: 112
+	addi  sp, sp, -112
+	sd    ra, 104(sp)
+	sd    s0, 96(sp)
+	addi  s0, sp, 112
 	li    t2, 3389
 	sw    t2, -20(s0)
 	lw    t2, -20(s0)
@@ -105,10 +105,16 @@ label1:
 	nop
 	lui   t5, %hi(k)
 	lw    a0, %lo(k)(t5)
+	sw    a0, -100(s0)
+	lw    a0, -100(s0)
+	call  print_int
+	nop
+	lui   t5, %hi(k)
+	lw    a0, %lo(k)(t5)
 	j     func_end0
 func_end0:
-	ld    ra, 88(sp)
-	ld    s0, 80(sp)
-	addi  sp, sp, 96
+	ld    ra, 104(sp)
+	ld    s0, 96(sp)
+	addi  sp, sp, 112
 	jr    ra
 	.size    main,  .-main

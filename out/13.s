@@ -30,6 +30,11 @@ main:
 	mul   t2, t0, t1
 	sw    t2, -24(s0)
 	lw    a0, -24(s0)
+	sw    a0, -28(s0)
+	lw    a0, -28(s0)
+	call  print_int
+	nop
+	lw    a0, -24(s0)
 	j     func_end0
 func_end0:
 	ld    ra, 24(sp)

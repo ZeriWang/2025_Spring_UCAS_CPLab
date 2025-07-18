@@ -161,6 +161,11 @@ label1:
 	call  print_char
 	nop
 	lw    a0, -20(s0)
+	sw    a0, -96(s0)
+	lw    a0, -96(s0)
+	call  print_int
+	nop
+	lw    a0, -20(s0)
 	j     func_end0
 func_end0:
 	ld    ra, 88(sp)
