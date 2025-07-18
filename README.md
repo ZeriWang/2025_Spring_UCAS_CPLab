@@ -7,7 +7,7 @@
 ```bash
 cd cact/grammar
 java -jar ../deps/antlr-4.13.1-complete.jar -Dlanguage=Cpp \
-    CactLexer.g4 CactParser.g4 -visitor -no-listener
+    CACT.g4 -visitor -listener
 ```
 
 2. 使用 `CMake` 构建项目
@@ -21,18 +21,33 @@ make -j4 # -j4表示使用4个线程进行编译
 
 等待编译完成。
 
-3. 构建运行时库
+3. 运行功能测试
 
 ```bash
-cd ../test/samples_generateIR/runtime_lib
-clang -emit-llvm -S runtime.c -o runtime.ll
+cd ..
+./test_functional.sh
 ```
 
-4. 运行测试
+功能测试脚本会：
 
-```bash
-cd ../../..
-./test_ir.sh
-```
+- 编译所有 `test/samples_generateIR/functional/` 目录下的 `.cact` 测试文件
+- 生成RISC-V汇编代码
+- 使用RISC-V交叉编译器链接运行时库
+- 使用Spike模拟器运行测试并验证输出
 
-测试脚本会自动链接运行时库，并执行所有测试用例。
+## 依赖工具
+
+### 必需工具
+
+- Java 8+ (用于运行ANTLR)
+- CMake 3.10+
+- C++编译器 (支持C++17)
+- RISC-V交叉编译器: `riscv64-unknown-elf-gcc`
+- Spike RISC-V模拟器: `spike`
+
+如果缺少RISC-V工具链，测试脚本会自动降级为仅编译测试。
+
+## 测试说明
+
+- `./test_functional.sh` - 运行所有功能测试
+- 测试结果会显示为 PASS/FAIL/COMPILE_FAIL 等状态
